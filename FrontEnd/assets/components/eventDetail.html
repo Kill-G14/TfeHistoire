@@ -1,0 +1,132 @@
+<template id="eventDetailTemplate">
+  <div class="eventDetail" id="eventDetailOverlay">
+    <div class="eventDetail-content">
+      <div class="position-relative">
+        <img
+          src=""
+          alt=""
+          class="w-100 eventDetail-image rounded-top"
+          id="detailImage"
+        />
+        <button
+          type="button"
+          class="btn btn-light position-absolute top-0 end-0 m-3"
+          id="closeDetailBtn"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <span
+          class="badge bg-primary position-absolute bottom-0 start-0 m-3 fs-6 px-3 py-2"
+          id="detailCategory"
+        ></span>
+      </div>
+
+      <div class="p-4 p-md-5">
+        <div class="mb-4">
+          <h2 class="text-primary fw-semibold mb-2" id="detailTitle"></h2>
+          <p class="text-muted" id="detailDescription"></p>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="eventDetail-info-box d-flex align-items-center gap-3">
+              <i class="bi bi-geo-alt fs-4 text-accent"></i>
+              <div>
+                <div class="small text-muted">Lieu</div>
+                <div class="fw-medium" id="detailLocation"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="eventDetail-info-box d-flex align-items-center gap-3">
+              <i class="bi bi-calendar3 fs-4 text-accent"></i>
+              <div>
+                <div class="small text-muted">Date</div>
+                <div class="fw-medium" id="detailDate"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="eventDetail-info-box d-flex align-items-center gap-3">
+              <i class="bi bi-clock fs-4 text-accent"></i>
+              <div>
+                <div class="small text-muted">Heure</div>
+                <div class="fw-medium" id="detailTime"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="eventDetail-info-box d-flex align-items-center gap-3">
+              <i class="bi bi-people fs-4 text-accent"></i>
+              <div>
+                <div class="small text-muted">Tickets disponibles</div>
+                <div class="fw-medium" id="detailTickets"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-top pt-4">
+          <h3 class="fs-5 fw-semibold text-primary mb-3">
+            Réserver des tickets
+          </h3>
+
+          <div class="eventDetail-reservation">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="text-muted">Prix par ticket</span>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-currency-euro fs-4 text-primary"></i>
+                <span class="fs-3 fw-bold text-primary" id="detailPrice"></span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="text-muted">Quantité</span>
+              <div class="d-flex align-items-center gap-3">
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  id="decreaseQty"
+                >
+                  -
+                </button>
+                <span
+                  class="fw-medium"
+                  style="min-width: 3rem; text-align: center"
+                  id="quantity"
+                  >1</span
+                >
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  id="increaseQty"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="d-flex align-items-center justify-content-between pt-3 mb-4 border-top"
+            >
+              <span class="fs-5 fw-semibold">Total</span>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-currency-euro fs-3 text-primary"></i>
+                <span class="fs-2 fw-bold text-primary" id="totalPrice"></span>
+              </div>
+            </div>
+
+            <button
+              class="btn btn-primary w-100 py-3 d-flex align-items-center justify-content-center gap-2"
+              id="reserveBtn"
+            >
+              <i class="bi bi-ticket-perforated"></i>
+              Réserver maintenant
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
