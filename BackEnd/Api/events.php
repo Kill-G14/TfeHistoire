@@ -15,19 +15,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Autoload Composer
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Services\EventService;
-use App\Services\AuthService;
+// Repositories
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+
+// Validators
+use App\Validators\EventValidator;
+use App\Validators\UserValidator;
+
+// Services
+use App\Services\AuthService;
+use App\Services\EventService;
+
+// Utils
 use App\Utils\Logger;
 
-try {
-  // Instanciation des dépendances
-  $eventRepository = new EventRepository();
-  $eventService = new EventService($eventRepository);
-  $userRepository = new UserRepository();
-  $authService = new AuthService($userRepository);
+// Repositories
+$eventRepository = new EventRepository();
+$userRepository = new UserRepository();
 
+// Validators
+$eventValidator = new EventValidator();
+$userValidator = new UserValidator();
+
+// Services
+$authService = new AuthService($userRepository, $userValidator);
+$eventService = new EventService($eventRepository, $eventValidator);
+
+try {
   // Récupération des données JSON
   $input = file_get_contents('php://input');
   $data = json_decode($input, true);

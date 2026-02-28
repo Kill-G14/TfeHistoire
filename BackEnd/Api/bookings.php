@@ -15,21 +15,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Autoload Composer
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Services\BookingService;
-use App\Services\AuthService;
+// Repositories
 use App\Repositories\BookingRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+
+// Validators
+use App\Validators\BookingValidator;
+use App\Validators\UserValidator;
+
+// Services
+use App\Services\AuthService;
+use App\Services\BookingService;
+
+// Utils
 use App\Utils\Logger;
 
-try {
-  // Instanciation des dépendances
-  $bookingRepository = new BookingRepository();
-  $eventRepository = new EventRepository();
-  $bookingService = new BookingService($bookingRepository, $eventRepository);
-  $userRepository = new UserRepository();
-  $authService = new AuthService($userRepository);
+// Repositories
+$bookingRepository = new BookingRepository();
+$eventRepository = new EventRepository();
+$userRepository = new UserRepository();
 
+// Validators
+$bookingValidator = new BookingValidator();
+$userValidator = new UserValidator();
+
+// Services
+$authService = new AuthService($userRepository, $userValidator);
+$bookingService = new BookingService($bookingRepository, $eventRepository, $bookingValidator);
+
+try {
   // Vérifier l'authentification
   $headers = getallheaders();
   $token = $headers['Authorization'] ?? null;

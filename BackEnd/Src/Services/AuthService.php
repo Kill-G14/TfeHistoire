@@ -10,15 +10,17 @@ use App\Utils\Logger;
 
 class AuthService {
   private UserRepository $userRepository;
+  private UserValidator $userValidator;
 
-  public function __construct(UserRepository $userRepository) {
+  public function __construct(UserRepository $userRepository, UserValidator $userValidator) {
     $this->userRepository = $userRepository;
+    $this->userValidator = $userValidator;
   }
 
   // Inscription
   public function register(array $data): array {
     // Validation
-    $errors = UserValidator::validateRegister($data);
+    $errors = $this->userValidator->validateRegister($data);
     if (!empty($errors)) {
       return [
         'success' => false,
@@ -80,7 +82,7 @@ class AuthService {
   // Connexion
   public function login(array $data): array {
     // Validation
-    $errors = UserValidator::validateLogin($data);
+    $errors = $this->userValidator->validateLogin($data);
     if (!empty($errors)) {
       return [
         'success' => false,

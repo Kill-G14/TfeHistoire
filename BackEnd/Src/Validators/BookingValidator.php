@@ -4,7 +4,7 @@ namespace App\Validators;
 
 class BookingValidator {
   // Valider les données de réservation
-  public static function validate(array $data): array {
+  public function validate(array $data): array {
     $errors = [];
 
     // Event ID

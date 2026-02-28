@@ -6,7 +6,7 @@ use App\Utils\Helpers;
 
 class UserValidator {
   // Valider les données d'inscription
-  public static function validateRegister(array $data): array {
+  public function validateRegister(array $data): array {
     $errors = [];
 
     // Email
@@ -34,7 +34,7 @@ class UserValidator {
   }
 
   // Valider les données de connexion
-  public static function validateLogin(array $data): array {
+  public function validateLogin(array $data): array {
     $errors = [];
 
     // Email
@@ -53,7 +53,7 @@ class UserValidator {
   }
 
   // Valider les données de mise à jour
-  public static function validateUpdate(array $data): array {
+  public function validateUpdate(array $data): array {
     $errors = [];
 
     // Name

@@ -6,7 +6,7 @@ use App\Utils\Helpers;
 
 class EventValidator {
   // Valider les données de création d'événement
-  public static function validate(array $data): array {
+  public function validate(array $data): array {
     $errors = [];
 
     // Title

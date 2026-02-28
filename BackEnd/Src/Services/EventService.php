@@ -10,9 +10,11 @@ use App\Utils\Logger;
 
 class EventService {
   private EventRepository $eventRepository;
+  private EventValidator $eventValidator;
 
-  public function __construct(EventRepository $eventRepository) {
+  public function __construct(EventRepository $eventRepository, EventValidator $eventValidator) {
     $this->eventRepository = $eventRepository;
+    $this->eventValidator = $eventValidator;
   }
 
   // Récupérer tous les événements
@@ -91,7 +93,7 @@ class EventService {
   // Créer un événement
   public function createEvent(array $data, int $userId): array {
     // Validation
-    $errors = EventValidator::validate($data);
+    $errors = $this->eventValidator->validate($data);
     if (!empty($errors)) {
       return [
         'success' => false,
@@ -160,7 +162,7 @@ class EventService {
     }
 
     // Validation
-    $errors = EventValidator::validate($data);
+    $errors = $this->eventValidator->validate($data);
     if (!empty($errors)) {
       return [
         'success' => false,

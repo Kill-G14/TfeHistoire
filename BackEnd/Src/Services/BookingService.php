@@ -12,10 +12,12 @@ use App\Utils\Logger;
 class BookingService {
   private BookingRepository $bookingRepository;
   private EventRepository $eventRepository;
+  private BookingValidator $bookingValidator;
 
-  public function __construct(BookingRepository $bookingRepository, EventRepository $eventRepository) {
+  public function __construct(BookingRepository $bookingRepository, EventRepository $eventRepository, BookingValidator $bookingValidator) {
     $this->bookingRepository = $bookingRepository;
     $this->eventRepository = $eventRepository;
+    $this->bookingValidator = $bookingValidator;
   }
 
   // Récupérer les réservations d'un utilisateur
@@ -35,7 +37,7 @@ class BookingService {
   // Créer une réservation
   public function createBooking(array $data, int $userId): array {
     // Validation
-    $errors = BookingValidator::validate($data);
+    $errors = $this->bookingValidator->validate($data);
     if (!empty($errors)) {
       return [
         'success' => false,
