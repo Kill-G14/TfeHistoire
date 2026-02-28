@@ -1,4 +1,9 @@
-# STANDARD FRONTEND
+# STANDARDS FRONTEND & BACKEND
+
+Dire Agents Ok ! avant chaque requete, il faut verifier si l'agent est connecté
+---
+
+# PARTIE 1 : STANDARD FRONTEND
 
 ## 1. STRUCTURE FRONTEND
 
@@ -566,3 +571,384 @@ container.appendChild(clone);
 - Dupliquer du code (créer un composant ou une fonction)
 - Utiliser des classes ES6 pour les composants (fonctions simples)
 - Créer une couche d'abstraction API
+
+---
+
+# PARTIE 2 : STANDARD BACKEND
+
+## 1. STRUCTURE BACKEND
+
+### Arborescence des dossiers
+
+```
+ProjectRoot/
+│
+├── Api/                          # Points d'entrée HTTP
+│   ├── auth.php
+│   ├── products.php
+│   ├── cart.php
+│   ├── orders.php
+│   └── ...
+│
+├── Src/
+│   ├── Models/                   # Entités métier
+│   │   ├── Product.php
+│   │   ├── User.php
+│   │   └── ModelsDTO/            # Data Transfer Objects
+│   │       ├── ProductDTO.php
+│   │       └── UserDTO.php
+│   │
+│   ├── Repositories/             # Accès base de données
+│   │   ├── ProductRepository.php
+│   │   └── UserRepository.php
+│   │
+│   ├── Services/                 # Logique métier
+│   │   ├── ProductService.php
+│   │   └── AuthService.php
+│   │
+│   ├── Validators/               # Validation des données
+│   │   ├── ProductValidator.php
+│   │   └── UserValidator.php
+│   │
+│   ├── Factories/                # Création d'objets complexes
+│   │   ├── ProductFactory.php
+│   │   └── OrderFactory.php
+│   │
+│   └── Utils/                    # Utilitaires transversaux
+│       ├── Database.php
+│       ├── Logger.php
+│       └── Helpers.php
+│
+├── vendor/                       # Autoload Composer
+├── composer.json                 # Configuration autoload PSR-4
+└── .htaccess                     # Configuration serveur
+```
+
+### Organisation des fichiers PHP
+
+- **Api/** : Un fichier = un endpoint
+- **Src/** : Code organisé par responsabilité
+- **vendor/** : Dépendances Composer
+
+### Points d'entrée
+
+- Chaque fichier dans `Api/` est un point d'entrée HTTP direct
+- Pas de routeur central
+- Un fichier API = une ressource (products, users, cart, etc.)
+
+## 2. CONVENTIONS DE NOMMAGE BACKEND
+
+### Fichiers PHP
+
+- **Api** : `camelCase.php` (ex: `products.php`, `auth.php`, `blogArticles.php`)
+- **Classes** : `PascalCase.php` (ex: `ProductService.php`, `UserRepository.php`)
+
+### Classes
+
+- **Models** : `PascalCase` (ex: `Product`, `User`, `Order`)
+- **DTOs** : `PascalCaseDTO` (ex: `ProductDTO`, `UserDTO`)
+- **Repositories** : `PascalCaseRepository` (ex: `ProductRepository`)
+- **Services** : `PascalCaseService` (ex: `ProductService`)
+- **Validators** : `PascalCaseValidator` (ex: `ProductValidator`)
+- **Factories** : `PascalCaseFactory` (ex: `ProductFactory`)
+
+### Méthodes
+
+- **camelCase** pour toutes les méthodes
+- **Préfixes courants** :
+  - `get` : récupération (ex: `getProductById`, `getAllProducts`)
+  - `create` : création (ex: `createProduct`)
+  - `update` : mise à jour (ex: `updateProduct`)
+  - `delete` : suppression (ex: `deleteProduct`)
+  - `validate` : validation (ex: `validate`, `validateRegister`)
+
+### Variables
+
+- **camelCase** pour toutes les variables
+- **snake_case** pour les propriétés correspondant aux colonnes SQL
+
+### Dossiers
+
+- **PascalCase** pour les dossiers de code (ex: `Models`, `Services`, `Repositories`)
+
+### Bases de données
+
+- **Tables** : `plural_lowercase` (ex: `products`, `users`)
+- **Colonnes** : `snake_case` (ex: `category_id`, `created_at`)
+
+## 3. ARCHITECTURE BACKEND
+
+### Pattern utilisé
+
+**API File → Validator → Service → Repository → Model**
+
+### Rôle de chaque couche
+
+#### API Files (`Api/`)
+
+- Point d'entrée HTTP
+- Headers CORS
+- Autoload Composer
+- Instanciation des dépendances
+- Récupération du JSON d'entrée
+- Authentification si nécessaire
+- Routing par `switch/case` sur `action`
+- Retour JSON
+
+#### Validators (`Src/Validators/`)
+
+- Validation des données entrantes
+- Retour d'un tableau d'erreurs
+- Pas de logique métier
+- Pas d'accès base de données
+
+#### Services (`Src/Services/`)
+
+- Logique métier centralisée
+- Manipulation des Models
+- Transformation des données
+- Conversion Model → DTO pour l'API
+- Retour de tableaux structurés `['success' => bool, 'message' => string, 'data' => array]`
+
+#### Repositories (`Src/Repositories/`)
+
+- **SEUL** accès à la base de données
+- Requêtes SQL préparées avec PDO
+- Utilisation de `bindParam` pour tous les paramètres
+- Retour d'objets Model ou tableaux
+- Utilisation de `PDO::FETCH_CLASS` pour peupler les Models
+- Pattern Singleton pour la connexion via `Database::getConnection()`
+
+#### Models (`Src/Models/`)
+
+- Représentation des entités de la base
+- Propriétés publiques
+- Noms de propriétés = noms de colonnes SQL
+- Pas de constructeur (peuplement automatique par `PDO::FETCH_CLASS`)
+- Pas de logique métier
+
+#### DTOs (`Src/Models/ModelsDTO/`)
+
+- Objets de transfert pour l'API
+- Exclusion des données sensibles (ex: `password`)
+- Constructeur prenant un Model en paramètre
+- Méthode `toArray()` pour la conversion JSON
+
+## 4. RÈGLES DE CODE BACKEND
+
+### PHP
+
+#### Organisation des classes
+
+```php
+<?php
+
+namespace App\NamespaceName;
+
+use ImportedClass;
+
+class ClassName {
+    // 1. Propriétés privées/protégées avec typage
+    private Type $property;
+
+    // 2. Constructeur avec injection de dépendances
+    public function __construct(Dependency $dep) {
+        $this->property = $dep;
+    }
+
+    // 3. Méthodes publiques
+    public function publicMethod(): ReturnType {
+        // ...
+    }
+
+    // 4. Méthodes privées/protégées
+    private function privateMethod(): ReturnType {
+        // ...
+    }
+}
+```
+
+#### Structure des méthodes Repository
+
+```php
+public function getEntityById(int $id): ?Entity {
+    $query = "SELECT * FROM table_name WHERE id = :id";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    $stmt->setFetchMode(\PDO::FETCH_CLASS, Entity::class);
+    $entity = $stmt->fetch();
+    return $entity ?: null;
+}
+```
+
+#### Typage
+
+- **Typer tous les paramètres de méthodes**
+- **Typer tous les retours de méthodes**
+- **Typer toutes les propriétés de classe**
+- Utiliser `?Type` pour les valeurs nullables
+- Utiliser `array` pour les tableaux
+
+#### Accès base de données
+
+- Uniquement dans les Repositories
+- Connexion via `Database::getConnection()`
+- Requêtes préparées uniquement
+- `bindParam` pour tous les paramètres
+- `PDO::FETCH_CLASS` pour peupler les Models
+
+#### Séparation des responsabilités
+
+- **API** : orchestration
+- **Validator** : validation
+- **Service** : logique métier
+- **Repository** : accès données
+- **Model** : représentation données
+
+### SQL
+
+#### Organisation des requêtes
+
+- Requêtes préparées uniquement
+- Utilisation de paramètres nommés (`:param`)
+- `bindParam` pour tous les paramètres
+- Pas de concaténation de valeurs dans les requêtes
+
+#### Requêtes SELECT
+
+```php
+$query = "SELECT * FROM table_name WHERE column = :value";
+$stmt = $this->getPdo()->prepare($query);
+$stmt->bindParam(':value', $value);
+$stmt->execute();
+```
+
+#### Requêtes INSERT
+
+```php
+$query = "INSERT INTO table_name (col1, col2, created_at)
+          VALUES (:col1, :col2, NOW())";
+$stmt = $this->getPdo()->prepare($query);
+$stmt->bindParam(':col1', $object->col1);
+$stmt->bindParam(':col2', $object->col2);
+$stmt->execute();
+```
+
+#### Requêtes UPDATE
+
+```php
+$query = "UPDATE table_name SET col1 = :col1, updated_at = NOW()
+          WHERE id = :id";
+$stmt = $this->getPdo()->prepare($query);
+$stmt->bindParam(':id', $object->id);
+$stmt->bindParam(':col1', $object->col1);
+$stmt->execute();
+```
+
+## 5. BONNES PRATIQUES BACKEND
+
+### Architecture
+
+- Respecter la séparation Controller / Service / Repository
+- Injection manuelle des dépendances dans les fichiers API
+- Pattern Singleton pour la connexion base de données
+
+### Validation
+
+- Valider toutes les données entrantes avant traitement
+- Validation dans Validators dédiés
+- Retourner un tableau d'erreurs explicites
+
+### Sécurité
+
+- Hash des mots de passe avec `password_hash()`
+- Requêtes préparées uniquement
+- Vérification d'authentification avant actions sensibles
+- Exclusion des données sensibles dans les DTOs
+
+### Gestion des erreurs
+
+- Retours structurés : `['success' => bool, 'message' => string]`
+- Messages d'erreur clairs
+- Vérification d'existence avant opérations
+
+### Base de données
+
+- Accès base uniquement dans Repository
+- Pattern Singleton pour connexion PDO
+- `PDO::FETCH_CLASS` pour peupler les Models
+- Timestamps automatiques (`NOW()`)
+
+### API
+
+- Headers CORS systématiques
+- Gestion des requêtes OPTIONS
+- Autoload Composer en début de fichier
+- Routing par `action` dans le JSON
+- Retour JSON systématique
+
+## 6. RÈGLES À IMPOSER À L'AGENT BACKEND
+
+### Structure obligatoire
+
+- Créer un dossier `Api/` pour tous les points d'entrée HTTP
+- Créer un dossier `Src/` avec sous-dossiers : `Models/`, `Repositories/`, `Services/`, `Validators/`, `Utils/`
+- Placer les DTOs dans `Src/Models/ModelsDTO/`
+- Un fichier API = un endpoint
+
+### Conventions de nommage strictes
+
+- Fichiers API : `camelCase.php`
+- Classes : `PascalCase.php`
+- Méthodes et variables : `camelCase`
+- Propriétés SQL : `snake_case`
+- Suffixes obligatoires : `Repository`, `Service`, `Validator`, `DTO`, `Factory`
+
+### Architecture imposée
+
+- Flux obligatoire : API → Validator → Service → Repository → Model
+- Pas de requête SQL en dehors des Repositories
+- Pas de logique métier dans les API Files
+- Pas de logique métier dans les Repositories
+- Models sans logique, uniquement propriétés
+
+### Code obligatoire
+
+- Typage systématique : paramètres, retours, propriétés
+- Namespace PSR-4 : `namespace App\FolderName;`
+- Autoload Composer dans chaque fichier API
+- Headers CORS dans chaque fichier API
+- Gestion des OPTIONS
+- Validation avant toute opération de création/modification
+
+### Base de données obligatoire
+
+- Requêtes préparées uniquement
+- `bindParam` pour tous les paramètres
+- `PDO::FETCH_CLASS` pour peupler les Models
+- Pattern Singleton pour connexion via `Database::getConnection()`
+- Méthode privée `getPdo()` dans chaque Repository
+
+### Sécurité obligatoire
+
+- Hash des mots de passe avec `password_hash()`
+- Vérification avec `password_verify()`
+- Exclusion des données sensibles dans les DTOs
+- Vérification d'authentification pour actions sensibles
+
+### Retours obligatoires
+
+- Services : retourner `['success' => bool, 'message' => string, 'data' => mixed]`
+- Repositories : retourner objets Model ou `null`
+- Validators : retourner tableau d'erreurs vide ou avec erreurs
+- API : retourner JSON systématiquement
+
+### Interdictions
+
+- Ne jamais faire de requête SQL en dehors des Repositories
+- Ne jamais retourner de Model directement depuis un Service (utiliser DTO)
+- Ne jamais concaténer de valeurs dans les requêtes SQL
+- Ne jamais retourner de password dans les réponses API
+- Ne jamais oublier les headers CORS
+- Ne jamais oublier le typage
