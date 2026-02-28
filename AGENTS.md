@@ -61,6 +61,10 @@ assets/
       └── ... autres images
 ```
 
+### Guideslines
+
+- Lire Guidelines.md pour avoir une cohérence visuelle et structurelle pour le porjet frontend
+
 ### Organisation des fichiers HTML
 
 - Un fichier HTML par page dans le dossier `pages/`
