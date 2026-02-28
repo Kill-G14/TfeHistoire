@@ -782,6 +782,36 @@ public function getEntityById(int $id): ?Entity {
 }
 ```
 
+#### Structure des Api Files
+
+// Models
+use App\Models\ModelName;
+
+// repositories 
+use App\Repositories\repositoryName;
+
+// Validator
+use App\Validators\ValidatorName;
+
+// services
+use App\Services\ServiceName;
+
+
+
+// Models
+$modelName = new ModelName();
+
+// repositories 
+$userRepository = new UserRepository();
+
+// Validator
+$validator = new ValidatorName();
+
+// services
+$service = new ServiceName($userRepository, $validator);
+
+
+
 #### Typage
 
 - **Typer tous les paramètres de méthodes**
