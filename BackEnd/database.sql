@@ -54,6 +54,15 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+-- Table des sessions (tokens d'authentification)
+CREATE TABLE IF NOT EXISTS sessions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    token VARCHAR(16) NOT NULL UNIQUE,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- Index pour améliorer les performances
 CREATE INDEX idx_events_date ON events (date);
 
@@ -66,6 +75,8 @@ CREATE INDEX idx_events_category ON events (category);
 CREATE INDEX idx_bookings_user ON bookings (user_id);
 
 CREATE INDEX idx_bookings_event ON bookings (event_id);
+
+CREATE INDEX idx_sessions_token ON sessions (token);
 
 -- Insertion de données de test
 INSERT INTO

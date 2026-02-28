@@ -6,15 +6,18 @@ use App\Models\User;
 use App\Models\ModelsDTO\UserDTO;
 use App\Repositories\UserRepository;
 use App\Validators\UserValidator;
+use App\Services\SessionService;
 use App\Utils\Logger;
 
 class AuthService {
   private UserRepository $userRepository;
   private UserValidator $userValidator;
+  private SessionService $sessionService;
 
-  public function __construct(UserRepository $userRepository, UserValidator $userValidator) {
+  public function __construct(UserRepository $userRepository, UserValidator $userValidator, SessionService $sessionService) {
     $this->userRepository = $userRepository;
     $this->userValidator = $userValidator;
+    $this->sessionService = $sessionService;
   }
 
   // Inscription
@@ -64,8 +67,16 @@ class AuthService {
       ];
     }
 
-    // Générer un token (simple simulation)
-    $token = bin2hex(random_bytes(32));
+    // Créer une session et générer un token
+    $token = $this->sessionService->createSession($userId);
+
+    if (!$token) {
+      Logger::error('Failed to create session', ['user_id' => $userId]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la création de la session'
+      ];
+    }
 
     Logger::info('User registered successfully', ['user_id' => $userId]);
 
@@ -109,8 +120,16 @@ class AuthService {
       ];
     }
 
-    // Générer un token (simple simulation)
-    $token = bin2hex(random_bytes(32));
+    // Créer une session et générer un token
+    $token = $this->sessionService->createSession($user->id);
+
+    if (!$token) {
+      Logger::error('Failed to create session', ['user_id' => $user->id]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la création de la session'
+      ];
+    }
 
     Logger::info('User logged in successfully', ['user_id' => $user->id]);
 
@@ -124,14 +143,28 @@ class AuthService {
     ];
   }
 
-  // Vérifier un token (simple simulation)
-  public function verifyToken(string $token): ?int {
-    // Dans une vraie application, vérifier le token en base de données
-    // Ici, c'est une simulation
-    if (strlen($token) === 64) {
-      return 1; // Retourne un ID utilisateur fictif
+  // Vérifier un token et récupérer l'ID utilisateur
+  public function checkToken(string $token): ?int {
+    return $this->sessionService->getUserIdByToken($token);
+  }
+
+  // Déconnexion (suppression de la session)
+  public function logout(string $token): array {
+    $deleted = $this->sessionService->deleteSessionByToken($token);
+
+    if (!$deleted) {
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la déconnexion'
+      ];
     }
-    return null;
+
+    Logger::info('User logged out successfully');
+
+    return [
+      'success' => true,
+      'message' => 'Déconnexion réussie'
+    ];
   }
 
   // Récupérer l'utilisateur connecté

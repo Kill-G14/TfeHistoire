@@ -3,7 +3,7 @@
 // Headers CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=UTF-8');
 
 // Gestion de la requête OPTIONS
@@ -18,6 +18,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Repositories
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\SessionRepository;
 
 // Validators
 use App\Validators\EventValidator;
@@ -26,6 +27,7 @@ use App\Validators\UserValidator;
 // Services
 use App\Services\AuthService;
 use App\Services\EventService;
+use App\Services\SessionService;
 
 // Utils
 use App\Utils\Logger;
@@ -33,13 +35,15 @@ use App\Utils\Logger;
 // Repositories
 $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
+$sessionRepository = new SessionRepository();
 
 // Validators
 $eventValidator = new EventValidator();
 $userValidator = new UserValidator();
 
 // Services
-$authService = new AuthService($userRepository, $userValidator);
+$sessionService = new SessionService($sessionRepository);
+$authService = new AuthService($userRepository, $userValidator, $sessionService);
 $eventService = new EventService($eventRepository, $eventValidator);
 
 try {
@@ -118,10 +122,7 @@ try {
 
     case 'create':
       // Vérifier l'authentification
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? null;
-
-      if (!$token) {
+      if (!isset($data['token']) || empty($data['token'])) {
         echo json_encode([
           'success' => false,
           'message' => 'Non authentifié'
@@ -129,8 +130,8 @@ try {
         exit;
       }
 
-      $token = str_replace('Bearer ', '', $token);
-      $userId = $authService->verifyToken($token);
+      $token = $data['token'];
+      $userId = $authService->checkToken($token);
 
       if (!$userId) {
         echo json_encode([
@@ -146,10 +147,7 @@ try {
 
     case 'update':
       // Vérifier l'authentification
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? null;
-
-      if (!$token) {
+      if (!isset($data['token']) || empty($data['token'])) {
         echo json_encode([
           'success' => false,
           'message' => 'Non authentifié'
@@ -157,8 +155,8 @@ try {
         exit;
       }
 
-      $token = str_replace('Bearer ', '', $token);
-      $userId = $authService->verifyToken($token);
+      $token = $data['token'];
+      $userId = $authService->checkToken($token);
 
       if (!$userId) {
         echo json_encode([
@@ -182,10 +180,7 @@ try {
 
     case 'delete':
       // Vérifier l'authentification
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? null;
-
-      if (!$token) {
+      if (!isset($data['token']) || empty($data['token'])) {
         echo json_encode([
           'success' => false,
           'message' => 'Non authentifié'
@@ -193,8 +188,8 @@ try {
         exit;
       }
 
-      $token = str_replace('Bearer ', '', $token);
-      $userId = $authService->verifyToken($token);
+      $token = $data['token'];
+      $userId = $authService->checkToken($token);
 
       if (!$userId) {
         echo json_encode([
@@ -218,10 +213,7 @@ try {
 
     case 'getMyEvents':
       // Vérifier l'authentification
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? null;
-
-      if (!$token) {
+      if (!isset($data['token']) || empty($data['token'])) {
         echo json_encode([
           'success' => false,
           'message' => 'Non authentifié'
@@ -229,8 +221,8 @@ try {
         exit;
       }
 
-      $token = str_replace('Bearer ', '', $token);
-      $userId = $authService->verifyToken($token);
+      $token = $data['token'];
+      $userId = $authService->checkToken($token);
 
       if (!$userId) {
         echo json_encode([

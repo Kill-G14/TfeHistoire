@@ -3,7 +3,7 @@
 // Headers CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=UTF-8');
 
 // Gestion de la requête OPTIONS
@@ -19,6 +19,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Repositories\BookingRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\SessionRepository;
 
 // Validators
 use App\Validators\BookingValidator;
@@ -27,6 +28,7 @@ use App\Validators\UserValidator;
 // Services
 use App\Services\AuthService;
 use App\Services\BookingService;
+use App\Services\SessionService;
 
 // Utils
 use App\Utils\Logger;
@@ -35,39 +37,18 @@ use App\Utils\Logger;
 $bookingRepository = new BookingRepository();
 $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
+$sessionRepository = new SessionRepository();
 
 // Validators
 $bookingValidator = new BookingValidator();
 $userValidator = new UserValidator();
 
 // Services
-$authService = new AuthService($userRepository, $userValidator);
+$sessionService = new SessionService($sessionRepository);
+$authService = new AuthService($userRepository, $userValidator, $sessionService);
 $bookingService = new BookingService($bookingRepository, $eventRepository, $bookingValidator);
 
 try {
-  // Vérifier l'authentification
-  $headers = getallheaders();
-  $token = $headers['Authorization'] ?? null;
-
-  if (!$token) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Non authentifié'
-    ]);
-    exit;
-  }
-
-  $token = str_replace('Bearer ', '', $token);
-  $userId = $authService->verifyToken($token);
-
-  if (!$userId) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Token invalide'
-    ]);
-    exit;
-  }
-
   // Récupération des données JSON
   $input = file_get_contents('php://input');
   $data = json_decode($input, true);
@@ -76,6 +57,26 @@ try {
     echo json_encode([
       'success' => false,
       'message' => 'Action non spécifiée'
+    ]);
+    exit;
+  }
+
+  // Vérifier l'authentification
+  if (!isset($data['token']) || empty($data['token'])) {
+    echo json_encode([
+      'success' => false,
+      'message' => 'Non authentifié'
+    ]);
+    exit;
+  }
+
+  $token = $data['token'];
+  $userId = $authService->checkToken($token);
+
+  if (!$userId) {
+    echo json_encode([
+      'success' => false,
+      'message' => 'Token invalide'
     ]);
     exit;
   }

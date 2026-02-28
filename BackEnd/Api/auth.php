@@ -3,7 +3,7 @@
 // Headers CORS
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=UTF-8');
 
 // Gestion de la requête OPTIONS
@@ -17,24 +17,28 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 // Repositories
 use App\Repositories\UserRepository;
+use App\Repositories\SessionRepository;
 
 // Validators
 use App\Validators\UserValidator;
 
 // Services
 use App\Services\AuthService;
+use App\Services\SessionService;
 
 // Utils
 use App\Utils\Logger;
 
 // Repositories
 $userRepository = new UserRepository();
+$sessionRepository = new SessionRepository();
 
 // Validators
 $userValidator = new UserValidator();
 
 // Services
-$authService = new AuthService($userRepository, $userValidator);
+$sessionService = new SessionService($sessionRepository);
+$authService = new AuthService($userRepository, $userValidator, $sessionService);
 
 try {
   // Récupération des données JSON
@@ -64,11 +68,8 @@ try {
       break;
 
     case 'getCurrentUser':
-      // Récupérer le token depuis les headers
-      $headers = getallheaders();
-      $token = $headers['Authorization'] ?? null;
-
-      if (!$token) {
+      // Récupérer le token depuis les données
+      if (!isset($data['token']) || empty($data['token'])) {
         echo json_encode([
           'success' => false,
           'message' => 'Token non fourni'
@@ -76,11 +77,10 @@ try {
         exit;
       }
 
-      // Retirer "Bearer " du token
-      $token = str_replace('Bearer ', '', $token);
+      $token = $data['token'];
 
       // Vérifier le token
-      $userId = $authService->verifyToken($token);
+      $userId = $authService->checkToken($token);
 
       if (!$userId) {
         echo json_encode([
@@ -91,6 +91,21 @@ try {
       }
 
       $result = $authService->getCurrentUser($userId);
+      echo json_encode($result);
+      break;
+
+    case 'logout':
+      // Récupérer le token depuis les données
+      if (!isset($data['token']) || empty($data['token'])) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Token non fourni'
+        ]);
+        exit;
+      }
+
+      $token = $data['token'];
+      $result = $authService->logout($token);
       echo json_encode($result);
       break;
 

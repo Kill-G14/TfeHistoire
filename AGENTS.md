@@ -1,6 +1,14 @@
 # STANDARDS FRONTEND & BACKEND
 
-Dire Agents Ok ! avant chaque requete, il faut verifier si l'agent est connecté
+### TEST AGENT
+
+Avant toute réponse, l'agent doit écrire :
+
+AGENTS_OK
+
+Code simple pas trop, voir pas d'abstraction ou de couches d'abstraction
+Concidére que je suis un Junior Dev donc n'utilise pas de technique trop pousser a moin que je te le demande
+
 ---
 
 # PARTIE 1 : STANDARD FRONTEND
