@@ -13,11 +13,15 @@ class EventDTO {
   public string $city;
   public string $postal_code;
   public string $address;
+  public ?float $latitude;
+  public ?float $longitude;
   public string $date;
   public string $time;
-  public float $price;
   public string $category;
-  public int $available_tickets;
+  public bool $is_free;
+  public bool $is_pending;
+  public bool $is_approved;
+  public bool $is_rejected;
   public ?string $image_url;
   public string $created_at;
 
@@ -30,11 +34,15 @@ class EventDTO {
     $this->city = $event->city;
     $this->postal_code = $event->postal_code;
     $this->address = $event->address;
+    $this->latitude = $event->latitude;
+    $this->longitude = $event->longitude;
     $this->date = $event->date;
     $this->time = $event->time;
-    $this->price = $event->price;
     $this->category = $event->category;
-    $this->available_tickets = $event->available_tickets;
+    $this->is_free = $event->is_free;
+    $this->is_pending = $event->is_pending;
+    $this->is_approved = $event->is_approved;
+    $this->is_rejected = $event->is_rejected;
     $this->image_url = $event->image_url;
     $this->created_at = $event->created_at;
   }
@@ -49,11 +57,15 @@ class EventDTO {
       'city' => $this->city,
       'postal_code' => $this->postal_code,
       'address' => $this->address,
+      'latitude' => $this->latitude,
+      'longitude' => $this->longitude,
       'date' => $this->date,
       'time' => $this->time,
-      'price' => $this->price,
       'category' => $this->category,
-      'available_tickets' => $this->available_tickets,
+      'is_free' => $this->is_free,
+      'is_pending' => $this->is_pending,
+      'is_approved' => $this->is_approved,
+      'is_rejected' => $this->is_rejected,
       'image_url' => $this->image_url,
       'created_at' => $this->created_at
     ];

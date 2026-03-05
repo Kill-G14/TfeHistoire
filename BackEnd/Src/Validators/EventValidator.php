@@ -57,23 +57,30 @@ class EventValidator {
       $errors['time'] = 'L\'heure n\'est pas valide (format attendu: HH:MM)';
     }
 
-    // Price
-    if (!isset($data['price'])) {
-      $errors['price'] = 'Le prix est requis';
-    } elseif (!is_numeric($data['price']) || $data['price'] < 0) {
-      $errors['price'] = 'Le prix doit être un nombre positif';
-    }
-
     // Category
     if (Helpers::isEmpty($data['category'] ?? null)) {
       $errors['category'] = 'La catégorie est requise';
     }
 
-    // Available tickets
-    if (!isset($data['available_tickets'])) {
-      $errors['available_tickets'] = 'Le nombre de tickets est requis';
-    } elseif (!is_numeric($data['available_tickets']) || $data['available_tickets'] < 0) {
-      $errors['available_tickets'] = 'Le nombre de tickets doit être un nombre positif';
+    // Is Free
+    if (!isset($data['is_free'])) {
+      $errors['is_free'] = 'Le statut gratuit/payant est requis';
+    } elseif (!is_bool($data['is_free']) && $data['is_free'] !== 0 && $data['is_free'] !== 1) {
+      $errors['is_free'] = 'Le statut gratuit/payant doit être un booléen';
+    }
+
+    // Latitude (optionnel)
+    if (isset($data['latitude']) && !Helpers::isEmpty($data['latitude'])) {
+      if (!is_numeric($data['latitude']) || $data['latitude'] < -90 || $data['latitude'] > 90) {
+        $errors['latitude'] = 'La latitude doit être comprise entre -90 et 90';
+      }
+    }
+
+    // Longitude (optionnel)
+    if (isset($data['longitude']) && !Helpers::isEmpty($data['longitude'])) {
+      if (!is_numeric($data['longitude']) || $data['longitude'] < -180 || $data['longitude'] > 180) {
+        $errors['longitude'] = 'La longitude doit être comprise entre -180 et 180';
+      }
     }
 
     // Image URL (optionnel)

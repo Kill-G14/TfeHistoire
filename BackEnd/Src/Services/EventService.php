@@ -111,11 +111,12 @@ class EventService {
     $event->city = $data['city'];
     $event->postal_code = $data['postal_code'];
     $event->address = $data['address'];
+    $event->latitude = isset($data['latitude']) ? (float) $data['latitude'] : null;
+    $event->longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
     $event->date = $data['date'];
     $event->time = $data['time'];
-    $event->price = (float) $data['price'];
     $event->category = $data['category'];
-    $event->available_tickets = (int) $data['available_tickets'];
+    $event->is_free = (bool) $data['is_free'];
     $event->image_url = $data['image_url'] ?? null;
 
     // Insérer en base de données
@@ -178,11 +179,12 @@ class EventService {
     $event->city = $data['city'];
     $event->postal_code = $data['postal_code'];
     $event->address = $data['address'];
+    $event->latitude = isset($data['latitude']) ? (float) $data['latitude'] : $event->latitude;
+    $event->longitude = isset($data['longitude']) ? (float) $data['longitude'] : $event->longitude;
     $event->date = $data['date'];
     $event->time = $data['time'];
-    $event->price = (float) $data['price'];
     $event->category = $data['category'];
-    $event->available_tickets = (int) $data['available_tickets'];
+    $event->is_free = (bool) $data['is_free'];
     $event->image_url = $data['image_url'] ?? $event->image_url;
 
     // Mettre à jour en base de données

@@ -19,7 +19,7 @@ class UserRepository {
 
   // Récupérer un utilisateur par ID
   public function getUserById(int $id): ?User {
-    $query = "SELECT * FROM users WHERE id = :id";
+    $query = "SELECT * FROM users WHERE id = :id AND is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
@@ -30,7 +30,7 @@ class UserRepository {
 
   // Récupérer un utilisateur par email
   public function getUserByEmail(string $email): ?User {
-    $query = "SELECT * FROM users WHERE email = :email";
+    $query = "SELECT * FROM users WHERE email = :email AND is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':email', $email);
     $stmt->execute();
@@ -65,9 +65,9 @@ class UserRepository {
     return $stmt->execute();
   }
 
-  // Supprimer un utilisateur
+  // Supprimer un utilisateur (soft delete)
   public function deleteUser(int $id): bool {
-    $query = "DELETE FROM users WHERE id = :id";
+    $query = "UPDATE users SET is_deleted = TRUE, updated_at = NOW() WHERE id = :id";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     return $stmt->execute();
@@ -75,7 +75,7 @@ class UserRepository {
 
   // Vérifier si un email existe déjà
   public function emailExists(string $email): bool {
-    $query = "SELECT COUNT(*) as count FROM users WHERE email = :email";
+    $query = "SELECT COUNT(*) as count FROM users WHERE email = :email AND is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':email', $email);
     $stmt->execute();
@@ -85,7 +85,7 @@ class UserRepository {
 
   // Récupérer tous les utilisateurs
   public function getAllUsers(): array {
-    $query = "SELECT * FROM users ORDER BY created_at DESC";
+    $query = "SELECT * FROM users WHERE is_deleted = FALSE ORDER BY created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->execute();
     $stmt->setFetchMode(PDO::FETCH_CLASS, User::class);
