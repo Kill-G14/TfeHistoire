@@ -1,0 +1,81 @@
+/* ===========================
+   ADMIN OFFICE - CUSTOM CSS
+   =========================== */
+
+/* ========== LOGIN PAGE ========== */
+
+.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.login-box {
+  width: 400px;
+}
+
+.login-box .card {
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.login-box .card-header {
+  background: transparent;
+  border-bottom: 1px solid #dee2e6;
+  padding: 20px;
+}
+
+.login-box .card-body {
+  padding: 30px;
+}
+
+.login-box-msg {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.login-box .btn-primary {
+  background-color: #667eea;
+  border-color: #667eea;
+  font-weight: 600;
+}
+
+.login-box .btn-primary:hover {
+  background-color: #5568d3;
+  border-color: #5568d3;
+}
+
+.login-box .input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.login-box .form-control {
+  border-left: none;
+}
+
+.login-box .form-control:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+/* ========== CUSTOM STYLES ========== */
+
+.alert {
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.icheck-primary label {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 576px) {
+  .login-box {
+    width: 90%;
+    margin-top: 20px;
+  }
+}
