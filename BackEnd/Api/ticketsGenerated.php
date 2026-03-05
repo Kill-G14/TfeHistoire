@@ -18,6 +18,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // Repositories
 use App\Repositories\PurchasedTicketRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\EventRepository;
+use App\Repositories\TicketRepository;
+use App\Repositories\OrderItemRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 
@@ -27,6 +30,7 @@ use App\Validators\UserValidator;
 // Services
 use App\Services\AuthService;
 use App\Services\SessionService;
+use App\Services\PdfService;
 
 // Utils
 use App\Utils\Logger;
@@ -34,6 +38,9 @@ use App\Utils\Logger;
 // Repositories
 $purchasedTicketRepository = new PurchasedTicketRepository();
 $orderRepository = new OrderRepository();
+$eventRepository = new EventRepository();
+$ticketRepository = new TicketRepository();
+$orderItemRepository = new OrderItemRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
 
@@ -43,6 +50,7 @@ $userValidator = new UserValidator();
 // Services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
+$pdfService = new PdfService($eventRepository, $ticketRepository, $orderItemRepository);
 
 try {
   // Récupération des données JSON
@@ -147,11 +155,72 @@ try {
         exit;
       }
 
-      // TODO: Implémenter la génération et le téléchargement de PDF
-      echo json_encode([
-        'success' => false,
-        'message' => 'Fonctionnalité en cours de développement'
-      ]);
+      // Récupérer le billet
+      $ticketGenerated = $purchasedTicketRepository->getTicketById((int) $data['id']);
+
+      if (!$ticketGenerated) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Billet non trouvé'
+        ]);
+        exit;
+      }
+
+      // Vérifier que l'utilisateur possède bien ce billet
+      $orderItem = $orderItemRepository->getOrderItemById($ticketGenerated->order_item_id);
+      if (!$orderItem) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Commande introuvable'
+        ]);
+        exit;
+      }
+
+      $order = $orderRepository->getOrderById($orderItem->order_id);
+      if (!$order || $order->user_id !== $userId) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Accès non autorisé à ce billet'
+        ]);
+        exit;
+      }
+
+      // Générer le PDF via PdfService
+      $result = $pdfService->generateTicketPdf($ticketGenerated, $userId);
+
+      if (!$result['success']) {
+        echo json_encode($result);
+        exit;
+      }
+
+      // Envoyer le PDF au client
+      $pdfPath = $result['data']['pdf_path'];
+      $filename = $result['data']['filename'];
+
+      if (!file_exists($pdfPath)) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'Fichier PDF introuvable'
+        ]);
+        exit;
+      }
+
+      // Modifier les headers pour l'envoi du fichier
+      header('Content-Type: application/pdf');
+      header('Content-Disposition: attachment; filename="' . $filename . '"');
+      header('Content-Length: ' . filesize($pdfPath));
+      header('Cache-Control: private, max-age=0, must-revalidate');
+      header('Pragma: public');
+
+      // Nettoyer le buffer de sortie et envoyer le fichier
+      ob_clean();
+      flush();
+      readfile($pdfPath);
+
+      // Optionnel : Supprimer le fichier après envoi pour économiser l'espace
+      // unlink($pdfPath);
+
+      exit;
       break;
 
     default:

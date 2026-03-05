@@ -1,0 +1,4 @@
+# Protection du dossier storage
+# Empêche l'accès direct aux fichiers via URL
+
+Deny from all

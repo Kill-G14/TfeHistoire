@@ -123,29 +123,31 @@ BackEnd/
 
 ---
 
-### 3. **Génération PDF des billets** ⭐⭐
+### 3. **Génération PDF des billets** ✅
 
 **Priorité :** MOYENNE
 
-Les billets ne sont pas encore générés en PDF.
+**✅ INTÉGRÉ - COMPLET**
 
-**À faire :**
+- ✅ TCPDF intégré via Composer (version 6.11.2)
+- ✅ Service `PdfService.php` créé avec toutes les règles de sécurité
+- ✅ PDF générés avec QR codes (TCPDF natif)
+- ✅ Stockage dans `BackEnd/storage/tickets/` (protégé par .htaccess)
+- ✅ Action `downloadTicket` implémentée dans `ticketsGenerated.php`
+- ✅ Vérification de propriété des billets (sécurité)
+- ✅ Échappement de toutes les données utilisateur
 
-- Intégrer une librairie PDF via Composer : `composer require tecnickcom/tcpdf`
-- Créer un service `PdfService.php` dans `Src/Services/`
-- Générer les PDF avec QR codes
-- Stocker les PDF dans un dossier `BackEnd/storage/tickets/`
-- Ajouter une action `downloadTicket` dans `ticketsGenerated.php`
-
-**Fichiers à créer :**
+**Fichiers créés :**
 
 ```
 BackEnd/
 ├── storage/
+│   ├── .htaccess                 # Protection du dossier
 │   └── tickets/                  # Dossier pour les PDF générés
-└── Src/
-    └── Services/
-        └── PdfService.php        # Génération de PDF
+├── Src/
+│   └── Services/
+│       └── PdfService.php        # Génération de PDF sécurisée
+└── TCPDF_INTEGRATION.md          # Documentation complète
 ```
 
 ---
@@ -284,12 +286,12 @@ Cette partie sera développée séparément du frontend public.
 - Tous les endpoints créés
 - Architecture respectée (AGENTS.md)
 
-### Intégrations externes : 0% ❌
+### Intégrations externes : 25% ⚠️
 
-- Mollie (paiement)
-- SendGrid (emails)
-- PDF (billets)
-- Google Maps
+- ❌ Mollie (paiement)
+- ❌ SendGrid (emails)
+- ✅ PDF (billets) - **INTÉGRÉ**
+- ❌ Google Maps
 
 ### Frontend : 20% ⚠️
 
@@ -306,7 +308,7 @@ Cette partie sera développée séparément du frontend public.
 1. ✅ APIs backend complètes
 2. ❌ Intégration Mollie (paiement)
 3. ❌ Envoi d'emails SendGrid
-4. ❌ Génération PDF des billets
+4. ✅ **Génération PDF des billets - INTÉGRÉ**
 5. ❌ Connecter frontend aux APIs
 
 ### Phase 2 - Important
