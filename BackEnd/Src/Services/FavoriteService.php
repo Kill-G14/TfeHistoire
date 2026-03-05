@@ -116,4 +116,14 @@ class FavoriteService {
       'message' => 'Événement retiré des favoris'
     ];
   }
+
+  // Alias pour getUserFavorites
+  public function getUserFavorites(int $userId): array {
+    return $this->getFavoritesByUserId($userId);
+  }
+
+  // Alias pour removeFavorite
+  public function removeFavorite(int $userId, int $eventId): array {
+    return $this->deleteFavorite($userId, $eventId);
+  }
 }

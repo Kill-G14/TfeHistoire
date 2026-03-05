@@ -9,7 +9,7 @@ use App\Models\ModelsDTO\OrderDTO;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\TicketRepository;
-use App\Repositories\TicketGeneratedRepository;
+use App\Repositories\PurchasedTicketRepository;
 use App\Validators\OrderValidator;
 use App\Utils\Logger;
 
@@ -17,20 +17,20 @@ class OrderService {
   private OrderRepository $orderRepository;
   private OrderItemRepository $orderItemRepository;
   private TicketRepository $ticketRepository;
-  private TicketGeneratedRepository $ticketGeneratedRepository;
+  private PurchasedTicketRepository $purchasedTicketRepository;
   private OrderValidator $orderValidator;
 
   public function __construct(
     OrderRepository $orderRepository,
     OrderItemRepository $orderItemRepository,
     TicketRepository $ticketRepository,
-    TicketGeneratedRepository $ticketGeneratedRepository,
+    PurchasedTicketRepository $purchasedTicketRepository,
     OrderValidator $orderValidator
   ) {
     $this->orderRepository = $orderRepository;
     $this->orderItemRepository = $orderItemRepository;
     $this->ticketRepository = $ticketRepository;
-    $this->ticketGeneratedRepository = $ticketGeneratedRepository;
+    $this->purchasedTicketRepository = $purchasedTicketRepository;
     $this->orderValidator = $orderValidator;
   }
 
@@ -73,7 +73,7 @@ class OrderService {
     ];
   }
 
-  // Créer une commande
+  // Achat du tickets (création de la commande)
   public function createOrder(array $data, int $userId): array {
     // Validation
     $errors = $this->orderValidator->validateCreateOrder($data);
@@ -223,5 +223,121 @@ class OrderService {
       'success' => true,
       'message' => 'Commande annulée avec succès'
     ];
+  }
+
+  // Confirmer le paiement et générer les billets
+  public function confirmPayment(int $orderId, string $paymentId): array {
+    $order = $this->orderRepository->getOrderById($orderId);
+
+    if (!$order) {
+      return [
+        'success' => false,
+        'message' => 'Commande non trouvée'
+      ];
+    }
+
+    // Vérifier que la commande n'est pas déjà payée
+    if ($order->is_paid) {
+      return [
+        'success' => false,
+        'message' => 'Cette commande est déjà payée'
+      ];
+    }
+
+    // Marquer la commande comme payée
+    $success = $this->orderRepository->markAsPaid($orderId, $paymentId);
+
+    if (!$success) {
+      Logger::error('Failed to mark order as paid', ['order_id' => $orderId]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la confirmation du paiement'
+      ];
+    }
+
+    // Récupérer les articles de commande
+    $orderItems = $this->orderItemRepository->getOrderItemsByOrderId($orderId);
+
+    // Générer les billets individuels
+    foreach ($orderItems as $orderItem) {
+      for ($i = 0; $i < $orderItem->quantity; $i++) {
+        $ticketGenerated = new TicketGenerated();
+        $ticketGenerated->order_item_id = $orderItem->id;
+        $ticketGenerated->unique_code = $this->generateUniqueCode();
+        $ticketGenerated->qr_code = $this->generateQRCode($ticketGenerated->unique_code);
+
+        $ticketId = $this->purchasedTicketRepository->createTicketGenerated($ticketGenerated);
+
+        if (!$ticketId) {
+          Logger::error('Failed to generate ticket', [
+            'order_item_id' => $orderItem->id,
+            'iteration' => $i
+          ]);
+        }
+      }
+    }
+
+    Logger::info('Payment confirmed and tickets generated', ['order_id' => $orderId]);
+
+    return [
+      'success' => true,
+      'message' => 'Paiement confirmé et billets générés'
+    ];
+  }
+
+  // Récupérer les billets générés pour une commande
+  public function getGeneratedTicketsByOrderId(int $orderId, int $userId): array {
+    $order = $this->orderRepository->getOrderById($orderId);
+
+    if (!$order) {
+      return [
+        'success' => false,
+        'message' => 'Commande non trouvée'
+      ];
+    }
+
+    // Vérifier que l'utilisateur est le propriétaire
+    if ($order->user_id !== $userId) {
+      return [
+        'success' => false,
+        'message' => 'Vous n\'êtes pas autorisé à voir ces billets'
+      ];
+    }
+
+    // Vérifier que la commande est payée
+    if (!$order->is_paid) {
+      return [
+        'success' => false,
+        'message' => 'Cette commande n\'est pas encore payée'
+      ];
+    }
+
+    $tickets = $this->purchasedTicketRepository->getTicketsByOrderId($orderId);
+
+    return [
+      'success' => true,
+      'data' => array_map(function($ticket) {
+        return [
+          'id' => $ticket->id,
+          'order_item_id' => $ticket->order_item_id,
+          'unique_code' => $ticket->unique_code,
+          'qr_code' => $ticket->qr_code,
+          'is_used' => $ticket->is_used,
+          'used_at' => $ticket->used_at,
+          'created_at' => $ticket->created_at
+        ];
+      }, $tickets)
+    ];
+  }
+
+  // Générer un code unique
+  private function generateUniqueCode(): string {
+    return strtoupper(bin2hex(random_bytes(8)));
+  }
+
+  // Générer un QR code (URL vers le code unique)
+  private function generateQRCode(string $uniqueCode): string {
+    // Format simple : URL qui pointe vers la validation du billet
+    return 'https://yourapp.com/validate/' . $uniqueCode;
   }
 }

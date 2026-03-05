@@ -9,32 +9,53 @@ BackEnd/
 ├── Api/                          # Points d'entrée HTTP
 │   ├── auth.php                  # Authentification
 │   ├── events.php                # Gestion des événements
-│   └── bookings.php              # Gestion des réservations
+│   ├── orders.php                # Gestion des commandes
+│   ├── tickets.php               # Gestion des types de billets
+│   ├── ticketsGenerated.php      # Billets achetés
+│   ├── favorites.php             # Favoris utilisateurs
+│   └── scanTicket.php            # Validation QR codes
 │
 ├── Src/
 │   ├── Models/                   # Entités métier
 │   │   ├── User.php
 │   │   ├── Event.php
-│   │   ├── Booking.php
+│   │   ├── Order.php
+│   │   ├── OrderItem.php
+│   │   ├── Ticket.php
+│   │   ├── TicketGenerated.php
+│   │   ├── Favorite.php
 │   │   └── ModelsDTO/            # Data Transfer Objects
 │   │       ├── UserDTO.php
 │   │       ├── EventDTO.php
-│   │       └── BookingDTO.php
+│   │       ├── OrderDTO.php
+│   │       ├── OrderItemDTO.php
+│   │       ├── TicketDTO.php
+│   │       ├── TicketGeneratedDTO.php
+│   │       └── FavoriteDTO.php
 │   │
 │   ├── Repositories/             # Accès base de données
 │   │   ├── UserRepository.php
 │   │   ├── EventRepository.php
-│   │   └── BookingRepository.php
+│   │   ├── OrderRepository.php
+│   │   ├── OrderItemRepository.php
+│   │   ├── TicketRepository.php
+│   │   ├── PurchasedTicketRepository.php
+│   │   ├── FavoriteRepository.php
+│   │   └── SessionRepository.php
 │   │
 │   ├── Services/                 # Logique métier
 │   │   ├── AuthService.php
 │   │   ├── EventService.php
-│   │   └── BookingService.php
+│   │   ├── OrderService.php
+│   │   ├── TicketService.php
+│   │   ├── FavoriteService.php
+│   │   └── SessionService.php
 │   │
 │   ├── Validators/               # Validation des données
 │   │   ├── UserValidator.php
 │   │   ├── EventValidator.php
-│   │   └── BookingValidator.php
+│   │   ├── OrderValidator.php
+│   │   └── TicketValidator.php
 │   │
 │   └── Utils/                    # Utilitaires transversaux
 │       ├── Database.php          # Connexion PDO
@@ -187,40 +208,117 @@ Headers: Authorization: Bearer {token}
 }
 ```
 
-### Réservations (`Api/bookings.php`)
+### Commandes (`Api/orders.php`)
 
-Toutes les routes de réservation nécessitent l'authentification.
+Toutes les routes de commande nécessitent l'authentification.
 
-#### Récupérer mes réservations
+#### Récupérer mes commandes
 
 ```json
-POST /Api/bookings.php
+POST /Api/orders.php
 Headers: Authorization: Bearer {token}
 {
-  "action": "getMyBookings"
+  "action": "getMyOrders",
+  "token": "user_token_here"
 }
 ```
 
-#### Créer une réservation
+#### Créer une commande
 
 ```json
-POST /Api/bookings.php
+POST /Api/orders.php
 Headers: Authorization: Bearer {token}
 {
   "action": "create",
-  "event_id": 1,
-  "tickets_count": 2
+  "token": "user_token_here",
+  "items": [
+    {
+      "ticket_id": 1,
+      "quantity": 2
+    },
+    {
+      "ticket_id": 2,
+      "quantity": 1
+    }
+  ]
 }
 ```
 
-#### Annuler une réservation
+#### Annuler une commande
 
 ```json
-POST /Api/bookings.php
+POST /Api/orders.php
 Headers: Authorization: Bearer {token}
 {
   "action": "cancel",
+  "token": "user_token_here",
   "id": 1
+}
+```
+
+### Billets (`Api/tickets.php`)
+
+#### Récupérer les billets d'un événement (public)
+
+```json
+POST /Api/tickets.php
+{
+  "action": "getByEvent",
+  "event_id": 1
+}
+```
+
+#### Créer un type de billet (organizer)
+
+```json
+POST /Api/tickets.php
+{
+  "action": "create",
+  "token": "organizer_token_here",
+  "event_id": 1,
+  "name": "Adult Ticket",
+  "description": "Billet adulte",
+  "price": 25.00,
+  "quantity": 100,
+  "start_sale_date": "2026-01-01 00:00:00",
+  "end_sale_date": "2026-12-31 23:59:59"
+}
+```
+
+### Favoris (`Api/favorites.php`)
+
+#### Ajouter aux favoris
+
+```json
+POST /Api/favorites.php
+{
+  "action": "add",
+  "token": "user_token_here",
+  "event_id": 1
+}
+```
+
+#### Retirer des favoris
+
+```json
+POST /Api/favorites.php
+{
+  "action": "remove",
+  "token": "user_token_here",
+  "event_id": 1
+}
+```
+
+### Validation de billets (`Api/scanTicket.php`)
+
+#### Valider un billet (organizer)
+
+```json
+POST /Api/scanTicket.php
+{
+  "action": "validate",
+  "token": "organizer_token_here",
+  "unique_code": "A1B2C3D4E5F6"
 }
 ```
 

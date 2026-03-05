@@ -2,7 +2,7 @@
 
 // Headers CORS
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=UTF-8');
 
@@ -16,37 +16,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Repositories
-use App\Repositories\BookingRepository;
+use App\Repositories\FavoriteRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 
 // Validators
-use App\Validators\BookingValidator;
 use App\Validators\UserValidator;
 
 // Services
 use App\Services\AuthService;
-use App\Services\BookingService;
+use App\Services\FavoriteService;
 use App\Services\SessionService;
 
 // Utils
 use App\Utils\Logger;
 
 // Repositories
-$bookingRepository = new BookingRepository();
+$favoriteRepository = new FavoriteRepository();
 $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
 
 // Validators
-$bookingValidator = new BookingValidator();
 $userValidator = new UserValidator();
 
 // Services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
-$bookingService = new BookingService($bookingRepository, $eventRepository, $bookingValidator);
+$favoriteService = new FavoriteService($favoriteRepository, $eventRepository);
 
 try {
   // Récupération des données JSON
@@ -85,26 +83,47 @@ try {
 
   // Routing par action
   switch ($action) {
-    case 'getMyBookings':
-      $result = $bookingService->getUserBookings($userId);
+    case 'getMyFavorites':
+      $result = $favoriteService->getUserFavorites($userId);
       echo json_encode($result);
       break;
 
-    case 'create':
-      $result = $bookingService->createBooking($data, $userId);
-      echo json_encode($result);
-      break;
-
-    case 'cancel':
-      if (!isset($data['id'])) {
+    case 'add':
+      if (!isset($data['event_id'])) {
         echo json_encode([
           'success' => false,
-          'message' => 'ID non fourni'
+          'message' => 'ID de l\'événement non fourni'
         ]);
         exit;
       }
 
-      $result = $bookingService->cancelBooking((int) $data['id'], $userId);
+      $result = $favoriteService->addFavorite($userId, (int) $data['event_id']);
+      echo json_encode($result);
+      break;
+
+    case 'remove':
+      if (!isset($data['event_id'])) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'ID de l\'événement non fourni'
+        ]);
+        exit;
+      }
+
+      $result = $favoriteService->removeFavorite($userId, (int) $data['event_id']);
+      echo json_encode($result);
+      break;
+
+    case 'isFavorite':
+      if (!isset($data['event_id'])) {
+        echo json_encode([
+          'success' => false,
+          'message' => 'ID de l\'événement non fourni'
+        ]);
+        exit;
+      }
+
+      $result = $favoriteService->isFavorite($userId, (int) $data['event_id']);
       echo json_encode($result);
       break;
 
@@ -117,7 +136,7 @@ try {
   }
 
 } catch (Exception $e) {
-  Logger::error('Bookings API error', ['error' => $e->getMessage()]);
+  Logger::error('Favorites API error', ['error' => $e->getMessage()]);
   echo json_encode([
     'success' => false,
     'message' => 'Une erreur est survenue'

@@ -6,7 +6,7 @@ use App\Models\TicketGenerated;
 use App\Utils\Database;
 use PDO;
 
-class TicketGeneratedRepository {
+class PurchasedTicketRepository {
   private PDO $pdo;
 
   public function __construct() {
@@ -102,5 +102,35 @@ class TicketGeneratedRepository {
     $stmt->execute();
     $stmt->setFetchMode(PDO::FETCH_CLASS, TicketGenerated::class);
     return $stmt->fetchAll();
+  }
+
+  // Récupérer tous les billets d'un utilisateur
+  public function getTicketsByUserId(int $userId): array {
+    $query = "SELECT tg.* FROM tickets_generated tg
+              INNER JOIN order_items oi ON tg.order_item_id = oi.id
+              INNER JOIN orders o ON oi.order_id = o.id
+              WHERE o.user_id = :user_id AND tg.is_deleted = FALSE AND o.is_deleted = FALSE
+              ORDER BY tg.created_at DESC";
+    
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $stmt->setFetchMode(PDO::FETCH_CLASS, TicketGenerated::class);
+    return $stmt->fetchAll();
+  }
+
+  // Alias pour getTicketById
+  public function getTicketById(int $id): ?TicketGenerated {
+    return $this->getTicketGeneratedById($id);
+  }
+
+  // Alias pour getTicketByUniqueCode
+  public function getTicketByUniqueCode(string $uniqueCode): ?TicketGenerated {
+    return $this->getTicketGeneratedByUniqueCode($uniqueCode);
+  }
+
+  // Alias pour markTicketAsUsed
+  public function markTicketAsUsed(int $id): bool {
+    return $this->markAsUsed($id);
   }
 }

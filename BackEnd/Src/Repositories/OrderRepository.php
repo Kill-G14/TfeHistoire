@@ -50,8 +50,8 @@ class OrderRepository {
     $stmt->bindParam(':is_paid', $order->is_paid, PDO::PARAM_INT);
     $stmt->bindParam(':is_failed', $order->is_failed, PDO::PARAM_INT);
     $stmt->bindParam(':is_cancelled', $order->is_cancelled, PDO::PARAM_INT);
-    $stmt->bindParam(':payment_provider', $order->payment_provider);
-    $stmt->bindParam(':payment_id', $order->payment_id);
+    $stmt->bindParam(':payment_provider', $order->payment_provider, PDO::PARAM_STR);
+    $stmt->bindParam(':payment_id', $order->payment_id, PDO::PARAM_STR);
     
     if ($stmt->execute()) {
       return (int) $this->getPdo()->lastInsertId();
@@ -81,7 +81,24 @@ class OrderRepository {
   }
 
   // Marquer une commande comme payée
-  public function markAsPaid(int $id): bool {
+  public function markAsPaid(int $id, ?string $paymentId = null): bool {
+    if ($paymentId !== null) {
+      $query = "UPDATE orders SET 
+                is_pending = FALSE,
+                is_paid = TRUE,
+                is_failed = FALSE,
+                is_cancelled = FALSE,
+                payment_id = :payment_id,
+                updated_at = NOW()
+                WHERE id = :id AND is_deleted = FALSE";
+      
+      $stmt = $this->getPdo()->prepare($query);
+      $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+      $stmt->bindParam(':payment_id', $paymentId, PDO::PARAM_STR);
+      
+      return $stmt->execute();
+    }
+    
     return $this->updateOrderStatus($id, false, true, false, false);
   }
 
@@ -108,7 +125,7 @@ class OrderRepository {
     $query = "UPDATE orders SET payment_id = :payment_id, updated_at = NOW() WHERE id = :id AND is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-    $stmt->bindParam(':payment_id', $paymentId);
+    $stmt->bindParam(':payment_id', $paymentId, PDO::PARAM_STR);
     return $stmt->execute();
   }
 }
