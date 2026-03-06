@@ -56,7 +56,7 @@ function attachLoginEvents() {
     const email = document.getElementById('loginEmail').value
     const password = document.getElementById('loginPassword').value
 
-    const result = auth.login(email, password)
+    const result = await auth.login(email, password)
 
     if (result.success) {
       closeLoginModal()
@@ -83,7 +83,7 @@ function attachRegisterEvents() {
     const email = document.getElementById('registerEmail').value
     const password = document.getElementById('registerPassword').value
 
-    const result = auth.register(email, password, name)
+    const result = await auth.register(email, password, name)
 
     if (result.success) {
       closeLoginModal()

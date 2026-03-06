@@ -50,7 +50,8 @@ export const auth = {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            action: 'logout'
+            action: 'logout',
+            token: token
           })
         })
       } catch (error) {
@@ -81,7 +82,8 @@ export const auth = {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          action: 'checkToken'
+          action: 'getCurrentUser',
+          token: token
         })
       })
 
