@@ -34,18 +34,18 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $ticketService = new TicketService($ticketRepository, $eventRepository, $ticketValidator);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
   case 'getByEvent':
-    if (!isset($request->event_id)) {
+    if (!isset($request['event_id'])) {
       $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
     } else {
       $response = $ticketService->getTicketsByEventId((int) $request->event_id);
@@ -53,55 +53,55 @@ switch ($request->action) {
     break;
 
   case 'getById':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
     } else {
-      $response = $ticketService->getTicketById((int) $request->id);
+      $response = $ticketService->getTicketById((int) $request['id']);
     }
     break;
 
   case 'create':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        $response = $ticketService->createTicket((array) $request, $userId);
+        $response = $ticketService->createTicket($request, $userId);
       }
     }
     break;
 
   case 'update':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        if (!isset($request->id)) {
+        if (!isset($request['id'])) {
           $response = ['success' => false, 'message' => 'ID non fourni'];
         } else {
-          $response = $ticketService->updateTicket((int) $request->id, (array) $request, $userId);
+          $response = $ticketService->updateTicket((int) $request['id'], $request, $userId);
         }
       }
     }
     break;
 
   case 'delete':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        if (!isset($request->id)) {
+        if (!isset($request['id'])) {
           $response = ['success' => false, 'message' => 'ID non fourni'];
         } else {
-          $response = $ticketService->deleteTicket((int) $request->id, $userId);
+          $response = $ticketService->deleteTicket((int) $request['id'], $userId);
         }
       }
     }

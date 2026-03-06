@@ -38,53 +38,52 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $orderService = new OrderService($orderRepository, $orderItemRepository, $ticketRepository, $purchasedTicketRepository, $orderValidator);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
 // Vérifier le token
-if (!isset($request->token)) {
+if (!isset($request['token'])) {
   $response = ['success' => false, 'message' => 'Token non fourni'];
   echo json_encode($response);
   exit;
 }
 
-$userId = $authService->checkToken($request->token);
+$userId = $authService->checkToken($request['token']);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
   case 'getMyOrders':
     $response = $orderService->getOrdersByUserId($userId);
     break;
 
   case 'getOrderById':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
     } else {
-      $response = $orderService->getOrderById((int) $request->id, $userId);
+      $response = $orderService->getOrderById((int) $request['id'], $userId);
     }
     break;
 
   case 'create':
-    $requestData = (array) $request;
-    $requestData['user_id'] = $userId;
-    $response = $orderService->createOrder($requestData, $userId);
+    $request['user_id'] = $userId;
+    $response = $orderService->createOrder($request, $userId);
     break;
 
   case 'cancel':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
     } else {
-      $response = $orderService->cancelOrder((int) $request->id, $userId);
+      $response = $orderService->cancelOrder((int) $request['id'], $userId);
     }
     break;
 

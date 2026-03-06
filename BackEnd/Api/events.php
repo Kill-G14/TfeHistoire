@@ -32,128 +32,110 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $eventService = new EventService($eventRepository, $eventValidator);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
 
   case 'getAll':
     $response = $eventService->getAllEvents();
     break;
 
   case 'getById':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
     } else {
-      $response = $eventService->getEventById((int) $request->id);
+      $response = $eventService->getEventById((int) $request['id']);
     }
     break;
 
   case 'getByCountry':
-    if (!isset($request->country)) {
+    if (!isset($request['country'])) {
       $response = ['success' => false, 'message' => 'Pays non fourni'];
     } else {
-      $response = $eventService->getEventsByCountry($request->country);
+      $response = $eventService->getEventsByCountry($request['country']);
     }
     break;
 
   case 'getByCategory':
-    if (!isset($request->category)) {
+    if (!isset($request['category'])) {
       $response = ['success' => false, 'message' => 'Catégorie non fournie'];
     } else {
-      $response = $eventService->getEventsByCategory($request->category);
+      $response = $eventService->getEventsByCategory($request['category']);
     }
     break;
 
   case 'search':
-    if (!isset($request->search)) {
+    if (!isset($request['search'])) {
       $response = ['success' => false, 'message' => 'Terme de recherche non fourni'];
     } else {
-      $response = $eventService->searchEvents($request->search);
+      $response = $eventService->searchEvents($request['search']);
     }
     break;
 
   case 'create':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        $response = $eventService->createEvent((array) $request, $userId);
+        $response = $eventService->createEvent($request, $userId);
       }
     }
     break;
 
   case 'update':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        if (!isset($request->id)) {
+        if (!isset($request['id'])) {
           $response = ['success' => false, 'message' => 'ID non fourni'];
         } else {
-          $response = $eventService->updateEvent((int) $request->id, (array) $request, $userId);
+          $response = $eventService->updateEvent((int) $request['id'], $request, $userId);
         }
       }
     }
     break;
 
   case 'delete':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
-        if (!isset($request->id)) {
+        if (!isset($request['id'])) {
           $response = ['success' => false, 'message' => 'ID non fourni'];
         } else {
-          $response = $eventService->deleteEvent((int) $request->id, $userId);
+          $response = $eventService->deleteEvent((int) $request['id'], $userId);
         }
       }
     }
     break;
 
   case 'getMyEvents':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
         $response = $eventService->getEventsByUserId($userId);
       }
-    }
-    break;
-
-  default:
-    $response = ['success' => false, 'message' => 'Action non reconnue'];
-    break;
-}
-
-echo json_encode($response);
-    }
-    break;
-
-  case 'getMyEvents':
-    $userId = $authService->checkToken($request->token);
-    if (!$userId) {
-      $response = ['success' => false, 'message' => 'Token invalide'];
-    } else {
-      $response = $eventService->getEventsByUserId($userId);
     }
     break;
 

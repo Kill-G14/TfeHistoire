@@ -32,55 +32,55 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $favoriteService = new FavoriteService($favoriteRepository, $eventRepository);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
 // Vérifier le token
-if (!isset($request->token)) {
+if (!isset($request['token'])) {
   $response = ['success' => false, 'message' => 'Token non fourni'];
   echo json_encode($response);
   exit;
 }
 
-$userId = $authService->checkToken($request->token);
+$userId = $authService->checkToken($request['token']);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
   case 'getMyFavorites':
     $response = $favoriteService->getUserFavorites($userId);
     break;
 
   case 'add':
-    if (!isset($request->event_id)) {
+    if (!isset($request['event_id'])) {
       $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
     } else {
-      $response = $favoriteService->addFavorite($userId, (int) $request->event_id);
+      $response = $favoriteService->addFavorite($userId, (int) $request['event_id']);
     }
     break;
 
   case 'remove':
-    if (!isset($request->event_id)) {
+    if (!isset($request['event_id'])) {
       $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
     } else {
-      $response = $favoriteService->removeFavorite($userId, (int) $request->event_id);
+      $response = $favoriteService->removeFavorite($userId, (int) $request['event_id']);
     }
     break;
 
   case 'isFavorite':
-    if (!isset($request->event_id)) {
+    if (!isset($request['event_id'])) {
       $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
     } else {
-      $response = $favoriteService->isFavorite($userId, (int) $request->event_id);
+      $response = $favoriteService->isFavorite($userId, (int) $request['event_id']);
     }
     break;
 

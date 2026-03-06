@@ -26,29 +26,29 @@ $userValidator = new UserValidator();
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
   case 'register':
-    $response = $authService->register((array) $request);
+    $response = $authService->register($request);
     break;
 
   case 'login':
-    $response = $authService->login((array) $request);
+    $response = $authService->login($request);
     break;
 
   case 'getCurrentUser':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $userId = $authService->checkToken($request->token);
+      $userId = $authService->checkToken($request['token']);
       if (!$userId) {
         $response = ['success' => false, 'message' => 'Token invalide'];
       } else {
@@ -58,10 +58,10 @@ switch ($request->action) {
     break;
 
   case 'logout':
-    if (!isset($request->token)) {
+    if (!isset($request['token'])) {
       $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $response = $authService->logout($request->token);
+      $response = $authService->logout($request['token']);
     }
     break;
 

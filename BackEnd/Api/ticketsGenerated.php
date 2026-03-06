@@ -38,30 +38,30 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $pdfService = new PdfService($eventRepository, $ticketRepository, $orderItemRepository);
 
-$request = json_decode(file_get_contents("php://input"));
+$request = json_decode(file_get_contents("php://input"), true);
 
 // Vérifier que la requête est valide
-if (!$request || !isset($request->action)) {
+if (!$request || !isset($request['action'])) {
   $response = ['success' => false, 'message' => 'Requête invalide'];
   echo json_encode($response);
   exit;
 }
 
 // Vérifier le token
-if (!isset($request->token)) {
+if (!isset($request['token'])) {
   $response = ['success' => false, 'message' => 'Token non fourni'];
   echo json_encode($response);
   exit;
 }
 
-$userId = $authService->checkToken($request->token);
+$userId = $authService->checkToken($request['token']);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
   echo json_encode($response);
   exit;
 }
 
-switch ($request->action) {
+switch ($request['action']) {
   case 'getMyTickets':
     $tickets = $purchasedTicketRepository->getTicketsByUserId($userId);
     
@@ -81,11 +81,11 @@ switch ($request->action) {
     break;
 
   case 'getTicketById':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
       break;
     }
-    $ticket = $purchasedTicketRepository->getTicketById((int) $request->id);
+    $ticket = $purchasedTicketRepository->getTicketById((int) $request['id']);
 
     if (!$ticket) {
       $response = ['success' => false, 'message' => 'Billet non trouvé'];
@@ -106,12 +106,12 @@ switch ($request->action) {
     break;
 
   case 'downloadTicket':
-    if (!isset($request->id)) {
+    if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];
       echo json_encode($response);
       exit;
     }
-    $ticketGenerated = $purchasedTicketRepository->getTicketById((int) $request->id);
+    $ticketGenerated = $purchasedTicketRepository->getTicketById((int) $request['id']);
 
     if (!$ticketGenerated) {
       $response = ['success' => false, 'message' => 'Billet non trouvé'];
