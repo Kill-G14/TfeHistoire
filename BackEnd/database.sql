@@ -208,7 +208,7 @@ INSERT INTO
     )
 VALUES (
         'admin@eurofetes.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        'admin123',
         'Admin EuroFêtes',
         TRUE,
         FALSE,
@@ -217,7 +217,7 @@ VALUES (
     ),
     (
         'moderator@eurofetes.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        'moderator123',
         'Modérateur',
         FALSE,
         FALSE,
@@ -226,7 +226,7 @@ VALUES (
     ),
     (
         'organizer@example.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        'organizer123',
         'Organisateur Test',
         FALSE,
         TRUE,
@@ -235,7 +235,7 @@ VALUES (
     ),
     (
         'user@example.com',
-        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+        'user123',
         'Utilisateur Test',
         FALSE,
         FALSE,
