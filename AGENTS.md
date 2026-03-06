@@ -214,7 +214,7 @@ Exemple :
 ```javascript
 // Imports
 import { renderNavbar } from "../components/navbar.js";
-import { EventManager } from "../managers/EventManager.js";
+import EventManager from "../managers/EventManager.js";
 import { helpers } from "../utils/helpers.js";
 
 // Fonction init
@@ -249,13 +249,15 @@ if (document.readyState === "loading") {
 
 ```javascript
 // Manager pour la gestion des événements
-const API_URL = "http://localhost/tfeHistoire/BackEnd/Api";
+class EventManager {
+  constructor() {
+    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+  }
 
-export const EventManager = {
   // Récupérer tous les événements
   async getAll() {
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -273,8 +275,11 @@ export const EventManager = {
         message: "Erreur de connexion au serveur",
       };
     }
-  },
-};
+  }
+}
+
+// Export d'une instance singleton
+export default new EventManager();
 ```
 
 #### Structure d'un composant
@@ -497,7 +502,7 @@ export const EventManager = {
 Utilisation dans une page :
 
 ```javascript
-import { EventManager } from "../managers/EventManager.js";
+import EventManager from "../managers/EventManager.js";
 
 async function loadEvents() {
   const result = await EventManager.getAll();
@@ -571,7 +576,7 @@ Exemple :
 
 ```javascript
 // Dans la page
-import { EventManager } from "../managers/EventManager.js";
+import EventManager from "../managers/EventManager.js";
 
 const result = await EventManager.getAll();
 if (result.success) {
@@ -643,9 +648,12 @@ if (result.success) {
 
 - Un fichier manager par domaine métier
 - Nommage : `{Domain}Manager.js` (PascalCase)
-- Export const avec méthodes
+- **Structure : Classe ES6** avec constructeur et méthodes
+- **Export : default d'une instance singleton** (`export default new ManagerName()`)
+- URL API dans le constructeur : `this.apiUrl`
 - Gestion des erreurs dans try/catch
 - Les pages utilisent les managers, jamais fetch directement
+- Import dans les pages : `import ManagerName from '../managers/ManagerName.js'`
 
 ### Utilitaires
 
@@ -690,7 +698,8 @@ if (result.success) {
 - Utiliser des scripts inline
 - Créer des variables globales
 - Dupliquer du code (créer un composant ou une fonction)
-- Utiliser des classes ES6 pour les composants (fonctions simples)
+- Utiliser des classes ES6 pour les composants (fonctions simples uniquement)
+- Utiliser des objets littéraux pour les managers (classes ES6 obligatoires)
 - Faire des appels `fetch()` dans les pages (utiliser les managers)
 
 ---

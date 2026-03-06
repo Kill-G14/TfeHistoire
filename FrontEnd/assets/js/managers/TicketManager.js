@@ -1,11 +1,13 @@
 // Manager pour la gestion des tickets
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
+class TicketManager {
+  constructor() {
+    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+  }
 
-export const TicketManager = {
   // Récupérer les tickets d'un événement
   async getByEvent(eventId) {
     try {
-      const response = await fetch(`${API_URL}/ticketsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -24,12 +26,12 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Récupérer un ticket par ID
   async getById(ticketId) {
     try {
-      const response = await fetch(`${API_URL}/ticketsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,7 +50,7 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Créer un ticket (admin)
   async create(ticketData, token) {
@@ -60,7 +62,7 @@ export const TicketManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ticketsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -80,7 +82,7 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Mettre à jour un ticket (admin)
   async update(ticketId, ticketData, token) {
@@ -92,7 +94,7 @@ export const TicketManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ticketsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,7 +115,7 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Supprimer un ticket (admin)
   async delete(ticketId, token) {
@@ -125,7 +127,7 @@ export const TicketManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ticketsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -145,7 +147,7 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Récupérer les tickets achetés par un utilisateur
   async getPurchasedByUser(token) {
@@ -157,7 +159,7 @@ export const TicketManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ticketsGeneratedApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ticketsGeneratedApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -176,7 +178,7 @@ export const TicketManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Scanner un ticket
   async scan(ticketCode, token) {
@@ -188,7 +190,7 @@ export const TicketManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/scanTicketApi.php`, {
+      const response = await fetch(`${this.apiUrl}/scanTicketApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -210,3 +212,5 @@ export const TicketManager = {
     }
   }
 }
+
+export default new TicketManager()

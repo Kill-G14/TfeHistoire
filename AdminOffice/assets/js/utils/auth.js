@@ -1,5 +1,5 @@
 // Gestion de l'authentification admin
-import { AuthManager } from '../managers/AuthManager.js'
+import AuthManager from '../managers/AuthManager.js'
 
 export const auth = {
   // Sauvegarder les données d'authentification

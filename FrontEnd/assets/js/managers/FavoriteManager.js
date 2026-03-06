@@ -1,7 +1,9 @@
 // Manager pour la gestion des favoris
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
+class FavoriteManager {
+  constructor() {
+    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+  }
 
-export const FavoriteManager = {
   // Récupérer les favoris d'un utilisateur
   async getByUser(token) {
     if (!token) {
@@ -12,7 +14,7 @@ export const FavoriteManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/favoritesApi.php`, {
+      const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -31,7 +33,7 @@ export const FavoriteManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Ajouter un événement aux favoris
   async add(eventId, token) {
@@ -43,7 +45,7 @@ export const FavoriteManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/favoritesApi.php`, {
+      const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -63,7 +65,7 @@ export const FavoriteManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Retirer un événement des favoris
   async remove(eventId, token) {
@@ -75,7 +77,7 @@ export const FavoriteManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/favoritesApi.php`, {
+      const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +97,7 @@ export const FavoriteManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Vérifier si un événement est dans les favoris
   async isFavorite(eventId, token) {
@@ -107,7 +109,7 @@ export const FavoriteManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/favoritesApi.php`, {
+      const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -129,3 +131,5 @@ export const FavoriteManager = {
     }
   }
 }
+
+export default new FavoriteManager()

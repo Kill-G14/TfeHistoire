@@ -1,7 +1,7 @@
 // Gestion de l'authentification
 
 import { storage } from './storage.js'
-import { AuthManager } from '../managers/AuthManager.js'
+import AuthManager from '../managers/AuthManager.js'
 
 const AUTH_KEY = 'eurofetes_user'
 const TOKEN_KEY = 'eurofetes_token'

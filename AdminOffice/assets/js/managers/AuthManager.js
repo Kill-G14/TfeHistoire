@@ -1,11 +1,13 @@
 // Manager pour la gestion de l'authentification admin
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
+class AuthManager {
+  constructor() {
+    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+  }
 
-export const AuthManager = {
   // Connexion admin/moderator
   async login(email, password) {
     try {
-      const response = await fetch(`${API_URL}/authApi.php`, {
+      const response = await fetch(`${this.apiUrl}/authApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -25,7 +27,7 @@ export const AuthManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Déconnexion
   async logout(token) {
@@ -37,7 +39,7 @@ export const AuthManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/authApi.php`, {
+      const response = await fetch(`${this.apiUrl}/authApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +59,7 @@ export const AuthManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Vérifier le token avec le backend
   async checkToken(token) {
@@ -69,7 +71,7 @@ export const AuthManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/authApi.php`, {
+      const response = await fetch(`${this.apiUrl}/authApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,3 +93,5 @@ export const AuthManager = {
     }
   }
 }
+
+export default new AuthManager()

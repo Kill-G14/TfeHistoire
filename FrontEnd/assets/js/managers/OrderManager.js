@@ -1,7 +1,9 @@
 // Manager pour la gestion des commandes
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
+class OrderManager {
+  constructor() {
+    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+  }
 
-export const OrderManager = {
   // Récupérer les commandes d'un utilisateur
   async getByUser(token) {
     if (!token) {
@@ -12,7 +14,7 @@ export const OrderManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ordersApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ordersApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -31,7 +33,7 @@ export const OrderManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Récupérer une commande par ID
   async getById(orderId, token) {
@@ -43,7 +45,7 @@ export const OrderManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ordersApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ordersApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -63,7 +65,7 @@ export const OrderManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Créer une commande
   async create(orderData, token) {
@@ -75,7 +77,7 @@ export const OrderManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ordersApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ordersApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +97,7 @@ export const OrderManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Annuler une commande
   async cancel(orderId, token) {
@@ -107,7 +109,7 @@ export const OrderManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/ordersApi.php`, {
+      const response = await fetch(`${this.apiUrl}/ordersApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -129,3 +131,5 @@ export const OrderManager = {
     }
   }
 }
+
+export default new OrderManager()

@@ -1,6 +1,6 @@
 // Imports
 import { auth } from '../utils/auth.js'
-import { AuthManager } from '../managers/AuthManager.js'
+import AuthManager from '../managers/AuthManager.js'
 
 // Fonction init
 async function init() {

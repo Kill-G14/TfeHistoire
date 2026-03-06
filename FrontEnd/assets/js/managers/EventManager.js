@@ -1,11 +1,13 @@
 // Manager pour la gestion des événements
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
+class EventManager {
+  constructor() {
+    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+  }
 
-export const EventManager = {
   // Récupérer tous les événements
   async getAll() {
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -23,12 +25,12 @@ export const EventManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Récupérer un événement par ID
   async getById(eventId) {
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -47,7 +49,7 @@ export const EventManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Créer un événement (nécessite authentification)
   async create(eventData, token) {
@@ -59,7 +61,7 @@ export const EventManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -79,7 +81,7 @@ export const EventManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Mettre à jour un événement (nécessite authentification)
   async update(eventId, eventData, token) {
@@ -91,7 +93,7 @@ export const EventManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -112,7 +114,7 @@ export const EventManager = {
         message: 'Erreur de connexion au serveur'
       }
     }
-  },
+  }
 
   // Supprimer un événement (nécessite authentification)
   async delete(eventId, token) {
@@ -124,7 +126,7 @@ export const EventManager = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/eventsApi.php`, {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -146,3 +148,5 @@ export const EventManager = {
     }
   }
 }
+
+export default new EventManager()

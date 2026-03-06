@@ -4,7 +4,7 @@ import { renderHeader } from '../components/header.js'
 import { renderLoginModal } from '../components/loginModal.js'
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
-import { EventManager } from '../managers/EventManager.js'
+import EventManager from '../managers/EventManager.js'
 
 async function init() {
   await renderHeader()

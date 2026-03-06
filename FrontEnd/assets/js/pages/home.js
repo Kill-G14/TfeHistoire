@@ -6,7 +6,7 @@ import { renderEventCards } from '../components/eventCard.js'
 import { showEventDetail } from '../components/eventDetail.js'
 import { helpers } from '../utils/helpers.js'
 import { filters } from '../utils/filters.js'
-import { EventManager } from '../managers/EventManager.js'
+import EventManager from '../managers/EventManager.js'
 
 let allEvents = []
 let filteredEvents = []

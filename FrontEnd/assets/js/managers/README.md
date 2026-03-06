@@ -4,12 +4,13 @@ Ce dossier contient tous les managers qui gèrent la logique des appels API vers
 
 ## Architecture
 
-Les **managers** sont responsables de :
+Les **managers** sont des **classes ES6 exportées en tant qu'instances singleton** qui sont responsables de :
 
 - Tous les appels `fetch()` vers le backend
 - La gestion des erreurs réseau
 - La structuration des données à envoyer
 - Le retour de résultats standardisés
+- Centralisation de l'URL API dans le constructeur
 
 Les **pages** sont responsables de :
 
@@ -17,6 +18,28 @@ Les **pages** sont responsables de :
 - La validation côté client
 - L'utilisation des managers pour les appels API
 - La gestion de l'état local de la page
+
+## Pattern utilisé
+
+Chaque manager est une **classe ES6** avec :
+
+- Un **constructeur** qui initialise `this.apiUrl`
+- Des **méthodes asynchrones** pour les appels API
+- Un **export default** d'une instance singleton
+
+```javascript
+class AuthManager {
+  constructor() {
+    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+  }
+
+  async login(email, password) {
+    // Logique d'appel API
+  }
+}
+
+export default new AuthManager();
+```
 
 ## Liste des Managers
 
@@ -34,7 +57,7 @@ Gestion de l'authentification utilisateur.
 **Exemple d'utilisation :**
 
 ```javascript
-import { AuthManager } from "../managers/AuthManager.js";
+import AuthManager from "../managers/AuthManager.js";
 
 const result = await AuthManager.login(email, password);
 if (result.success) {
@@ -57,7 +80,7 @@ Gestion des événements.
 **Exemple d'utilisation :**
 
 ```javascript
-import { EventManager } from "../managers/EventManager.js";
+import EventManager from "../managers/EventManager.js";
 
 // Sans authentification
 const result = await EventManager.getAll();
@@ -81,7 +104,7 @@ Gestion des favoris utilisateur.
 **Exemple d'utilisation :**
 
 ```javascript
-import { FavoriteManager } from "../managers/FavoriteManager.js";
+import FavoriteManager from "../managers/FavoriteManager.js";
 
 const token = auth.getToken();
 const result = await FavoriteManager.add(eventId, token);
@@ -104,7 +127,7 @@ Gestion des commandes.
 **Exemple d'utilisation :**
 
 ```javascript
-import { OrderManager } from "../managers/OrderManager.js";
+import OrderManager from "../managers/OrderManager.js";
 
 const token = auth.getToken();
 const result = await OrderManager.create(orderData, token);
@@ -127,7 +150,7 @@ Gestion des tickets (billetterie).
 **Exemple d'utilisation :**
 
 ```javascript
-import { TicketManager } from "../managers/TicketManager.js";
+import TicketManager from "../managers/TicketManager.js";
 
 // Sans authentification
 const result = await TicketManager.getByEvent(eventId);
@@ -179,10 +202,14 @@ const result = await Manager.method(data, token);
 
 ## URL API
 
-Tous les managers pointent vers :
+Chaque manager a son URL API définie dans le constructeur :
 
 ```javascript
-const API_URL = "http://localhost/tfeHistoire/BackEnd/Api";
+class AuthManager {
+  constructor() {
+    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+  }
+}
 ```
 
 Les endpoints correspondent aux fichiers API backend :
@@ -200,8 +227,8 @@ Les endpoints correspondent aux fichiers API backend :
 ### Dans les pages
 
 ```javascript
-// ✅ BON - Utiliser les managers
-import { EventManager } from "../managers/EventManager.js";
+// ✅ BON - Utiliser les managers (import default)
+import EventManager from "../managers/EventManager.js";
 
 async function loadEvents() {
   const result = await EventManager.getAll();
