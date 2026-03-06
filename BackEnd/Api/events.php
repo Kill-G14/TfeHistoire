@@ -34,6 +34,13 @@ $eventService = new EventService($eventRepository, $eventValidator);
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
 switch ($request->action) {
 
   case 'getAll':
@@ -41,45 +48,103 @@ switch ($request->action) {
     break;
 
   case 'getById':
-    $response = $eventService->getEventById((int) $request->id);
+    if (!isset($request->id)) {
+      $response = ['success' => false, 'message' => 'ID non fourni'];
+    } else {
+      $response = $eventService->getEventById((int) $request->id);
+    }
     break;
 
   case 'getByCountry':
-    $response = $eventService->getEventsByCountry($request->country);
+    if (!isset($request->country)) {
+      $response = ['success' => false, 'message' => 'Pays non fourni'];
+    } else {
+      $response = $eventService->getEventsByCountry($request->country);
+    }
     break;
 
   case 'getByCategory':
-    $response = $eventService->getEventsByCategory($request->category);
+    if (!isset($request->category)) {
+      $response = ['success' => false, 'message' => 'Catégorie non fournie'];
+    } else {
+      $response = $eventService->getEventsByCategory($request->category);
+    }
     break;
 
   case 'search':
-    $response = $eventService->searchEvents($request->search);
+    if (!isset($request->search)) {
+      $response = ['success' => false, 'message' => 'Terme de recherche non fourni'];
+    } else {
+      $response = $eventService->searchEvents($request->search);
+    }
     break;
 
   case 'create':
-    $userId = $authService->checkToken($request->token);
-    if (!$userId) {
-      $response = ['success' => false, 'message' => 'Token invalide'];
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $response = $eventService->createEvent((array) $request, $userId);
+      $userId = $authService->checkToken($request->token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        $response = $eventService->createEvent((array) $request, $userId);
+      }
     }
     break;
 
   case 'update':
-    $userId = $authService->checkToken($request->token);
-    if (!$userId) {
-      $response = ['success' => false, 'message' => 'Token invalide'];
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $response = $eventService->updateEvent((int) $request->id, (array) $request, $userId);
+      $userId = $authService->checkToken($request->token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        if (!isset($request->id)) {
+          $response = ['success' => false, 'message' => 'ID non fourni'];
+        } else {
+          $response = $eventService->updateEvent((int) $request->id, (array) $request, $userId);
+        }
+      }
     }
     break;
 
   case 'delete':
-    $userId = $authService->checkToken($request->token);
-    if (!$userId) {
-      $response = ['success' => false, 'message' => 'Token invalide'];
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $response = $eventService->deleteEvent((int) $request->id, $userId);
+      $userId = $authService->checkToken($request->token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        if (!isset($request->id)) {
+          $response = ['success' => false, 'message' => 'ID non fourni'];
+        } else {
+          $response = $eventService->deleteEvent((int) $request->id, $userId);
+        }
+      }
+    }
+    break;
+
+  case 'getMyEvents':
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
+    } else {
+      $userId = $authService->checkToken($request->token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        $response = $eventService->getEventsByUserId($userId);
+      }
+    }
+    break;
+
+  default:
+    $response = ['success' => false, 'message' => 'Action non reconnue'];
+    break;
+}
+
+echo json_encode($response);
     }
     break;
 

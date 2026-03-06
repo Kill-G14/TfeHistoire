@@ -40,6 +40,20 @@ $orderService = new OrderService($orderRepository, $orderItemRepository, $ticket
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
+// Vérifier le token
+if (!isset($request->token)) {
+  $response = ['success' => false, 'message' => 'Token non fourni'];
+  echo json_encode($response);
+  exit;
+}
+
 $userId = $authService->checkToken($request->token);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
@@ -53,7 +67,11 @@ switch ($request->action) {
     break;
 
   case 'getOrderById':
-    $response = $orderService->getOrderById((int) $request->id, $userId);
+    if (!isset($request->id)) {
+      $response = ['success' => false, 'message' => 'ID non fourni'];
+    } else {
+      $response = $orderService->getOrderById((int) $request->id, $userId);
+    }
     break;
 
   case 'create':
@@ -63,7 +81,11 @@ switch ($request->action) {
     break;
 
   case 'cancel':
-    $response = $orderService->cancelOrder((int) $request->id, $userId);
+    if (!isset($request->id)) {
+      $response = ['success' => false, 'message' => 'ID non fourni'];
+    } else {
+      $response = $orderService->cancelOrder((int) $request->id, $userId);
+    }
     break;
 
   default:

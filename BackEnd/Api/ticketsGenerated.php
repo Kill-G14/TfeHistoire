@@ -40,6 +40,20 @@ $pdfService = new PdfService($eventRepository, $ticketRepository, $orderItemRepo
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
+// Vérifier le token
+if (!isset($request->token)) {
+  $response = ['success' => false, 'message' => 'Token non fourni'];
+  echo json_encode($response);
+  exit;
+}
+
 $userId = $authService->checkToken($request->token);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
@@ -67,6 +81,10 @@ switch ($request->action) {
     break;
 
   case 'getTicketById':
+    if (!isset($request->id)) {
+      $response = ['success' => false, 'message' => 'ID non fourni'];
+      break;
+    }
     $ticket = $purchasedTicketRepository->getTicketById((int) $request->id);
 
     if (!$ticket) {
@@ -88,6 +106,11 @@ switch ($request->action) {
     break;
 
   case 'downloadTicket':
+    if (!isset($request->id)) {
+      $response = ['success' => false, 'message' => 'ID non fourni'];
+      echo json_encode($response);
+      exit;
+    }
     $ticketGenerated = $purchasedTicketRepository->getTicketById((int) $request->id);
 
     if (!$ticketGenerated) {

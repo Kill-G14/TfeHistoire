@@ -4,7 +4,6 @@ import { renderHeader } from '../components/header.js'
 import { renderLoginModal } from '../components/loginModal.js'
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
-import { storage } from '../utils/storage.js'
 
 async function init() {
   await renderHeader()
@@ -37,37 +36,49 @@ function attachEventListeners() {
   }
 }
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
   e.preventDefault()
 
   const formData = {
-    id: Date.now().toString(),
+    action: 'create',
+    token: auth.getToken(),
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
     country: document.getElementById('country').value,
     city: document.getElementById('city').value,
-    date: helpers.formatDate(document.getElementById('date').value),
+    postal_code: document.getElementById('postalCode')?.value || '',
+    address: document.getElementById('address')?.value || '',
+    date: document.getElementById('date').value,
     time: document.getElementById('time').value,
-    price: parseFloat(document.getElementById('price').value),
     category: document.getElementById('category').value,
-    availableTickets: parseInt(document.getElementById('availableTickets').value),
-    image: document.getElementById('imageUrl').value || "https://images.unsplash.com/photo-1767128312636-de243003b0fe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoaXN0b3JpY2FsJTIwZmVzdGl2YWwlMjBldXJvcGV8ZW58MXx8fHwxNzY3ODczMjc0fDA&ixlib=rb-4.1.0&q=80&w=1080"
+    is_free: document.getElementById('isFree')?.checked || false,
+    image_url: document.getElementById('imageUrl')?.value || ''
   }
 
-  // Récupérer les événements existants
-  const events = storage.get('eurofetes_events') || []
-  
-  // Ajouter le nouvel événement
-  events.push(formData)
-  
-  // Sauvegarder
-  storage.set('eurofetes_events', events)
+  // Désactiver le bouton de soumission
+  const submitBtn = createEventForm.querySelector('button[type="submit"]')
+  if (submitBtn) {
+    submitBtn.disabled = true
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Création...'
+  }
 
-  helpers.showToast('Événement créé avec succès !', 'success')
+  // Appel API pour créer l'événement
+  const result = await helpers.apiCallAuth('events.php', formData)
 
-  setTimeout(() => {
-    window.location.href = '../pages/index.html'
-  }, 1000)
+  if (result.success) {
+    helpers.showToast('Événement créé avec succès !', 'success')
+    setTimeout(() => {
+      window.location.href = '../pages/index.html'
+    }, 1000)
+  } else {
+    helpers.showToast(result.message || 'Erreur lors de la création de l\'événement', 'error')
+    
+    // Réactiver le bouton
+    if (submitBtn) {
+      submitBtn.disabled = false
+      submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Créer l\'événement'
+    }
+  }
 }
 
 if (document.readyState === 'loading') {

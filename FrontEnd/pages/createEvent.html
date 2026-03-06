@@ -159,6 +159,30 @@
               />
             </div>
           </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label for="postalCode" class="form-label">Code postal *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="postalCode"
+                placeholder="Ex: 75001"
+                required
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label for="address" class="form-label">Adresse *</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                placeholder="Ex: Place de la République"
+                required
+              />
+            </div>
+          </div>
         </div>
 
         <!-- Date et horaires -->
@@ -188,9 +212,18 @@
             Billetterie
           </div>
 
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="isFree" />
+              <label class="form-check-label" for="isFree">
+                Événement gratuit
+              </label>
+            </div>
+          </div>
+
           <div class="row g-3">
             <div class="col-md-6">
-              <label for="price" class="form-label">Prix du ticket (€) *</label>
+              <label for="price" class="form-label">Prix du ticket (€)</label>
               <input
                 type="number"
                 class="form-control"
@@ -198,13 +231,14 @@
                 placeholder="25.00"
                 step="0.01"
                 min="0"
-                required
+                value="0"
               />
+              <small class="text-muted">Laisser à 0 si gratuit</small>
             </div>
 
             <div class="col-md-6">
               <label for="availableTickets" class="form-label"
-                >Nombre de tickets disponibles *</label
+                >Nombre de tickets disponibles</label
               >
               <input
                 type="number"
@@ -212,8 +246,10 @@
                 id="availableTickets"
                 placeholder="500"
                 min="1"
-                required
               />
+              <small class="text-muted"
+                >Optionnel pour les événements libres</small
+              >
             </div>
           </div>
         </div>
@@ -225,10 +261,10 @@
             class="btn btn-outline-secondary flex-fill"
             id="btnCancel"
           >
-            Annuler
+            <i class="bi bi-x-circle"></i> Annuler
           </button>
           <button type="submit" class="btn btn-primary flex-fill">
-            Publier l'événement
+            <i class="bi bi-check-circle"></i> Créer l'événement
           </button>
         </div>
       </form>

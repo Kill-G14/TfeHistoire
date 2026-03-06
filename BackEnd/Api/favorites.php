@@ -34,6 +34,20 @@ $favoriteService = new FavoriteService($favoriteRepository, $eventRepository);
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
+// Vérifier le token
+if (!isset($request->token)) {
+  $response = ['success' => false, 'message' => 'Token non fourni'];
+  echo json_encode($response);
+  exit;
+}
+
 $userId = $authService->checkToken($request->token);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
@@ -47,15 +61,27 @@ switch ($request->action) {
     break;
 
   case 'add':
-    $response = $favoriteService->addFavorite($userId, (int) $request->event_id);
+    if (!isset($request->event_id)) {
+      $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
+    } else {
+      $response = $favoriteService->addFavorite($userId, (int) $request->event_id);
+    }
     break;
 
   case 'remove':
-    $response = $favoriteService->removeFavorite($userId, (int) $request->event_id);
+    if (!isset($request->event_id)) {
+      $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
+    } else {
+      $response = $favoriteService->removeFavorite($userId, (int) $request->event_id);
+    }
     break;
 
   case 'isFavorite':
-    $response = $favoriteService->isFavorite($userId, (int) $request->event_id);
+    if (!isset($request->event_id)) {
+      $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
+    } else {
+      $response = $favoriteService->isFavorite($userId, (int) $request->event_id);
+    }
     break;
 
   default:

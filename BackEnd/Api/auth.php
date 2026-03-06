@@ -28,6 +28,13 @@ $authService = new AuthService($userRepository, $userValidator, $sessionService)
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
 switch ($request->action) {
   case 'register':
     $response = $authService->register((array) $request);
@@ -38,16 +45,24 @@ switch ($request->action) {
     break;
 
   case 'getCurrentUser':
-    $userId = $authService->checkToken($request->token);
-    if (!$userId) {
-      $response = ['success' => false, 'message' => 'Token invalide'];
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
     } else {
-      $response = $authService->getCurrentUser($userId);
+      $userId = $authService->checkToken($request->token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        $response = $authService->getCurrentUser($userId);
+      }
     }
     break;
 
   case 'logout':
-    $response = $authService->logout($request->token);
+    if (!isset($request->token)) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
+    } else {
+      $response = $authService->logout($request->token);
+    }
     break;
 
   default:

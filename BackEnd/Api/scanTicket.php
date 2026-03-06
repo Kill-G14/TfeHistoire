@@ -30,6 +30,20 @@ $authService = new AuthService($userRepository, $userValidator, $sessionService)
 
 $request = json_decode(file_get_contents("php://input"));
 
+// Vérifier que la requête est valide
+if (!$request || !isset($request->action)) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
+}
+
+// Vérifier le token
+if (!isset($request->token)) {
+  $response = ['success' => false, 'message' => 'Token non fourni'];
+  echo json_encode($response);
+  exit;
+}
+
 $userId = $authService->checkToken($request->token);
 if (!$userId) {
   $response = ['success' => false, 'message' => 'Token invalide'];
@@ -47,6 +61,10 @@ if (!$user || !$user->is_organizer) {
 
 switch ($request->action) {
   case 'validate':
+    if (!isset($request->unique_code) && !isset($request->qr_code)) {
+      $response = ['success' => false, 'message' => 'Code unique ou QR code requis'];
+      break;
+    }
     $code = $request->unique_code ?? $request->qr_code;
     $ticket = $purchasedTicketRepository->getTicketByUniqueCode($code);
 
@@ -77,6 +95,10 @@ switch ($request->action) {
     break;
 
   case 'checkStatus':
+    if (!isset($request->unique_code) && !isset($request->qr_code)) {
+      $response = ['success' => false, 'message' => 'Code unique ou QR code requis'];
+      break;
+    }
     $code = $request->unique_code ?? $request->qr_code;
     $ticket = $purchasedTicketRepository->getTicketByUniqueCode($code);
 
