@@ -1,161 +1,80 @@
 <?php
 
-// Headers CORS
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Content-Type: application/json; charset=UTF-8');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Gestion de la requête OPTIONS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-  http_response_code(200);
-  exit;
-}
+require __DIR__ . '/../vendor/autoload.php';
 
-// Autoload Composer
-require_once __DIR__ . '/../vendor/autoload.php';
-
-// Repositories
+// Models
+// repositories 
 use App\Repositories\TicketRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
-
-// Validators
+// Validator
 use App\Validators\TicketValidator;
 use App\Validators\UserValidator;
-
-// Services
+// services
 use App\Services\AuthService;
 use App\Services\TicketService;
 use App\Services\SessionService;
 
-// Utils
-use App\Utils\Logger;
-
-// Repositories
+// Models
+// repositories 
 $ticketRepository = new TicketRepository();
 $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
-
-// Validators
+// Validator
 $ticketValidator = new TicketValidator();
 $userValidator = new UserValidator();
-
-// Services
+// services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $ticketService = new TicketService($ticketRepository, $eventRepository, $ticketValidator);
 
-try {
-  // Récupération des données JSON
-  $input = file_get_contents('php://input');
-  $data = json_decode($input, true);
+$request = json_decode(file_get_contents("php://input"));
 
-  if (!$data || !isset($data['action'])) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Action non spécifiée'
-    ]);
-    exit;
-  }
+switch ($request->action) {
+  case 'getByEvent':
+    $response = $ticketService->getTicketsByEventId((int) $request->event_id);
+    break;
 
-  $action = $data['action'];
+  case 'getById':
+    $response = $ticketService->getTicketById((int) $request->id);
+    break;
 
-  // Actions publiques (pas besoin d'authentification)
-  if ($action === 'getByEvent') {
-    if (!isset($data['event_id'])) {
-      echo json_encode([
-        'success' => false,
-        'message' => 'ID de l\'événement non fourni'
-      ]);
-      exit;
+  case 'create':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $ticketService->createTicket((array) $request, $userId);
     }
+    break;
 
-    $result = $ticketService->getTicketsByEventId((int) $data['event_id']);
-    echo json_encode($result);
-    exit;
-  }
+  case 'update':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $ticketService->updateTicket((int) $request->id, (array) $request, $userId);
+    }
+    break;
 
-  // Actions nécessitant l'authentification (organizer)
-  if (!isset($data['token']) || empty($data['token'])) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Non authentifié'
-    ]);
-    exit;
-  }
+  case 'delete':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $ticketService->deleteTicket((int) $request->id, $userId);
+    }
+    break;
 
-  $token = $data['token'];
-  $userId = $authService->checkToken($token);
-
-  if (!$userId) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Token invalide'
-    ]);
-    exit;
-  }
-
-  // Routing par action
-  switch ($action) {
-    case 'create':
-      $result = $ticketService->createTicket($data, $userId);
-      echo json_encode($result);
-      break;
-
-    case 'update':
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
-
-      $result = $ticketService->updateTicket((int) $data['id'], $data, $userId);
-      echo json_encode($result);
-      break;
-
-    case 'delete':
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
-
-      $result = $ticketService->deleteTicket((int) $data['id'], $userId);
-      echo json_encode($result);
-      break;
-
-    case 'getById':
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
-
-      $result = $ticketService->getTicketById((int) $data['id']);
-      echo json_encode($result);
-      break;
-
-    default:
-      echo json_encode([
-        'success' => false,
-        'message' => 'Action inconnue'
-      ]);
-      break;
-  }
-
-} catch (Exception $e) {
-  Logger::error('Tickets API error', ['error' => $e->getMessage()]);
-  echo json_encode([
-    'success' => false,
-    'message' => 'Une erreur est survenue'
-  ]);
+  default:
+    $response = ['success' => false, 'message' => 'Action non reconnue'];
+    break;
 }
+
+echo json_encode($response);

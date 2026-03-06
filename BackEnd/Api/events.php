@@ -1,253 +1,100 @@
 <?php
 
-// Headers CORS
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Content-Type: application/json; charset=UTF-8');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Gestion de la requête OPTIONS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-  http_response_code(200);
-  exit;
-}
+require __DIR__ . '/../vendor/autoload.php';
 
-// Autoload Composer
-require_once __DIR__ . '/../vendor/autoload.php';
-
-// Repositories
+// Models
+// repositories 
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
-
-// Validators
+// Validator
 use App\Validators\EventValidator;
 use App\Validators\UserValidator;
-
-// Services
+// services
 use App\Services\AuthService;
 use App\Services\EventService;
 use App\Services\SessionService;
 
-// Utils
-use App\Utils\Logger;
-
-// Repositories
+// Models
+// repositories 
 $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
-
-// Validators
+// Validator
 $eventValidator = new EventValidator();
 $userValidator = new UserValidator();
-
-// Services
+// services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
 $eventService = new EventService($eventRepository, $eventValidator);
 
-try {
-  // Récupération des données JSON
-  $input = file_get_contents('php://input');
-  $data = json_decode($input, true);
+$request = json_decode(file_get_contents("php://input"));
 
-  if (!$data || !isset($data['action'])) {
-    echo json_encode([
-      'success' => false,
-      'message' => 'Action non spécifiée'
-    ]);
-    exit;
-  }
+switch ($request->action) {
 
-  $action = $data['action'];
+  case 'getAll':
+    $response = $eventService->getAllEvents();
+    break;
 
-  // Routing par action
-  switch ($action) {
-    case 'getAll':
-      $result = $eventService->getAllEvents();
-      echo json_encode($result);
-      break;
+  case 'getById':
+    $response = $eventService->getEventById((int) $request->id);
+    break;
 
-    case 'getById':
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
+  case 'getByCountry':
+    $response = $eventService->getEventsByCountry($request->country);
+    break;
 
-      $result = $eventService->getEventById((int) $data['id']);
-      echo json_encode($result);
-      break;
+  case 'getByCategory':
+    $response = $eventService->getEventsByCategory($request->category);
+    break;
 
-    case 'getByCountry':
-      if (!isset($data['country'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Pays non fourni'
-        ]);
-        exit;
-      }
+  case 'search':
+    $response = $eventService->searchEvents($request->search);
+    break;
 
-      $result = $eventService->getEventsByCountry($data['country']);
-      echo json_encode($result);
-      break;
+  case 'create':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $eventService->createEvent((array) $request, $userId);
+    }
+    break;
 
-    case 'getByCategory':
-      if (!isset($data['category'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Catégorie non fournie'
-        ]);
-        exit;
-      }
+  case 'update':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $eventService->updateEvent((int) $request->id, (array) $request, $userId);
+    }
+    break;
 
-      $result = $eventService->getEventsByCategory($data['category']);
-      echo json_encode($result);
-      break;
+  case 'delete':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $eventService->deleteEvent((int) $request->id, $userId);
+    }
+    break;
 
-    case 'search':
-      if (!isset($data['search'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Terme de recherche non fourni'
-        ]);
-        exit;
-      }
+  case 'getMyEvents':
+    $userId = $authService->checkToken($request->token);
+    if (!$userId) {
+      $response = ['success' => false, 'message' => 'Token invalide'];
+    } else {
+      $response = $eventService->getEventsByUserId($userId);
+    }
+    break;
 
-      $result = $eventService->searchEvents($data['search']);
-      echo json_encode($result);
-      break;
-
-    case 'create':
-      // Vérifier l'authentification
-      if (!isset($data['token']) || empty($data['token'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Non authentifié'
-        ]);
-        exit;
-      }
-
-      $token = $data['token'];
-      $userId = $authService->checkToken($token);
-
-      if (!$userId) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Token invalide'
-        ]);
-        exit;
-      }
-
-      $result = $eventService->createEvent($data, $userId);
-      echo json_encode($result);
-      break;
-
-    case 'update':
-      // Vérifier l'authentification
-      if (!isset($data['token']) || empty($data['token'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Non authentifié'
-        ]);
-        exit;
-      }
-
-      $token = $data['token'];
-      $userId = $authService->checkToken($token);
-
-      if (!$userId) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Token invalide'
-        ]);
-        exit;
-      }
-
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
-
-      $result = $eventService->updateEvent((int) $data['id'], $data, $userId);
-      echo json_encode($result);
-      break;
-
-    case 'delete':
-      // Vérifier l'authentification
-      if (!isset($data['token']) || empty($data['token'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Non authentifié'
-        ]);
-        exit;
-      }
-
-      $token = $data['token'];
-      $userId = $authService->checkToken($token);
-
-      if (!$userId) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Token invalide'
-        ]);
-        exit;
-      }
-
-      if (!isset($data['id'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'ID non fourni'
-        ]);
-        exit;
-      }
-
-      $result = $eventService->deleteEvent((int) $data['id'], $userId);
-      echo json_encode($result);
-      break;
-
-    case 'getMyEvents':
-      // Vérifier l'authentification
-      if (!isset($data['token']) || empty($data['token'])) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Non authentifié'
-        ]);
-        exit;
-      }
-
-      $token = $data['token'];
-      $userId = $authService->checkToken($token);
-
-      if (!$userId) {
-        echo json_encode([
-          'success' => false,
-          'message' => 'Token invalide'
-        ]);
-        exit;
-      }
-
-      $result = $eventService->getEventsByUserId($userId);
-      echo json_encode($result);
-      break;
-
-    default:
-      echo json_encode([
-        'success' => false,
-        'message' => 'Action inconnue'
-      ]);
-      break;
-  }
-
-} catch (Exception $e) {
-  Logger::error('Events API error', ['error' => $e->getMessage()]);
-  echo json_encode([
-    'success' => false,
-    'message' => 'Une erreur est survenue'
-  ]);
+  default:
+    $response = ['success' => false, 'message' => 'Action non reconnue'];
+    break;
 }
+
+echo json_encode($response);

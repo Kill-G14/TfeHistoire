@@ -423,6 +423,35 @@ container.appendChild(clone);
 - `await response.json()` pour récupération
 - Pas de couche d'abstraction
 
+Exemple de structure :
+
+   async function connect(email, password) {
+        const header = {
+            "Content-Type": "application/json",
+        };
+        const method = "POST";
+        const body = JSON.stringify({
+            email: email,
+            password: password,
+            action: "connect"
+        });
+        const result = await fetch("http://localhost/", {
+            method: method,
+            headers: header,
+            body: body,
+        });
+        const resultJson = await result.json();
+        console.log(resultJson);
+
+        if (resultJson.success && resultJson.token) {
+            localStorage.setItem("token", resultJson.token);
+            console.log("Connexion reussie" + resultJson.token);
+            window.location.href = "reception.html";    
+        } else {
+            console.log("Connexion echouee");
+        }
+    }
+
 #### Gestion asynchrone
 
 - `async/await` pour toutes les opérations asynchrones
