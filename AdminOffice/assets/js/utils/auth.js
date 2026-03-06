@@ -1,4 +1,6 @@
 // Gestion de l'authentification admin
+import { AuthManager } from '../managers/AuthManager.js'
+
 export const auth = {
   // Sauvegarder les données d'authentification
   saveAuthData(token, user, remember = false) {
@@ -42,21 +44,7 @@ export const auth = {
     const token = this.getToken()
 
     if (token) {
-      try {
-        await fetch('../../BackEnd/Api/auth.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            action: 'logout',
-            token: token
-          })
-        })
-      } catch (error) {
-        console.error('Erreur lors de la déconnexion:', error)
-      }
+      await AuthManager.logout(token)
     }
 
     // Supprimer les données locales
@@ -74,30 +62,17 @@ export const auth = {
     const token = this.getToken()
     if (!token) return false
 
-    try {
-      const response = await fetch('../../BackEnd/Api/auth.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          action: 'getCurrentUser',
-          token: token
-        })
-      })
+    const result = await AuthManager.checkToken(token)
 
-      const result = await response.json()
+    if (!result.success) {
+      this.logout()
+      return false
+    }
 
-      if (!result.success) {
-        this.logout()
-        return false
-      }
-
-      // Vérifier le rôle
-      if (!this.isAdminOrModerator()) {
-        this.logout()
-        return false
+    // Vérifier le rôle
+    if (!this.isAdminOrModerator()) {
+      this.logout()
+      return false
       }
 
       return true

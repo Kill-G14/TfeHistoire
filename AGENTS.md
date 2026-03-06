@@ -46,6 +46,12 @@ assets/
   │   │   ├── cart.js
   │   │   ├── checkout.js
   │   │   └── account.js
+  │   ├── managers/
+  │   │   ├── AuthManager.js
+  │   │   ├── EventManager.js
+  │   │   ├── FavoriteManager.js
+  │   │   ├── OrderManager.js
+  │   │   └── TicketManager.js
   │   └── utils/
   │       ├── auth.js
   │       ├── storage.js
@@ -85,10 +91,11 @@ assets/
 ### Organisation JavaScript
 
 - Modules ES6 avec `type="module"`
-- Séparation en 3 dossiers :
+- Séparation en 4 dossiers :
   - `components/` : composants réutilisables qui chargent templates HTML
-  - `pages/` : scripts spécifiques à chaque page
-  - `utils/` : fonctions utilitaires
+  - `pages/` : scripts spécifiques à chaque page (interactions UI uniquement)
+  - `managers/` : logique des appels API vers le backend
+  - `utils/` : fonctions utilitaires (formatage, storage, auth)
 - Un fichier par fonctionnalité ou composant
 - Exports nommés ou par défaut selon contexte
 
@@ -194,10 +201,11 @@ Exemple :
 
 ### Organisation JS
 
-#### Séparation composants/pages
+#### Séparation composants/pages/managers
 
 - **Components** : composants réutilisables qui chargent des templates HTML
-- **Pages** : scripts dédiés à une page spécifique
+- **Pages** : scripts dédiés à une page spécifique (interactions UI uniquement)
+- **Managers** : logique des appels API vers le backend
 - **Utils** : fonctions utilitaires transversales
 - **Templates HTML** : fichiers `.html` dans `assets/components/` avec balises `<template>`
 
@@ -206,7 +214,8 @@ Exemple :
 ```javascript
 // Imports
 import { renderNavbar } from "../components/navbar.js";
-import { loadProducts } from "../utils/helpers.js";
+import { EventManager } from "../managers/EventManager.js";
+import { helpers } from "../utils/helpers.js";
 
 // Fonction init
 async function init() {
@@ -217,12 +226,12 @@ async function init() {
 
 // Fonctions de chargement de données
 async function loadData() {
-  const response = await fetch("api-url.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "getData" }),
-  });
-  const result = await response.json();
+  const result = await EventManager.getAll();
+  if (result.success) {
+    displayData(result.data);
+  } else {
+    helpers.showToast(result.message, "error");
+  }
 }
 
 // Gestion des événements
@@ -234,6 +243,38 @@ if (document.readyState === "loading") {
 } else {
   init();
 }
+```
+
+#### Structure d'un manager
+
+```javascript
+// Manager pour la gestion des événements
+const API_URL = "http://localhost/tfeHistoire/BackEnd/Api";
+
+export const EventManager = {
+  // Récupérer tous les événements
+  async getAll() {
+    try {
+      const response = await fetch(`${API_URL}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "getAll",
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors du chargement des événements:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  },
+};
 ```
 
 #### Structure d'un composant
@@ -411,7 +452,9 @@ container.appendChild(clone);
 
 #### Appels API
 
-- `fetch()` natif
+- Tous les appels `fetch()` doivent être dans les **Managers**
+- Les pages ne font **jamais** de `fetch()` directement
+- Utilisation de managers pour centraliser la logique API
 - Méthode POST
 - Headers JSON :
   ```javascript
@@ -421,36 +464,51 @@ container.appendChild(clone);
   ```
 - Body stringifié : `JSON.stringify(data)`
 - `await response.json()` pour récupération
-- Pas de couche d'abstraction
+- Retour standardisé : `{ success: boolean, message: string, data?: any }`
 
-Exemple de structure :
+Exemple dans un Manager :
 
-   async function connect(email, password) {
-        const header = {
-            "Content-Type": "application/json",
-        };
-        const method = "POST";
-        const body = JSON.stringify({
-            email: email,
-            password: password,
-            action: "connect"
-        });
-        const result = await fetch("http://localhost/", {
-            method: method,
-            headers: header,
-            body: body,
-        });
-        const resultJson = await result.json();
-        console.log(resultJson);
+```javascript
+export const EventManager = {
+  async getAll() {
+    try {
+      const response = await fetch(`${API_URL}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "getAll",
+        }),
+      });
 
-        if (resultJson.success && resultJson.token) {
-            localStorage.setItem("token", resultJson.token);
-            console.log("Connexion reussie" + resultJson.token);
-            window.location.href = "reception.html";    
-        } else {
-            console.log("Connexion echouee");
-        }
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
     }
+  },
+};
+```
+
+Utilisation dans une page :
+
+```javascript
+import { EventManager } from "../managers/EventManager.js";
+
+async function loadEvents() {
+  const result = await EventManager.getAll();
+
+  if (result.success) {
+    displayEvents(result.data);
+  } else {
+    helpers.showToast(result.message, "error");
+  }
+}
+```
 
 #### Gestion asynchrone
 
@@ -501,12 +559,25 @@ Exemple de structure :
 
 ### Appels API
 
-- `fetch()` natif direct dans les pages/composants
-- Méthode POST avec JSON
-- Headers `Content-Type: application/json`
-- Body avec `JSON.stringify()`
-- Pas de couche d'abstraction API
+- **Managers** : tous les appels `fetch()` sont centralisés dans les managers
+- **Pages** : utilisent les managers, ne font jamais de `fetch()` directement
+- Un manager par domaine (Auth, Event, Favorite, Order, Ticket)
+- Méthodes avec paramètres clairs
+- Retour standardisé : `{ success: boolean, message: string, data?: any }`
+- Gestion des erreurs dans les managers
 - `async/await` obligatoire
+
+Exemple :
+
+```javascript
+// Dans la page
+import { EventManager } from "../managers/EventManager.js";
+
+const result = await EventManager.getAll();
+if (result.success) {
+  // Traiter les données
+}
+```
 
 ### Responsive
 
@@ -518,7 +589,7 @@ Exemple de structure :
 
 ### Structure obligatoire
 
-- Toujours respecter l'arborescence `assets/js/{components,pages,utils}` et `assets/components/`
+- Toujours respecter l'arborescence `assets/js/{components,pages,managers,utils}` et `assets/components/`
 - Un fichier HTML = un fichier JS dans `pages/`
 - Tous les HTML dans le dossier `pages/`
 - Templates HTML dans `assets/components/`
@@ -562,10 +633,19 @@ Exemple de structure :
 
 ### API
 
-- `fetch()` natif direct
-- Pas de couche d'abstraction
+- Tous les appels `fetch()` dans les **Managers**
+- Un manager par domaine (Auth, Event, Favorite, etc.)
 - Méthode POST avec JSON
 - Headers et body à chaque appel
+- Retour standardisé : `{ success: boolean, message: string, data?: any }`
+
+### Managers
+
+- Un fichier manager par domaine métier
+- Nommage : `{Domain}Manager.js` (PascalCase)
+- Export const avec méthodes
+- Gestion des erreurs dans try/catch
+- Les pages utilisent les managers, jamais fetch directement
 
 ### Utilitaires
 
@@ -611,7 +691,7 @@ Exemple de structure :
 - Créer des variables globales
 - Dupliquer du code (créer un composant ou une fonction)
 - Utiliser des classes ES6 pour les composants (fonctions simples)
-- Créer une couche d'abstraction API
+- Faire des appels `fetch()` dans les pages (utiliser les managers)
 
 ---
 
@@ -828,7 +908,7 @@ public function getEntityById(int $id): ?Entity {
 // Models
 use App\Models\ModelName;
 
-// repositories 
+// repositories
 use App\Repositories\repositoryName;
 
 // Validator
@@ -837,12 +917,10 @@ use App\Validators\ValidatorName;
 // services
 use App\Services\ServiceName;
 
-
-
 // Models
 $modelName = new ModelName();
 
-// repositories 
+// repositories
 $userRepository = new UserRepository();
 
 // Validator
@@ -850,8 +928,6 @@ $validator = new ValidatorName();
 
 // services
 $service = new ServiceName($userRepository, $validator);
-
-
 
 #### Typage
 

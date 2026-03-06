@@ -1,10 +1,10 @@
 // Gestion de l'authentification
 
 import { storage } from './storage.js'
+import { AuthManager } from '../managers/AuthManager.js'
 
 const AUTH_KEY = 'eurofetes_user'
 const TOKEN_KEY = 'eurofetes_token'
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
 
 export const auth = {
   // Vérifier si l'utilisateur est connecté
@@ -19,69 +19,28 @@ export const auth = {
 
   // Connexion avec appel API
   async login(email, password) {
-    try {
-      const response = await fetch(`${API_URL}/auth.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'login',
-          email: email,
-          password: password
-        })
-      })
+    const result = await AuthManager.login(email, password)
 
-      const result = await response.json()
-
-      if (result.success) {
-        // Stocker l'utilisateur et le token
-        storage.set(AUTH_KEY, result.data.user)
-        storage.set(TOKEN_KEY, result.data.token)
-      }
-
-      return result
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error)
-      return {
-        success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+    if (result.success) {
+      // Stocker l'utilisateur et le token
+      storage.set(AUTH_KEY, result.data.user)
+      storage.set(TOKEN_KEY, result.data.token)
     }
+
+    return result
   },
 
   // Inscription avec appel API
   async register(email, password, name) {
-    try {
-      const response = await fetch(`${API_URL}/auth.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'register',
-          email: email,
-          password: password,
-          name: name
-        })
-      })
+    const result = await AuthManager.register(email, password, name)
 
-      const result = await response.json()
-
-      if (result.success) {
-        // Stocker l'utilisateur et le token
-        storage.set(AUTH_KEY, result.data.user)
-        storage.set(TOKEN_KEY, result.data.token)
-      }
-
-      return result
-    } catch (error) {
-      console.error('Erreur lors de l\'inscription:', error)
-      return {
-        success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+    if (result.success) {
+      // Stocker l'utilisateur et le token
+      storage.set(AUTH_KEY, result.data.user)
+      storage.set(TOKEN_KEY, result.data.token)
     }
+
+    return result
   },
 
   // Déconnexion avec appel API
@@ -89,20 +48,7 @@ export const auth = {
     const token = storage.get(TOKEN_KEY)
 
     if (token) {
-      try {
-        await fetch(`${API_URL}/auth.php`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'logout',
-            token: token
-          })
-        })
-      } catch (error) {
-        console.error('Erreur lors de la déconnexion:', error)
-      }
+      await AuthManager.logout(token)
     }
 
     // Supprimer les données locales dans tous les cas

@@ -6,6 +6,7 @@ import { renderEventCards } from '../components/eventCard.js'
 import { showEventDetail } from '../components/eventDetail.js'
 import { helpers } from '../utils/helpers.js'
 import { filters } from '../utils/filters.js'
+import { EventManager } from '../managers/EventManager.js'
 
 let allEvents = []
 let filteredEvents = []
@@ -22,7 +23,7 @@ async function init() {
 
 async function loadEvents() {
   // Charger les événements depuis le backend
-  const result = await helpers.apiCall('events.php', { action: 'getAll' })
+  const result = await EventManager.getAll()
   
   if (result.success) {
     allEvents = result.data

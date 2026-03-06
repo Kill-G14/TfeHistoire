@@ -1,9 +1,5 @@
 // Fonctions utilitaires
 
-import { auth } from './auth.js'
-
-const API_URL = 'http://localhost/tfeHistoire/BackEnd/Api'
-
 export const helpers = {
   // Formater une date
   formatDate(dateStr) {
@@ -78,59 +74,5 @@ export const helpers = {
   getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search)
     return urlParams.get(param)
-  },
-
-  // Appel API sans authentification
-  async apiCall(endpoint, data) {
-    try {
-      const response = await fetch(`${API_URL}/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      return await response.json()
-    } catch (error) {
-      console.error('Erreur API:', error)
-      return {
-        success: false,
-        message: 'Erreur de connexion au serveur'
-      }
-    }
-  },
-
-  // Appel API avec authentification (ajoute automatiquement le token)
-  async apiCallAuth(endpoint, data) {
-    const token = auth.getToken()
-
-    if (!token) {
-      return {
-        success: false,
-        message: 'Non authentifié'
-      }
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...data,
-          token: token
-        })
-      })
-
-      return await response.json()
-    } catch (error) {
-      console.error('Erreur API:', error)
-      return {
-        success: false,
-        message: 'Erreur de connexion au serveur'
-      }
-    }
   }
 }

@@ -1,5 +1,6 @@
 // Imports
 import { auth } from '../utils/auth.js'
+import { AuthManager } from '../managers/AuthManager.js'
 
 // Fonction init
 async function init() {
@@ -45,43 +46,24 @@ async function handleLogin() {
   submitBtn.disabled = true
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...'
 
-  try {
-    const response = await fetch('../../BackEnd/Api/auth.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        action: 'login',
-        email: email,
-        password: password
-      })
-    })
+  const result = await AuthManager.login(email, password)
 
-    const result = await response.json()
-
-    if (result.success) {
-      // Vérifier le rôle
-      if (result.data.role !== 'admin' && result.data.role !== 'moderator') {
-        showError('Accès refusé. Seuls les administrateurs et modérateurs peuvent se connecter.')
-        submitBtn.disabled = false
-        submitBtn.innerHTML = 'Connexion'
-        return
-      }
-
-      // Sauvegarder les données d'authentification
-      auth.saveAuthData(result.data.token, result.data.user, remember)
-
-      // Rediriger vers le dashboard
-      window.location.href = 'index.html'
-    } else {
-      showError(result.message || 'Email ou mot de passe incorrect')
+  if (result.success) {
+    // Vérifier le rôle
+    if (result.data.role !== 'admin' && result.data.role !== 'moderator') {
+      showError('Accès refusé. Seuls les administrateurs et modérateurs peuvent se connecter.')
       submitBtn.disabled = false
       submitBtn.innerHTML = 'Connexion'
+      return
     }
-  } catch (error) {
-    console.error('Erreur lors de la connexion:', error)
-    showError('Erreur de connexion. Veuillez réessayer.')
+
+    // Sauvegarder les données d'authentification
+    auth.saveAuthData(result.data.token, result.data.user, remember)
+
+    // Rediriger vers le dashboard
+    window.location.href = 'index.html'
+  } else {
+    showError(result.message || 'Email ou mot de passe incorrect')
     submitBtn.disabled = false
     submitBtn.innerHTML = 'Connexion'
   }

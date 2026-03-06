@@ -4,6 +4,7 @@ import { renderHeader } from '../components/header.js'
 import { renderLoginModal } from '../components/loginModal.js'
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
+import { EventManager } from '../managers/EventManager.js'
 
 async function init() {
   await renderHeader()
@@ -39,9 +40,7 @@ function attachEventListeners() {
 async function handleSubmit(e) {
   e.preventDefault()
 
-  const formData = {
-    action: 'create',
-    token: auth.getToken(),
+  const eventData = {
     title: document.getElementById('title').value,
     description: document.getElementById('description').value,
     country: document.getElementById('country').value,
@@ -63,7 +62,8 @@ async function handleSubmit(e) {
   }
 
   // Appel API pour créer l'événement
-  const result = await helpers.apiCallAuth('events.php', formData)
+  const token = auth.getToken()
+  const result = await EventManager.create(eventData, token)
 
   if (result.success) {
     helpers.showToast('Événement créé avec succès !', 'success')
