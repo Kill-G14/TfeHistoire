@@ -65,7 +65,7 @@ switch ($request['action']) {
       $response = ['success' => false, 'message' => 'Code unique ou QR code requis'];
       break;
     }
-    $code = $request->unique_code ?? $request->qr_code;
+    $code = $request['unique_code'] ?? $request['qr_code'];
     $ticket = $purchasedTicketRepository->getTicketByUniqueCode($code);
 
     if (!$ticket) {

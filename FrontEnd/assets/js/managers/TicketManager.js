@@ -165,7 +165,7 @@ class TicketManager {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'getByUser',
+          action: 'getMyTickets',
           token: token
         })
       })
@@ -196,9 +196,9 @@ class TicketManager {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'scan',
+          action: 'validate',
           token: token,
-          ticket_code: ticketCode
+          unique_code: ticketCode
         })
       })
 

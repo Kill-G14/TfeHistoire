@@ -147,6 +147,78 @@ class EventManager {
       }
     }
   }
+
+  // Récupérer les événements par pays
+  async getByCountry(country) {
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'getByCountry',
+          country: country
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors du chargement des événements par pays:', error)
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
+
+  // Récupérer les événements par catégorie
+  async getByCategory(category) {
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'getByCategory',
+          category: category
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors du chargement des événements par catégorie:', error)
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
+
+  // Rechercher des événements
+  async search(searchTerm) {
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'search',
+          search: searchTerm
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors de la recherche d\'événements:', error)
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
 }
 
 export default new EventManager()

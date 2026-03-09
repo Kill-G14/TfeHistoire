@@ -48,7 +48,7 @@ switch ($request['action']) {
     if (!isset($request['event_id'])) {
       $response = ['success' => false, 'message' => 'ID de l\'événement non fourni'];
     } else {
-      $response = $ticketService->getTicketsByEventId((int) $request->event_id);
+      $response = $ticketService->getTicketsByEventId((int) $request['event_id']);
     }
     break;
 
