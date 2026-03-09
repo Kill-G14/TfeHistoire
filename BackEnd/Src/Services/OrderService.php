@@ -126,7 +126,7 @@ class OrderService {
     $order->is_paid = false;
     $order->is_failed = false;
     $order->is_cancelled = false;
-    $order->payment_provider = 'mollie';
+    $order->payment_provider = 'stripe';
     $order->payment_id = null;
 
     $orderId = $this->orderRepository->createOrder($order);

@@ -1,6 +1,136 @@
 # État du projet - TfeHistoire
 
-**Date de vérification :** 05/03/2026
+**Date de vérification :** 09/03/2026
+**Architecture :** SPA (Single Page Application) - En transition
+
+---
+
+## 🔄 MIGRATION VERS SPA - EN COURS
+
+### ⚠️ TRANSITION ARCHITECTURE
+
+**État actuel :** Multi-pages (multiple fichiers HTML)
+**État cible :** Single Page Application (SPA)
+**Documentation :** Mise à jour dans AGENTS.md
+
+### 📋 Changements requis pour passer en SPA
+
+#### 1. **Structure des fichiers** ⭐⭐⭐ PRIORITÉ HAUTE
+
+**À faire :**
+
+- ✅ Créer un seul `index.html` à la racine de FrontEnd/
+- ✅ Créer `assets/js/app.js` (point d'entrée principal)
+- ✅ Créer `assets/js/router.js` (routeur SPA avec History API)
+- ✅ Renommer `assets/js/pages/` en `assets/js/views/`
+- ✅ Créer `assets/js/store/appState.js` (state management)
+- ✅ Déplacer templates HTML dans `assets/templates/views/`
+- ⚠️ Supprimer les anciens fichiers HTML de `pages/`
+
+**Fichiers à créer :**
+
+```
+FrontEnd/
+├── index.html                    # SEUL fichier HTML
+├── assets/
+│   ├── js/
+│   │   ├── app.js               # Point d'entrée + init
+│   │   ├── router.js            # Routeur SPA
+│   │   ├── views/               # Ex-pages (renommé)
+│   │   │   ├── home.js
+│   │   │   ├── events.js
+│   │   │   ├── eventDetail.js
+│   │   │   ├── createEvent.js
+│   │   │   ├── profile.js
+│   │   │   ├── myOrders.js
+│   │   │   ├── myTickets.js
+│   │   │   └── map.js
+│   │   ├── store/
+│   │   │   └── appState.js      # State management
+│   │   └── ...
+│   └── templates/
+│       └── views/
+│           ├── home.html
+│           ├── events.html
+│           ├── eventDetail.html
+│           └── ...
+```
+
+#### 2. **Adaptation des vues** ⭐⭐
+
+**Chaque vue doit :**
+
+- ✅ Exporter `meta` : `{ title, description }`
+- ✅ Exporter `mount(container, params)` : montage de la vue
+- ✅ Exporter `unmount()` : démontage et nettoyage
+- ✅ Utiliser `appState` pour l'état global
+- ✅ Nettoyer les event listeners dans `unmount()`
+
+**Exemple de structure :**
+
+```javascript
+// views/home.js
+export const meta = {
+  title: "Accueil - EuroFêtes",
+  description: "Découvrez les événements historiques",
+};
+
+export async function mount(container, params) {
+  // Injection template + chargement données + événements
+}
+
+export async function unmount() {
+  // Nettoyage
+}
+
+export default { mount, unmount, meta };
+```
+
+#### 3. **Navigation SPA** ⭐⭐⭐ PRIORITÉ HAUTE
+
+**À faire :**
+
+- ✅ Tous les liens internes doivent avoir `data-link`
+- ✅ URLs sans `.html` : `/events`, `/event/123`
+- ✅ Interception des clics dans le routeur
+- ✅ Support History API (boutons précédent/suivant)
+- ✅ Lazy loading des vues avec `import()`
+
+**Exemple :**
+
+```html
+<!-- Avant (multi-pages) -->
+<a href="/pages/events.html">Événements</a>
+
+<!-- Après (SPA) -->
+<a href="/events" data-link>Événements</a>
+```
+
+#### 4. **State Management** ⭐⭐
+
+**À faire :**
+
+- ✅ Créer `store/appState.js`
+- ✅ Implémenter pattern subscribe/notify
+- ✅ Gérer l'état global : `user`, `cart`, `events`, `favorites`
+- ✅ Synchroniser composants automatiquement
+- ✅ Persister dans localStorage
+
+#### 5. **Composants persistants** ⭐
+
+**À faire :**
+
+- ✅ Navbar et footer chargés UNE SEULE FOIS dans `app.js`
+- ✅ Mise à jour dynamique selon l'état (user connecté/déconnecté)
+- ✅ Pas de réinjection à chaque changement de vue
+
+#### 6. **Métadonnées dynamiques** ⭐
+
+**À faire :**
+
+- ✅ `<title id="pageTitle">` dans index.html
+- ✅ `<meta id="pageDescription">` dans index.html
+- ✅ Mise à jour automatique par le routeur
 
 ---
 
@@ -69,17 +199,17 @@
 
 ## ⚠️ CE QUI MANQUE
 
-### 1. **Intégration Mollie** ⭐⭐⭐
+### 1. **Intégration Stripe** ⭐⭐⭐
 
 **Priorité :** HAUTE
 
-Le système de paiement avec Mollie n'est pas encore implémenté.
+Le système de paiement avec Stripe n'est pas encore implémenté.
 
 **À faire :**
 
-- Créer un service `MollieService.php` dans `Src/Services/`
-- Intégrer la librairie Mollie via Composer : `composer require mollie/mollie-api-php`
-- Ajouter une action `initPayment` dans `orders.php` pour créer le paiement Mollie
+- Créer un service `StripeService.php` dans `Src/Services/`
+- Intégrer la librairie Stripe via Composer : `composer require stripe/stripe-php`
+- Ajouter une action `initPayment` dans `orders.php` pour créer le paiement Stripe
 - Créer un endpoint `webhook.php` pour recevoir les confirmations de paiement
 - Appeler `OrderService->confirmPayment()` après confirmation du webhook
 
@@ -88,10 +218,10 @@ Le système de paiement avec Mollie n'est pas encore implémenté.
 ```
 BackEnd/
 ├── Api/
-│   └── webhook.php               # Webhook Mollie
+│   └── webhook.php               # Webhook Stripe
 └── Src/
     └── Services/
-        └── MollieService.php     # Intégration Mollie API
+        └── StripeService.php     # Intégration Stripe API
 ```
 
 ---
@@ -216,25 +346,25 @@ Le frontend utilise encore des données mockées. Il faut le connecter aux vraie
   - Page "Mes commandes"
   - Page "Mes billets"
   - Page "Mes favoris"
-- Intégrer le système de paiement Mollie côté frontend
+- Intégrer le système de paiement Stripe côté frontend
 - Créer une page de confirmation de paiement
 
 **Pages à créer :**
 
 ```
-FrontEnd/pages/
-├── eventDetail.html              # Détails événement
-├── myOrders.html                 # Mes commandes
-├── myTickets.html                # Mes billets
-├── myFavorites.html              # Mes favoris
-└── paymentSuccess.html           # Confirmation paiement
+FrontEnd/views/
+├── eventDetail.js                # Détails événement
+├── myOrders.js                   # Mes commandes
+├── myTickets.js                  # Mes billets
+├── myFavorites.js                # Mes favoris
+└── paymentSuccess.js             # Confirmation paiement
 
-FrontEnd/assets/js/pages/
-├── eventDetail.js
-├── myOrders.js
-├── myTickets.js
-├── myFavorites.js
-└── paymentSuccess.js
+FrontEnd/assets/templates/views/
+├── eventDetail.html
+├── myOrders.html
+├── myTickets.html
+├── myFavorites.html
+└── paymentSuccess.html
 ```
 
 ---
@@ -288,7 +418,7 @@ Cette partie sera développée séparément du frontend public.
 
 ### Intégrations externes : 25% ⚠️
 
-- ❌ Mollie (paiement)
+- ❌ Stripe (paiement)
 - ❌ SendGrid (emails)
 - ✅ PDF (billets) - **INTÉGRÉ**
 - ❌ Google Maps
@@ -306,7 +436,7 @@ Cette partie sera développée séparément du frontend public.
 ### Phase 1 - Critique (pour MVP)
 
 1. ✅ APIs backend complètes
-2. ❌ Intégration Mollie (paiement)
+2. ❌ Intégration Stripe (paiement)
 3. ❌ Envoi d'emails SendGrid
 4. ✅ **Génération PDF des billets - INTÉGRÉ**
 5. ❌ Connecter frontend aux APIs
@@ -331,8 +461,8 @@ Cette partie sera développée séparément du frontend public.
 # Se placer dans le dossier BackEnd
 cd c:\wamp64\www\tfeHistoire\BackEnd
 
-# Installer Mollie
-composer require mollie/mollie-api-php
+# Installer Stripe
+composer require stripe/stripe-php
 
 # Installer SendGrid
 composer require sendgrid/sendgrid
@@ -343,4 +473,4 @@ composer require tecnickcom/tcpdf
 
 ---
 
-**Note :** Le backend est fonctionnel à 100% pour les opérations CRUD. Les intégrations tierces (Mollie, SendGrid, PDF) et le frontend sont les prochaines étapes critiques.
+**Note :** Le backend est fonctionnel à 100% pour les opérations CRUD. Les intégrations tierces (Stripe, SendGrid, PDF) et le frontend sont les prochaines étapes critiques.

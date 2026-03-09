@@ -11,27 +11,22 @@ Concidére que je suis un Junior Dev donc n'utilise pas de technique trop pousse
 
 ---
 
-# PARTIE 1 : STANDARD FRONTEND
+# PARTIE 1 : STANDARD FRONTEND (SPA - Single Page Application)
 
 ## 1. STRUCTURE FRONTEND
 
 ### Arborescence des dossiers
 
 ```
-pages/
-  ├── index.html
-  ├── products.html
-  ├── cart.html
-  ├── register.html
-  ├── blog.html
-  ├── login.html
-  └── ect....
+index.html                         # SEUL fichier HTML de l'application
 
 assets/
   ├── css/
   │   ├── custom.css
   │   └── input.css
   ├── js/
+  │   ├── app.js                  # Point d'entrée principal + routeur
+  │   ├── router.js               # Routeur SPA (History API)
   │   ├── components/
   │   │   ├── navbar.js
   │   │   ├── footer.js
@@ -39,7 +34,7 @@ assets/
   │   │   ├── loginModal.js
   │   │   ├── cartWidget.js
   │   │   └── newsletter.js
-  │   ├── pages/
+  │   ├── views/
   │   │   ├── home.js
   │   │   ├── products.js
   │   │   ├── productDetail.js
@@ -52,32 +47,41 @@ assets/
   │   │   ├── FavoriteManager.js
   │   │   ├── OrderManager.js
   │   │   └── TicketManager.js
+  │   ├── store/
+  │   │   └── appState.js         # Gestion d'état centralisée
   │   └── utils/
   │       ├── auth.js
   │       ├── storage.js
   │       └── helpers.js
-  ├── components/
+  ├── templates/
   │   ├── navbar.html
   │   ├── footer.html
   │   ├── productCard.html
   │   ├── loginModal.html
-  │   └── cartWidget.html
+  │   ├── cartWidget.html
+  │   └── views/
+  │       ├── home.html
+  │       ├── products.html
+  │       ├── productDetail.html
+  │       ├── cart.html
+  │       └── checkout.html
   └── images/
       ├── logo.png
       └── ... autres images
 ```
 
-### Guideslines
+### Guidelines
 
-- Lire Guidelines.md pour avoir une cohérence visuelle et structurelle pour le porjet frontend
+- Lire Guidelines.md pour avoir une cohérence visuelle et structurelle pour le projet frontend
+- **SPA** : Un seul fichier HTML, toutes les pages sont des vues chargées dynamiquement
 
-### Organisation des fichiers HTML
+### Organisation du fichier HTML unique
 
-- Un fichier HTML par page dans le dossier `pages/`
-- Templates de composants dans `assets/components/`
-- Templates HTML natifs avec balise `<template>`
-- Nommage en camelCase
-- Structure sémantique et claire
+- **Un seul** `index.html` à la racine
+- Contient les éléments persistants (navbar, footer)
+- Contient un conteneur principal `#app` pour l'injection des vues
+- Scripts chargés une seule fois au démarrage
+- Métadonnées mises à jour dynamiquement via JavaScript
 
 ### Organisation CSS
 
@@ -91,10 +95,13 @@ assets/
 ### Organisation JavaScript
 
 - Modules ES6 avec `type="module"`
-- Séparation en 4 dossiers :
-  - `components/` : composants réutilisables qui chargent templates HTML
-  - `pages/` : scripts spécifiques à chaque page (interactions UI uniquement)
+- **app.js** : Point d'entrée principal de l'application
+- **router.js** : Routeur SPA avec History API
+- Séparation en 5 dossiers :
+  - `components/` : composants réutilisables (navbar, footer, cards)
+  - `views/` : vues correspondant aux routes (home, products, cart)
   - `managers/` : logique des appels API vers le backend
+  - `store/` : gestion d'état centralisée de l'application
   - `utils/` : fonctions utilitaires (formatage, storage, auth)
 - Un fichier par fonctionnalité ou composant
 - Exports nommés ou par défaut selon contexte
@@ -103,17 +110,18 @@ assets/
 
 - CSS : `assets/css/`
 - JS : `assets/js/`
-- Templates HTML : `assets/components/`
+- Templates HTML : `assets/templates/`
+- Templates de vues : `assets/templates/views/`
 - Images : `assets/images/`
-- Chemins relatifs depuis les pages : `../assets/`
+- Chemins absolus depuis la racine : `/assets/`
 
 ## 2. CONVENTIONS DE NOMMAGE FRONTEND
 
-### Fichiers HTML
+### Fichier HTML
 
-- camelCase : `index.html`, `products.html`
-- Un nom par fonctionnalité : `checkout.html`, `favorites.html`
-- Templates dans `assets/components/` : `navbar.html`, `productCard.html`
+- **Un seul fichier** : `index.html` à la racine
+- Templates de vues dans `assets/templates/views/` : `home.html`, `products.html`
+- Templates de composants dans `assets/templates/` : `navbar.html`, `productCard.html`
 
 ### Fichiers CSS
 
@@ -121,28 +129,34 @@ assets/
 
 ### Fichiers JS
 
+- **app.js** : Point d'entrée principal
+- **router.js** : Routeur SPA
 - camelCase : `productCard.js`, `loginModal.js`
 - Un fichier JS par composant dans `components/`
+- Un fichier JS par vue dans `views/`
 
 ### Variables JavaScript
 
-- camelCase : `cartCount`, `isAuth`, `productId`, `templateObjects`
-- Constantes en UPPERCASE : `API_BASE_URL`
+- camelCase : `cartCount`, `isAuth`, `productId`, `currentRoute`
+- Constantes en UPPERCASE : `API_BASE_URL`, `ROUTES`
 
 ### Fonctions JavaScript
 
 - camelCase : `renderNavbar()`, `loadProducts()`, `attachEventListeners()`
 - Préfixes courants :
-  - `render` : pour le rendu de composants
+  - `render` : pour le rendu de composants/vues
   - `load` : pour le chargement de données
   - `loadTemplate` : pour le chargement de templates HTML
   - `attach` : pour les écouteurs d'événements
-  - `create` : pour la création d'éléments
+  - `navigate` : pour la navigation entre vues
+  - `init` : pour l'initialisation
+  - `mount` : pour le montage d'une vue
+  - `unmount` : pour le démontage d'une vue
   - `get`, `set` : pour les getters/setters
 
 ### Classes JavaScript
 
-- PascalCase : `ApiClient`, `ProductApi`
+- PascalCase : `Router`, `AppState`, `ApiClient`
 
 ### Classes CSS
 
@@ -151,11 +165,12 @@ assets/
 
 ### IDs HTML
 
-- camelCase : `#navbar`, `#productList`, `#modalContainer`
+- camelCase : `#app`, `#navbar`, `#footer`, `#viewContainer`
+- **#app** : Conteneur principal obligatoire pour les vues
 
 ### Dossiers
 
-- Minuscules simples : `pages/`, `components/`, `utils/`, `css/`, `images/`
+- Minuscules simples : `views/`, `components/`, `utils/`, `css/`, `images/`, `templates/`, `store/`
 
 ## 3. ARCHITECTURE FRONTEND
 
@@ -163,9 +178,11 @@ assets/
 
 - Doctype HTML5
 - Structure sémantique avec balises HTML5
-- Sections identifiées par `id` pour injection dynamique
+- **Un seul fichier** `index.html` à la racine
+- Conteneur principal `#app` pour l'injection dynamique des vues
+- Navbar et footer injectés une seule fois au démarrage
 - Bootstrap pour la grille et composants UI
-- Scripts module en fin de `<body>`
+- Script module `app.js` en fin de `<body>`
 
 Exemple :
 
@@ -173,15 +190,42 @@ Exemple :
 <!doctype html>
 <html lang="fr">
   <head>
-    <!-- meta, title, fonts, CSS -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">Mon Application</title>
+    <meta
+      name="description"
+      id="pageDescription"
+      content="Description par défaut"
+    />
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/custom.css" />
   </head>
   <body>
+    <!-- Navbar persistant -->
     <nav id="navbar"></nav>
-    <main>
-      <!-- contenu -->
-    </main>
+
+    <!-- Conteneur principal pour les vues -->
+    <main id="app"></main>
+
+    <!-- Footer persistant -->
     <footer id="footer"></footer>
-    <script type="module" src="../assets/js/pages/home.js"></script>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Application principale -->
+    <script type="module" src="/assets/js/app.js"></script>
   </body>
 </html>
 ```
@@ -193,49 +237,64 @@ Exemple :
   - Surcharges Bootstrap
   - Classes utilitaires personnalisées
   - Styles spécifiques au projet
+  - Animations de transitions entre vues
 - Organisation du CSS :
   - Styles généraux en premier
   - Surcharges Bootstrap
   - Classes utilitaires
   - Composants spécifiques
+  - Animations et transitions
 
 ### Organisation JS
 
-#### Séparation composants/pages/managers
+#### Séparation app/router/components/views/managers
 
-- **Components** : composants réutilisables qui chargent des templates HTML
-- **Pages** : scripts dédiés à une page spécifique (interactions UI uniquement)
+- **app.js** : Point d'entrée principal, initialisation de l'application
+- **router.js** : Routeur SPA avec History API
+- **Components** : composants réutilisables (navbar, footer, cards)
+- **Views** : vues correspondant aux routes (home, products, cart)
 - **Managers** : logique des appels API vers le backend
+- **Store** : gestion d'état centralisée (appState.js)
 - **Utils** : fonctions utilitaires transversales
-- **Templates HTML** : fichiers `.html` dans `assets/components/` avec balises `<template>`
 
-#### Structure d'un fichier page
+#### Structure du fichier app.js (Point d'entrée)
 
 ```javascript
 // Imports
-import { renderNavbar } from "../components/navbar.js";
-import EventManager from "../managers/EventManager.js";
-import { helpers } from "../utils/helpers.js";
+import { Router } from "./router.js";
+import { renderNavbar } from "./components/navbar.js";
+import { renderFooter } from "./components/footer.js";
+import { appState } from "./store/appState.js";
+import { auth } from "./utils/auth.js";
+
+// Définition des routes
+const routes = {
+  "/": () => import("./views/home.js"),
+  "/products": () => import("./views/products.js"),
+  "/product/:id": () => import("./views/productDetail.js"),
+  "/cart": () => import("./views/cart.js"),
+  "/checkout": () => import("./views/checkout.js"),
+  "/account": () => import("./views/account.js"),
+};
+
+// Instance du routeur
+const router = new Router(routes, "#app");
 
 // Fonction init
 async function init() {
+  // Vérifier l'authentification
+  await auth.checkAuth();
+
+  // Rendre les composants persistants
   await renderNavbar();
-  await loadData();
-  attachEventListeners();
-}
+  await renderFooter();
 
-// Fonctions de chargement de données
-async function loadData() {
-  const result = await EventManager.getAll();
-  if (result.success) {
-    displayData(result.data);
-  } else {
-    helpers.showToast(result.message, "error");
-  }
-}
+  // Initialiser le routeur
+  router.init();
 
-// Gestion des événements
-function attachEventListeners() {}
+  // Écouter les changements d'état
+  appState.subscribe("user", updateNavbar);
+}
 
 // Initialisation
 if (document.readyState === "loading") {
@@ -243,6 +302,226 @@ if (document.readyState === "loading") {
 } else {
   init();
 }
+```
+
+#### Structure du fichier router.js
+
+```javascript
+// Routeur SPA avec History API
+export class Router {
+  constructor(routes, appSelector) {
+    this.routes = routes;
+    this.appElement = document.querySelector(appSelector);
+    this.currentView = null;
+    this.params = {};
+  }
+
+  init() {
+    // Écouter les changements d'URL
+    window.addEventListener("popstate", () => this.handleRoute());
+
+    // Intercepter les clics sur les liens
+    document.addEventListener("click", (e) => {
+      if (e.target.matches("[data-link]")) {
+        e.preventDefault();
+        this.navigate(e.target.getAttribute("href"));
+      }
+    });
+
+    // Charger la route initiale
+    this.handleRoute();
+  }
+
+  async navigate(url) {
+    history.pushState(null, null, url);
+    await this.handleRoute();
+  }
+
+  async handleRoute() {
+    const path = window.location.pathname;
+
+    // Trouver la route correspondante
+    const route = this.matchRoute(path);
+
+    if (route) {
+      // Démonter la vue précédente
+      if (this.currentView && this.currentView.unmount) {
+        await this.currentView.unmount();
+      }
+
+      // Charger et monter la nouvelle vue
+      const viewModule = await route.handler();
+      this.currentView = viewModule.default || viewModule;
+
+      // Mettre à jour les métadonnées
+      this.updateMetadata(this.currentView.meta);
+
+      // Monter la vue
+      await this.currentView.mount(this.appElement, this.params);
+    } else {
+      // Route 404
+      this.show404();
+    }
+  }
+
+  matchRoute(path) {
+    for (const [pattern, handler] of Object.entries(this.routes)) {
+      const match = this.match(pattern, path);
+      if (match) {
+        this.params = match.params;
+        return { handler, params: match.params };
+      }
+    }
+    return null;
+  }
+
+  match(pattern, path) {
+    // Convertir le pattern en regex (ex: /product/:id -> /product/([^/]+))
+    const paramNames = [];
+    const regexPattern = pattern
+      .replace(/:[^/]+/g, (match) => {
+        paramNames.push(match.slice(1));
+        return "([^/]+)";
+      })
+      .replace(/\//g, "\\/");
+
+    const regex = new RegExp(`^${regexPattern}$`);
+    const matches = path.match(regex);
+
+    if (matches) {
+      const params = {};
+      paramNames.forEach((name, index) => {
+        params[name] = matches[index + 1];
+      });
+      return { params };
+    }
+
+    return null;
+  }
+
+  updateMetadata(meta = {}) {
+    document.title = meta.title || "Mon Application";
+
+    const description = document.getElementById("pageDescription");
+    if (description) {
+      description.content = meta.description || "Description par défaut";
+    }
+  }
+
+  show404() {
+    this.appElement.innerHTML = `
+      <div class="container text-center py-5">
+        <h1>404</h1>
+        <p>Page non trouvée</p>
+        <a href="/" data-link class="btn btn-primary">Retour à l'accueil</a>
+      </div>
+    `;
+  }
+}
+```
+
+#### Structure d'un fichier view
+
+```javascript
+// Imports
+import EventManager from "../managers/EventManager.js";
+import { helpers } from "../utils/helpers.js";
+import { appState } from "../store/appState.js";
+
+// Métadonnées de la vue
+export const meta = {
+  title: "Accueil - Mon Site",
+  description: "Description de la page d'accueil",
+};
+
+// Template HTML (peut aussi être chargé depuis assets/templates/views/)
+const template = `
+  <div class="container">
+    <h1>Page d'accueil</h1>
+    <div id="eventsList"></div>
+  </div>
+`;
+
+// Variables locales de la vue
+let events = [];
+let unsubscribe = null;
+
+// Fonction mount (appelée lors du chargement de la vue)
+export async function mount(container, params) {
+  // Injecter le template
+  container.innerHTML = template;
+
+  // Charger les données
+  await loadEvents();
+
+  // Attacher les événements
+  attachEventListeners();
+
+  // S'abonner aux changements d'état
+  unsubscribe = appState.subscribe("events", renderEvents);
+}
+
+// Fonction unmount (appelée avant de quitter la vue)
+export async function unmount() {
+  // Nettoyer les event listeners
+  // Annuler les abonnements
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
+  // Annuler les requêtes en cours
+  // Libérer les ressources
+}
+
+// Charger les événements
+async function loadEvents() {
+  const result = await EventManager.getAll();
+
+  if (result.success) {
+    events = result.data;
+    appState.set("events", events);
+    renderEvents(events);
+  } else {
+    helpers.showToast(result.message, "error");
+  }
+}
+
+// Rendre les événements
+function renderEvents(events) {
+  const container = document.getElementById("eventsList");
+  if (!container) return;
+
+  container.innerHTML = events
+    .map(
+      (event) => `
+    <div class="card">
+      <h3>${event.name}</h3>
+      <p>${event.description}</p>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+// Attacher les event listeners
+function attachEventListeners() {
+  // Event delegation
+  const container = document.getElementById("eventsList");
+  if (!container) return;
+
+  container.addEventListener("click", (e) => {
+    if (e.target.matches(".btn-details")) {
+      const id = e.target.dataset.id;
+      // Navigation
+      window.dispatchEvent(
+        new CustomEvent("navigate", { detail: `/product/${id}` }),
+      );
+    }
+  });
+}
+
+// Export par défaut
+export default { mount, unmount, meta };
 ```
 
 #### Structure d'un manager
@@ -287,6 +566,7 @@ export default new EventManager();
 ```javascript
 // Imports
 import { auth } from "../utils/auth.js";
+import { appState } from "../store/appState.js";
 
 // Objet pour stocker les templates
 const templateObjects = {};
@@ -306,52 +586,166 @@ async function loadTemplate(path) {
 }
 
 // Export de fonction de rendu
-export async function renderComponent() {
-  await loadTemplate("../components/component.html");
+export async function renderNavbar() {
+  await loadTemplate("/assets/templates/navbar.html");
 
-  const element = document.getElementById("component");
+  const element = document.getElementById("navbar");
   if (!element) return;
 
-  const clone = templateObjects["componentTemplate"].cloneNode(true);
+  const clone = templateObjects["navbarTemplate"].cloneNode(true);
   element.appendChild(clone);
+
+  // Attacher les événements
+  attachNavbarEvents();
+
+  // S'abonner aux changements d'état utilisateur
+  appState.subscribe("user", updateNavbar);
+}
+
+function attachNavbarEvents() {
+  // Event listeners pour la navbar
+  const navbar = document.getElementById("navbar");
+  if (!navbar) return;
+
+  // Intercepter les liens pour la navigation SPA
+  navbar.addEventListener("click", (e) => {
+    if (e.target.matches("[data-link]")) {
+      e.preventDefault();
+      const href = e.target.getAttribute("href");
+      window.dispatchEvent(new CustomEvent("navigate", { detail: href }));
+    }
+  });
+}
+
+function updateNavbar(user) {
+  // Mettre à jour l'affichage de la navbar selon l'utilisateur
+  const loginBtn = document.getElementById("loginBtn");
+  const userMenu = document.getElementById("userMenu");
+
+  if (user) {
+    loginBtn?.classList.add("d-none");
+    userMenu?.classList.remove("d-none");
+  } else {
+    loginBtn?.classList.remove("d-none");
+    userMenu?.classList.add("d-none");
+  }
 }
 ```
 
 #### Structure d'un template HTML
 
 ```html
-<template id="productCard">
-  <div class="card">
-    <img src="" alt="Product" class="productImage" />
-    <h3 class="productName"></h3>
-    <p class="productPrice"></p>
-    <button class="btn btn-primary addToCart">Ajouter</button>
-  </div>
+<template id="navbarTemplate">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a href="/" data-link class="navbar-brand">Mon Site</a>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a href="/" data-link class="nav-link">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a href="/products" data-link class="nav-link">Produits</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </template>
+```
+
+#### Structure appState.js (Store)
+
+```javascript
+// Gestion d'état centralisée
+class AppState {
+  constructor() {
+    this.state = {
+      user: null,
+      cart: [],
+      events: [],
+      favorites: [],
+    };
+    this.subscribers = {};
+  }
+
+  // Obtenir une valeur
+  get(key) {
+    return this.state[key];
+  }
+
+  // Définir une valeur
+  set(key, value) {
+    this.state[key] = value;
+    this.notify(key, value);
+  }
+
+  // S'abonner aux changements
+  subscribe(key, callback) {
+    if (!this.subscribers[key]) {
+      this.subscribers[key] = [];
+    }
+    this.subscribers[key].push(callback);
+
+    // Retourner une fonction de désabonnement
+    return () => {
+      this.subscribers[key] = this.subscribers[key].filter(
+        (cb) => cb !== callback,
+      );
+    };
+  }
+
+  // Notifier les abonnés
+  notify(key, value) {
+    if (this.subscribers[key]) {
+      this.subscribers[key].forEach((callback) => callback(value));
+    }
+  }
+
+  // Réinitialiser l'état
+  reset() {
+    this.state = {
+      user: null,
+      cart: [],
+      events: [],
+      favorites: [],
+    };
+    Object.keys(this.subscribers).forEach((key) => {
+      this.notify(key, this.state[key]);
+    });
+  }
+}
+
+// Export d'une instance singleton
+export const appState = new AppState();
 ```
 
 #### Structure Utils
 
 ```javascript
-export const utilName = {
-  method1() {},
-  method2() {},
+export const helpers = {
+  formatDate(date) {
+    // ...
+  },
+  showToast(message, type) {
+    // ...
+  },
 };
 ```
 
-### Scripts par page
+### Scripts et chargement
 
-- Un fichier JS principal par page dans `pages/`
-- Import des composants nécessaires
+- **Un seul script** : `app.js` chargé au démarrage
+- Lazy loading des vues via `import()` dynamique
 - Bootstrap JS via CDN chargé avant le script custom
-- Ordre : Bootstrap Bundle → Script page module
+- Ordre : Bootstrap Bundle → app.js
 
 ### Organisation du DOM
 
-- Sections identifiées par ID pour injection : `#navbar`, `#footer`, `#productList`
+- **#app** : Conteneur principal pour l'injection des vues
+- **#navbar** : Navbar persistante (chargée une seule fois)
+- **#footer** : Footer persistant (chargé une seule fois)
 - IDs pour éléments interactifs
 - Classes Bootstrap pour styles
-- `dataset` pour stocker des données : `data-product-id`
+- `dataset` pour stocker des données : `data-product-id`, `data-link`
 
 ## 4. RÈGLES DE CODE FRONTEND
 
@@ -362,26 +756,27 @@ export const utilName = {
 - Doctype HTML5 : `<!doctype html>`
 - Lang : `<html lang="fr">`
 - Viewport responsive : `<meta name="viewport" content="width=device-width, initial-scale=1.0">`
+- Métadonnées avec ID pour mise à jour dynamique : `<title id="pageTitle">`, `<meta id="pageDescription">`
 
 #### Indentation
 
 - 2 espaces
 - Balises auto-fermantes avec `/>`
 
-#### Organisation
+#### Organisation du fichier index.html
 
 - HEAD :
   - Meta charset et viewport
-  - Title
+  - Title et description avec IDs
   - Preconnect fonts
   - CDN CSS (Bootstrap, Icons, Fonts)
   - CSS custom
 - BODY :
-  - Navbar injectée via JS
-  - Contenu principal
-  - Footer injecté via JS
-  - Scripts en fin de body
-  - Scripts avec `type="module"`
+  - Navbar avec `id="navbar"` (injectée au démarrage)
+  - Conteneur principal `<main id="app"></main>`
+  - Footer avec `id="footer"` (injecté au démarrage)
+  - Scripts CDN (Bootstrap Bundle)
+  - Script principal `app.js` avec `type="module"`
 
 ### CSS
 
@@ -391,13 +786,28 @@ export const utilName = {
 - Surcharges Bootstrap (btn, colors)
 - Classes utilitaires personnalisées
 - Styles de composants
-- Animations et transitions
+- **Animations de transitions entre vues**
+- Classes pour les états de chargement
 
 #### Structure
 
 - Sélecteurs simples
 - Classes Bootstrap surchargées avec `!important` si nécessaire
 - Classes utilitaires préfixées ou descriptives
+
+#### Transitions SPA
+
+```css
+/* Exemple de transitions pour la SPA */
+#app {
+  transition: opacity 0.3s ease-in-out;
+}
+
+#app.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+```
 
 #### Séparation des fichiers
 
@@ -409,6 +819,7 @@ export const utilName = {
 
 - ES6+ : async/await, arrow functions, template literals
 - Modules ES6 : import/export
+- Import dynamique pour lazy loading : `import()`
 - camelCase pour variables et fonctions
 - Pas de point-virgule obligatoire (dépend du style)
 - Template literals pour HTML : `` `<div></div>` ``
@@ -416,21 +827,57 @@ export const utilName = {
 
 #### Organisation du code
 
+##### app.js (Point d'entrée)
+
 - Imports en haut
-- Déclarations de fonctions
-- Fonction `init()` comme point d'entrée
+- Définition des routes
+- Instanciation du routeur
+- Fonction `init()` : initialisation de l'application
+- Chargement unique des composants persistants
 - Initialisation en bas avec `DOMContentLoaded`
-- Déclarations d'objets templates en haut
+
+##### router.js
+
+- Classe `Router` exportée
+- Méthode `init()` : initialisation et event listeners
+- Méthode `navigate()` : navigation programmatique
+- Méthode `handleRoute()` : gestion des changements de route
+- Méthode `matchRoute()` : correspondance pattern/URL
+- Méthode `updateMetadata()` : mise à jour title/description
+
+##### views/
+
+- Export `meta` : métadonnées de la vue (title, description)
+- Export `mount()` : fonction appelée lors du chargement de la vue
+- Export `unmount()` : fonction appelée avant de quitter la vue
+- Fonctions privées pour la logique interne
+- Export default d'un objet `{ mount, unmount, meta }`
+
+##### components/
+
+- Fonction `render{ComponentName}()` exportée
+- Chargement du template HTML
+- Injection dans le conteneur approprié
+- Attachement des event listeners
+- Abonnement aux changements d'état si nécessaire
+
+##### store/appState.js
+
+- Classe `AppState` avec state management
+- Méthodes `get()` et `set()`
+- Méthode `subscribe()` pour abonnements
+- Méthode `notify()` pour notifier les abonnés
+- Export d'une instance singleton
 
 #### Manipulation du DOM
 
-- `document.getElementById()` pour sélection
+- `document.getElementById()` ou `document.querySelector()` pour sélection
 - `element.innerHTML` ou `appendChild()` pour injection
-- `document.addEventListener()` pour les événements globaux
-- Event delegation pour les événements dynamiques
+- Event delegation systématique
 - `e.target.closest()` pour remonter au parent
-- `dataset` pour stocker des données : `data-product-id`
+- `dataset` pour stocker des données : `data-product-id`, `data-link`
 - `cloneNode(true)` pour templates
+- **Nettoyage des event listeners** dans `unmount()`
 
 #### Gestion des templates HTML
 
@@ -455,10 +902,24 @@ const clone = templateObjects["cardProduct"].cloneNode(true);
 container.appendChild(clone);
 ```
 
+#### Navigation SPA
+
+```javascript
+// Navigation via routeur
+import { router } from './router.js'
+router.navigate('/products')
+
+// Ou via événement personnalisé
+window.dispatchEvent(new CustomEvent('navigate', { detail: '/products' }))
+
+// Liens HTML avec data-link
+<a href="/products" data-link>Produits</a>
+```
+
 #### Appels API
 
 - Tous les appels `fetch()` doivent être dans les **Managers**
-- Les pages ne font **jamais** de `fetch()` directement
+- Les vues ne font **jamais** de `fetch()` directement
 - Utilisation de managers pour centraliser la logique API
 - Méthode POST
 - Headers JSON :
@@ -499,7 +960,7 @@ export const EventManager = {
 };
 ```
 
-Utilisation dans une page :
+Utilisation dans une vue :
 
 ```javascript
 import EventManager from "../managers/EventManager.js";
@@ -520,52 +981,97 @@ async function loadEvents() {
 - `async/await` pour toutes les opérations asynchrones
 - `try/catch` pour la gestion d'erreurs
 - Retour de résultats via objets : `{ success: true, data: ... }`
+- Gestion des requêtes en vol (annulation dans `unmount()`)
+
+#### Gestion du state
+
+- Utilisation du store `appState` pour l'état global
+- Abonnement aux changements : `appState.subscribe('key', callback)`
+- Désabonnement dans `unmount()` pour éviter les fuites mémoire
+- LocalStorage pour la persistance (auth, settings)
 
 ## 5. BONNES PRATIQUES FRONTEND
 
 ### Séparation CSS / JS / HTML
 
-- HTML : structure et contenu statique uniquement
+- HTML : structure unique dans `index.html`
 - CSS : styles et présentation
-- JS : logique, interactions, injection dynamique
+- JS : logique, routing, interactions, injection dynamique
 - Pas de styles inline dans le HTML
 - Pas de HTML statique répété (utiliser des composants JS)
 
-### Organisation des pages
+### Organisation de l'application SPA
 
-- Une page = un fichier HTML + un fichier JS dans `pages/`
-- Les composants sont injectés dynamiquement
-- Navigation via liens relatifs : `/pages/products.html`
-- Paramètres d'URL : `product-detail.html?id=123`
+- Un seul fichier `index.html` à la racine
+- Routeur pour gérer la navigation (router.js)
+- Vues dans `assets/js/views/` (un fichier par route)
+- Composants réutilisables dans `assets/js/components/`
+- Templates HTML dans `assets/templates/` et `assets/templates/views/`
+- Navigation sans rechargement de page
+- URLs propres sans `.html` : `/products`, `/product/123`
 
 ### Gestion des scripts
 
-- Un script module par page
-- Import des composants nécessaires
+- **Un seul script chargé** : `app.js` (point d'entrée)
+- Lazy loading des vues avec `import()` dynamique
 - Bootstrap JS via CDN chargé avant le script custom
-- Ordre : Bootstrap Bundle → Script page
+- Ordre : Bootstrap Bundle → app.js
+
+### Cycle de vie des vues
+
+- **mount()** : Appelée lors du chargement de la vue
+  - Injection du template
+  - Chargement des données
+  - Attachement des event listeners
+  - Abonnement au state
+- **unmount()** : Appelée avant de quitter la vue
+  - Nettoyage des event listeners
+  - Désabonnement du state
+  - Annulation des requêtes en cours
+  - Libération des ressources
 
 ### Organisation des composants
 
-- Templates HTML dans `assets/components/`
+- Templates HTML dans `assets/templates/`
 - Chargement dynamique via `fetch()` + `DOMParser()`
 - Un fichier JS par composant dans `assets/js/components/`
 - Export d'une fonction `render{ComponentName}()`
 - Clone avec `cloneNode(true)` avant manipulation
 - Vérification de l'existence de l'élément avant injection
-- Composants autonomes et réutilisables
+- **Composants persistants** : navbar, footer (chargés une seule fois)
+- **Composants dynamiques** : cards, modals (rechargés à la demande)
 
-### Gestion de l'état
+### Gestion de l'état (State Management)
 
-- localStorage pour persistance : tokens, user, favorites
+- **appState.js** : Store centralisé pour l'état global
+- Pattern subscribe/notify pour la réactivité
+- Utilisation de `appState.set()` pour modifier l'état
+- Abonnement avec `appState.subscribe('key', callback)`
+- **Toujours désabonner** dans `unmount()` pour éviter les fuites mémoire
+- localStorage pour persistance : tokens, user, favorites, settings
 - Module `storage.js` pour abstraction localStorage
 - Module `auth.js` pour gestion authentification
-- Pas de state management complexe
+
+### Navigation SPA
+
+- **History API** : `history.pushState()` pour changer l'URL
+- **Interception des liens** : attribut `data-link` sur les balises `<a>`
+- **Événement popstate** : écouter les boutons précédent/suivant du navigateur
+- **Navigation programmatique** : `router.navigate('/path')`
+- Pas de rechargement de page
+- Transitions fluides entre vues
+
+### Gestion des métadonnées
+
+- Mise à jour dynamique du `<title>`
+- Mise à jour de `<meta name="description">`
+- Métadonnées définies dans chaque vue (objet `meta`)
+- Mise à jour automatique par le routeur lors du changement de vue
 
 ### Appels API
 
 - **Managers** : tous les appels `fetch()` sont centralisés dans les managers
-- **Pages** : utilisent les managers, ne font jamais de `fetch()` directement
+- **Vues** : utilisent les managers, ne font jamais de `fetch()` directement
 - Un manager par domaine (Auth, Event, Favorite, Order, Ticket)
 - Méthodes avec paramètres clairs
 - Retour standardisé : `{ success: boolean, message: string, data?: any }`
@@ -575,34 +1081,68 @@ async function loadEvents() {
 Exemple :
 
 ```javascript
-// Dans la page
+// Dans une vue
 import EventManager from "../managers/EventManager.js";
 
-const result = await EventManager.getAll();
-if (result.success) {
-  // Traiter les données
+async function loadEvents() {
+  const result = await EventManager.getAll();
+  if (result.success) {
+    // Traiter les données
+  }
 }
 ```
+
+### Performance et optimisation
+
+- **Lazy loading** : chargement différé des vues avec `import()`
+- **Code splitting** : séparation du code par route
+- **Cache des templates** : ne pas recharger les mêmes templates
+- **Event delegation** : utiliser la délégation pour les éléments dynamiques
+- **Nettoyage mémoire** : toujours nettoyer dans `unmount()`
+- **Transitions CSS** : utiliser CSS pour les animations, pas JS
 
 ### Responsive
 
 - Bootstrap grid system
 - Classes responsive Bootstrap : `d-none d-md-block`
 - Mobile-first
+- Navigation mobile adaptée (burger menu)
+
+### SEO et accessibilité
+
+- Métadonnées dynamiques (title, description)
+- Balises sémantiques HTML5
+- Attributs ARIA si nécessaire
+- Support du bouton précédent/suivant du navigateur
+- URLs propres et significatives
 
 ## 6. RÈGLES À IMPOSER À L'AGENT FRONTEND
 
 ### Structure obligatoire
 
-- Toujours respecter l'arborescence `assets/js/{components,pages,managers,utils}` et `assets/components/`
-- Un fichier HTML = un fichier JS dans `pages/`
-- Tous les HTML dans le dossier `pages/`
-- Templates HTML dans `assets/components/`
+- Toujours respecter l'arborescence `assets/js/{components,views,managers,store,utils}` et `assets/templates/`
+- **Un seul fichier HTML** : `index.html` à la racine
+- **Un fichier JS par vue** dans `views/`
+- **Un fichier JS par composant** dans `components/`
+- Templates HTML des vues dans `assets/templates/views/`
+- Templates HTML des composants dans `assets/templates/`
+- **Obligatoire : router.js** pour la gestion des routes
+- **Obligatoire : app.js** comme point d'entrée unique
+
+### Architecture SPA obligatoire
+
+- **Un seul index.html** avec conteneur `#app`
+- **Routeur JavaScript** avec History API
+- **Navigation sans rechargement** : intercepter tous les liens avec `data-link`
+- **Lazy loading** des vues via `import()` dynamique
+- Composants persistants (navbar, footer) chargés une seule fois
+- Vues montées/démontées dynamiquement
 
 ### Modules ES6
 
 - Toujours utiliser `import/export`
-- Script avec `type="module"`
+- Script principal avec `type="module"`
+- Import dynamique pour les vues : `() => import('./views/home.js')`
 - Pas de scripts globaux multiples
 
 ### Bootstrap
@@ -614,20 +1154,53 @@ if (result.success) {
 
 ### Nommage
 
-- Fichiers HTML : camelCase
+- Fichier HTML : `index.html` (un seul)
 - Fichiers JS : camelCase
+- **router.js** et **app.js** : noms fixes obligatoires
 - Variables/fonctions : camelCase
 - Classes : PascalCase
 - Constantes : UPPERCASE
 
 ### Organisation du code
 
-- Imports en haut
-- Point d'entrée : fonction `init()`
-- Initialisation avec `DOMContentLoaded`
-- Toujours vérifier l'existence des éléments DOM avant manipulation
+#### app.js (Point d'entrée)
 
-### Composants
+- Imports en haut
+- Définition des routes (objet `routes`)
+- Instanciation du routeur
+- Fonction `init()` : initialisation globale
+- Chargement des composants persistants
+- Initialisation du routeur
+- Lancement avec `DOMContentLoaded`
+
+#### router.js (Routeur)
+
+- Classe `Router` exportée
+- Constructeur : `(routes, appSelector)`
+- Méthode `init()` : écouter popstate et clics
+- Méthode `navigate(url)` : navigation programmatique
+- Méthode `handleRoute()` : montage/démontage des vues
+- Méthode `matchRoute(path)` : correspondance pattern/URL
+- Support des paramètres dynamiques : `/product/:id`
+
+#### views/ (Vues)
+
+- **Structure obligatoire** :
+  - Export `meta` : `{ title, description }`
+  - Export `mount(container, params)` : montage de la vue
+  - Export `unmount()` : démontage et nettoyage
+  - Export default : `{ mount, unmount, meta }`
+- **mount()** doit :
+  - Injecter le template dans le conteneur
+  - Charger les données nécessaires
+  - Attacher les event listeners
+  - S'abonner au state si nécessaire
+- **unmount()** doit :
+  - Nettoyer les event listeners
+  - Désabonner du state
+  - Annuler les requêtes en cours
+
+#### components/ (Composants)
 
 - Un composant = un fichier HTML template + un fichier JS
 - Templates HTML natifs avec `<template id="...">`
@@ -635,6 +1208,28 @@ if (result.success) {
 - Clone avec `cloneNode(true)`
 - Export d'une fonction `render{Name}()`
 - Toujours retourner si l'élément d'injection n'existe pas
+- **Composants persistants** : ne pas recharger à chaque navigation
+
+### State Management (Store)
+
+- **Obligatoire** : `store/appState.js`
+- Classe `AppState` avec pattern singleton
+- Méthodes obligatoires :
+  - `get(key)` : récupérer une valeur
+  - `set(key, value)` : définir une valeur (+ notification)
+  - `subscribe(key, callback)` : s'abonner aux changements
+  - `notify(key, value)` : notifier les abonnés
+- État global : `user`, `cart`, `events`, `favorites`, etc.
+- **Toujours désabonner** dans `unmount()` des vues
+
+### Navigation
+
+- **Attribut data-link obligatoire** : `<a href="/products" data-link>`
+- **Pas de .html dans les URLs** : `/products`, `/product/123`
+- **History API** : utiliser `history.pushState()`
+- **Écouter popstate** : supporter boutons précédent/suivant
+- **Navigation programmatique** : `router.navigate('/path')`
+- Intercepter tous les clics sur liens avec `data-link`
 
 ### API
 
@@ -652,8 +1247,8 @@ if (result.success) {
 - **Export : default d'une instance singleton** (`export default new ManagerName()`)
 - URL API dans le constructeur : `this.apiUrl`
 - Gestion des erreurs dans try/catch
-- Les pages utilisent les managers, jamais fetch directement
-- Import dans les pages : `import ManagerName from '../managers/ManagerName.js'`
+- Les vues utilisent les managers, jamais fetch directement
+- Import dans les vues : `import ManagerName from '../managers/ManagerName.js'`
 
 ### Utilitaires
 
@@ -661,6 +1256,12 @@ if (result.success) {
 - Auth dans `utils/auth.js`
 - Storage dans `utils/storage.js`
 - Export const avec méthodes
+
+### Métadonnées dynamiques
+
+- Chaque vue doit exporter `meta` : `{ title, description }`
+- Le routeur met à jour automatiquement le `<title>` et `<meta description>`
+- IDs dans index.html : `<title id="pageTitle">`, `<meta id="pageDescription">`
 
 ### Indentation
 
@@ -673,12 +1274,15 @@ if (result.success) {
 - Surcharges Bootstrap en premier
 - Classes utilitaires ensuite
 - Styles de composants en dernier
+- **Animations de transitions entre vues**
 
 ### Gestion des événements
 
-- Event delegation pour éléments dynamiques
-- `e.preventDefault()` et `e.stopPropagation()` si nécessaire
+- **Event delegation obligatoire** pour éléments dynamiques
+- `e.preventDefault()` pour les liens avec `data-link`
+- `e.stopPropagation()` si nécessaire
 - `dataset` pour passer des données
+- **Toujours nettoyer** dans `unmount()`
 
 ### Async/Await
 
@@ -688,19 +1292,31 @@ if (result.success) {
 
 ### Chemins
 
-- Relatifs depuis `pages/` : `../assets/`
-- Absolus pour navigation : `/pages/products.html`
+- **Absolus depuis la racine** : `/assets/`, `/assets/templates/`
+- Pas de chemins relatifs : `../assets/` (interdit)
+- Navigation : `/products`, `/product/123` (sans .html)
+
+### Cycle de vie obligatoire
+
+- **app.js** : lancé une seule fois au démarrage
+- **Composants persistants** : navbar, footer chargés une seule fois
+- **Vues** : montées/démontées à chaque changement de route
+- **mount()** : initialiser la vue
+- **unmount()** : nettoyer avant de quitter
 
 ### Ne jamais
 
-- Mélanger HTML/CSS/JS dans un même fichier
+- Créer plusieurs fichiers HTML (un seul : index.html)
 - Utiliser jQuery
 - Utiliser des scripts inline
 - Créer des variables globales
 - Dupliquer du code (créer un composant ou une fonction)
-- Utiliser des classes ES6 pour les composants (fonctions simples uniquement)
-- Utiliser des objets littéraux pour les managers (classes ES6 obligatoires)
-- Faire des appels `fetch()` dans les pages (utiliser les managers)
+- Faire des appels `fetch()` dans les vues (utiliser les managers)
+- Oublier de nettoyer dans `unmount()` (fuites mémoire)
+- Utiliser `.html` dans les URLs de navigation
+- Recharger la page lors de la navigation
+- Oublier l'attribut `data-link` sur les liens internes
+- Charger les composants persistants à chaque vue (navbar/footer)
 
 ---
 

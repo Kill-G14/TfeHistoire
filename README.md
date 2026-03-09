@@ -1,4 +1,30 @@
-Résumé du projet – Plateforme de découverte et réservation d’événements historiques
+## Résumé du projet – Plateforme de découverte et réservation d’événements historiques
+
+## ⚠️ IMPORTANT - CHANGEMENT D'ARCHITECTURE
+
+**Date :** 09/03/2026  
+**Nouvelle architecture :** **SPA (Single Page Application)**
+
+Le projet a été re-documenté pour suivre une architecture **SPA moderne** au lieu du modèle multi-pages initial.
+
+📖 **Voir documentation :**
+
+- `AGENTS.md` : Standards frontend SPA complets
+- `MIGRATION_SPA.md` : Guide de migration détaillé
+- `PROJECT_STATUS.md` : État de la migration
+- `FrontEnd/README.md` : Documentation SPA
+
+**Principaux changements :**
+
+- ✅ Un seul fichier HTML (`index.html`)
+- ✅ Routeur JavaScript avec History API
+- ✅ Navigation sans rechargement de page
+- ✅ State management centralisé
+- ✅ Lazy loading des vues
+- ✅ URLs propres sans `.html`
+
+---
+
 Vue générale du projet
 
 Ce projet consiste à développer une plateforme web permettant de découvrir et réserver des événements historiques.
@@ -196,7 +222,7 @@ cancelled
 
 Le paiement est traité via :
 
-payment_provider = mollie
+payment_provider = stripe
 
 Les billets achetés sont stockés dans order_items.
 
@@ -272,7 +298,7 @@ Paiements
 
 Les paiements sont gérés via :
 
-Mollie
+Stripe
 
 Le système doit gérer :
 

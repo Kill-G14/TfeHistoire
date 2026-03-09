@@ -1,58 +1,72 @@
-# EuroFêtes Historiques
+# EuroFêtes Historiques - SPA
 
-Application web de réservation d'événements historiques européens. Version refactorisée en vanilla JavaScript avec Bootstrap 5.
+Application web Single Page Application (SPA) de réservation d'événements historiques européens. Version moderne en vanilla JavaScript avec routeur et Bootstrap 5.
 
 ## 🎯 Fonctionnalités
 
+- **SPA Navigation** : Navigation fluide sans rechargement de page
 - **Liste d'événements** : Affichage de tous les événements historiques d'Europe
 - **Filtres avancés** : Recherche par nom, filtrage par pays et catégorie
 - **Détails d'événement** : Vue détaillée avec réservation de tickets
 - **Création d'événement** : Formulaire complet pour créer de nouveaux événements
-- **Authentification** : Système de connexion/inscription (mock)
+- **Authentification** : Système de connexion/inscription
 - **Profil utilisateur** : Gestion des réservations et événements créés
-- **Carte interactive** : Visualisation géographique (placeholder)
+- **Carte interactive** : Visualisation géographique
+- **State Management** : Gestion d'état centralisée avec appState
 
 ## 🛠️ Technologies utilisées
 
-- **HTML5** : Structure sémantique
-- **CSS3** : Styles personnalisés
-- **JavaScript ES6+** : Modules, async/await, arrow functions
+- **HTML5** : Structure (index.html unique)
+- **CSS3** : Styles personnalisés + animations de transitions
+- **JavaScript ES6+** : Modules, async/await, arrow functions, Router SPA
 - **Bootstrap 5.3** : Framework CSS
 - **Bootstrap Icons** : Icônes
+- **History API** : Navigation SPA sans rechargement
 - **LocalStorage** : Persistance des données
 
-## 📁 Structure du projet
+## 📁 Structure du projet (SPA)
 
 ```
-pages/
-  ├── index.html           # Page d'accueil avec liste d'événements
-  ├── createEvent.html     # Formulaire de création d'événement
-  ├── profile.html         # Page profil utilisateur
-  └── map.html             # Carte interactive
+index.html           # SEUL fichier HTML de l'application
 
 assets/
   ├── css/
-  │   └── custom.css       # Styles personnalisés
+  │   └── custom.css       # Styles personnalisés + transitions SPA
   ├── js/
+  │   ├── app.js               # Point d'entrée principal
+  │   ├── router.js            # Routeur SPA (History API)
   │   ├── components/
-  │   │   ├── header.js           # Header avec navigation
-  │   │   ├── eventCard.js        # Carte d'événement
-  │   │   ├── loginModal.js       # Modal de connexion
-  │   │   └── eventDetail.js      # Détail d'événement
-  │   ├── pages/
-  │   │   ├── home.js             # Script page d'accueil
-  │   │   ├── createEvent.js      # Script création d'événement
-  │   │   ├── profile.js          # Script profil
-  │   │   └── map.js              # Script carte
+  │   │   ├── navbar.js        # Navbar persistante
+  │   │   ├── footer.js        # Footer persistant
+  │   │   ├── eventCard.js     # Carte d'événement
+  │   │   ├── loginModal.js    # Modal de connexion
+  │   │   └── eventDetail.js   # Détail d'événement
+  │   ├── views/
+  │   │   ├── home.js          # Vue accueil
+  │   │   ├── createEvent.js   # Vue création événement
+  │   │   ├── profile.js       # Vue profil
+  │   │   └── map.js           # Vue carte
+  │   ├── managers/
+  │   │   ├── EventManager.js  # Appels API événements
+  │   │   ├── AuthManager.js   # Appels API auth
+  │   │   └── ...
+  │   ├── store/
+  │   │   └── appState.js      # State management centralisé
   │   └── utils/
-  │       ├── auth.js             # Gestion authentification
-  │       ├── storage.js          # Gestion localStorage
-  │       └── helpers.js          # Fonctions utilitaires
-  └── components/
-      ├── header.html             # Template header
-      ├── eventCard.html          # Template carte événement
-      ├── loginModal.html         # Template modal login
-      └── eventDetail.html        # Template détail événement
+  │       ├── auth.js          # Gestion authentification
+  │       ├── storage.js       # Gestion localStorage
+  │       └── helpers.js       # Fonctions utilitaires
+  └── templates/
+      ├── navbar.html          # Template navbar
+      ├── footer.html          # Template footer
+      ├── eventCard.html       # Template carte événement
+      ├── loginModal.html      # Template modal login
+      ├── eventDetail.html     # Template détail événement
+      └── views/
+          ├── home.html        # Template vue accueil
+          ├── createEvent.html # Template vue création
+          ├── profile.html     # Template vue profil
+          └── map.html         # Template vue carte
 ```
 
 ## 🚀 Installation et démarrage
@@ -60,7 +74,7 @@ assets/
 ### Prérequis
 
 - Un serveur web local (WAMP, XAMPP, Live Server, etc.)
-- Un navigateur web moderne
+- Un navigateur web moderne compatible ES6+
 
 ### Installation
 
@@ -71,33 +85,42 @@ assets/
 ### Utilisation avec WAMP
 
 ```
-c:\wamp64\www\Event Booking Website\
+c:\wamp64\www\tfeHistoire\FrontEnd\
 ```
 
-Accéder à : `http://localhost/Event Booking Website/pages/index.html`
+Accéder à : `http://localhost/tfeHistoire/FrontEnd/`
 
 ### Utilisation avec Live Server (VS Code)
 
 1. Installer l'extension "Live Server"
 2. Ouvrir le dossier du projet
-3. Clic droit sur `pages/index.html` → "Open with Live Server"
+3. Clic droit sur `index.html` → "Open with Live Server"
 
 ## 📖 Guide d'utilisation
 
-### Navigation
+### Navigation SPA
 
-- **Événements** : Page d'accueil avec tous les événements
-- **Carte** : Carte interactive (à venir)
-- **Créer un événement** : Accessible uniquement connecté
-- **Profil** : Accessible uniquement connecté
+- **URLs propres** : `/`, `/products`, `/product/123`
+- **Pas de rechargement** : Navigation instantanée
+- **Boutons précédent/suivant** : Fonctionnels (History API)
+- **Transitions fluides** : Animations CSS entre les vues
+
+### Routes disponibles
+
+- `/` : Page d'accueil avec liste d'événements
+- `/events` : Liste complète des événements
+- `/event/:id` : Détails d'un événement spécifique
+- `/create-event` : Création d'événement (authentification requise)
+- `/profile` : Profil utilisateur (authentification requise)
+- `/map` : Carte interactive des événements
 
 ### Fonctionnalités principales
 
 #### Voir les événements
 
-1. Accéder à la page d'accueil
+1. Accéder à la page d'accueil (`/`)
 2. Utiliser les filtres pour affiner la recherche
-3. Cliquer sur une carte pour voir les détails
+3. Cliquer sur une carte pour voir les détails (navigation SPA)
 
 #### Réserver un événement
 
@@ -117,7 +140,8 @@ Accéder à : `http://localhost/Event Booking Website/pages/index.html`
 
 1. Cliquer sur "Connexion"
 2. Choisir "Connexion" ou "Inscription"
-3. Remplir les champs (mock - accepte n'importe quelles valeurs)
+3. Remplir les champs
+4. La navbar se met à jour automatiquement (state management)
 
 ## 🎨 Personnalisation
 
@@ -133,39 +157,82 @@ Modifier les variables CSS dans `assets/css/custom.css` :
 }
 ```
 
-### Événements
+### Transitions SPA
 
-Les événements sont stockés dans le localStorage. Pour réinitialiser :
+Modifier les animations de transitions dans `assets/css/custom.css` :
 
-```javascript
-localStorage.removeItem("eurofetes_events");
+```css
+#app {
+  transition: opacity 0.3s ease-in-out;
+}
+
+#app.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
 ```
 
-Les événements par défaut sont définis dans `assets/js/pages/home.js`.
+### Événements
 
-## 🔧 Architecture technique
+Les événements sont stockés dans le store centralisé `appState` et en localStorage.
 
-### Composants
+## 🔧 Architecture technique (SPA)
 
-Chaque composant suit le pattern :
+### app.js (Point d'entrée)
 
-- Un fichier HTML avec `<template>` pour la structure
-- Un fichier JS qui charge le template et gère la logique
-- Export d'une fonction `render{ComponentName}()`
+- Définition des routes
+- Instanciation du routeur
+- Chargement des composants persistants (navbar, footer)
+- Initialisation de l'application
+
+### router.js (Routeur SPA)
+
+- Gestion de l'historique (History API)
+- Correspondance URL ↔ Vue
+- Lazy loading des vues
+- Support des paramètres dynamiques (`:id`)
+- Mise à jour des métadonnées (title, description)
+
+### Views (Vues)
+
+Chaque vue suit le pattern :
+
+- Export `meta` : métadonnées (title, description)
+- Export `mount(container, params)` : montage de la vue
+- Export `unmount()` : démontage et nettoyage
+- Chargement des données via Managers
+- Gestion locale des event listeners
+
+### Components (Composants)
+
+Composants réutilisables :
+
+- **Persistants** : navbar, footer (chargés une seule fois)
+- **Dynamiques** : cards, modals (rechargés à la demande)
+- Chargement de templates HTML
+- Gestion d'événements
+- Abonnement au state
+
+### State Management (Store)
+
+- **appState.js** : Store centralisé
+- Pattern subscribe/notify
+- État global : user, cart, events, favorites
+- Synchronisation automatique des composants
+- Persistance dans localStorage
+
+### Managers
+
+- Centralisation des appels API
+- Retour standardisé : `{ success, message, data }`
+- Gestion des erreurs
+- Un manager par domaine métier
 
 ### Utilitaires
 
-- **auth.js** : Gestion de l'authentification (mock)
+- **auth.js** : Gestion de l'authentification
 - **storage.js** : Abstraction du localStorage
 - **helpers.js** : Fonctions utilitaires (formatage, filtres, toasts)
-
-### Pages
-
-Chaque page suit le pattern :
-
-- Import des composants nécessaires
-- Fonction `init()` comme point d'entrée
-- Chargement avec `DOMContentLoaded`
 
 ## 📱 Responsive Design
 
@@ -174,6 +241,7 @@ L'application est entièrement responsive grâce à Bootstrap :
 - Mobile first
 - Breakpoints adaptés
 - Grille flexible
+- Navigation mobile adaptée
 
 ## 🌐 Compatibilité navigateurs
 
@@ -182,17 +250,45 @@ L'application est entièrement responsive grâce à Bootstrap :
 - Safari : ✅
 - Opera : ✅
 
+Nécessite un navigateur compatible :
+
+- ES6+ Modules
+- History API
+- Async/await
+- DOMParser
+
 ## 📝 Conventions de code
 
 - **Nommage** : camelCase pour variables/fonctions, PascalCase pour classes
 - **Indentation** : 2 espaces
-- **Modules** : ES6 import/export
+- **Modules** : ES6 import/export + import() dynamique
 - **Async** : async/await (pas de .then())
 - **DOM** : querySelector/getElementById
+- **Navigation** : History API + data-link
+- **URLs** : Sans .html (`/products`, `/product/123`)
+
+## 🔄 Cycle de vie d'une vue
+
+1. **Navigation** : Utilisateur clique sur un lien avec `data-link`
+2. **Unmount** : La vue précédente est démontée (nettoyage)
+3. **Lazy load** : La nouvelle vue est chargée via `import()`
+4. **Mount** : La nouvelle vue est montée (template + données + événements)
+5. **Update** : Mise à jour des métadonnées (title, description)
 
 ## 🤝 Contribution
 
-Respecter les conventions définies dans `AGENTS.md` pour toute modification.
+Respecter les conventions définies dans `AGENTS.md` (architecture SPA) pour toute modification.
+
+## 🆕 Changements SPA vs Multi-pages
+
+- ✅ Un seul fichier HTML au lieu de plusieurs
+- ✅ Routeur JavaScript pour la navigation
+- ✅ Lazy loading des vues
+- ✅ State management centralisé
+- ✅ Transitions fluides sans rechargement
+- ✅ URLs propres sans .html
+- ✅ Support boutons précédent/suivant
+- ✅ Métadonnées dynamiques
 
 ## 📄 Licence
 

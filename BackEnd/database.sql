@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS orders (
     is_paid BOOLEAN DEFAULT FALSE,
     is_failed BOOLEAN DEFAULT FALSE,
     is_cancelled BOOLEAN DEFAULT FALSE,
-    payment_provider VARCHAR(50) DEFAULT 'mollie',
+    payment_provider VARCHAR(50) DEFAULT 'stripe',
     payment_id VARCHAR(255),
     is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
