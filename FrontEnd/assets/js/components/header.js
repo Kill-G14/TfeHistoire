@@ -1,6 +1,7 @@
 // Composant Header
 
 import { auth } from '../utils/auth.js'
+import { appState } from '../store/appState.js'
 
 const templateObjects = {}
 
@@ -17,8 +18,8 @@ async function loadTemplate(path) {
   })
 }
 
-export async function renderHeader(currentView = 'home') {
-  await loadTemplate('../assets/components/header.html')
+export async function renderHeader() {
+  await loadTemplate('./assets/components/header.html')
 
   const headerElement = document.getElementById('header')
   if (!headerElement) return
@@ -27,23 +28,24 @@ export async function renderHeader(currentView = 'home') {
   headerElement.innerHTML = ''
   headerElement.appendChild(clone)
 
-  // Marquer le lien actif
-  updateActiveNav(currentView)
+  // Marquer le lien actif selon l'URL
+  updateActiveNav()
 
   // Rendre les actions du header
   renderHeaderActions()
 }
 
-function updateActiveNav(currentView) {
+function updateActiveNav() {
+  const currentPath = window.location.pathname.replace(/^\/tfeHistoire\/FrontEnd/, '')
   const navHome = document.getElementById('navHome')
   const navMap = document.getElementById('navMap')
 
   if (navHome) navHome.classList.remove('active')
   if (navMap) navMap.classList.remove('active')
 
-  if (currentView === 'home' && navHome) {
+  if ((currentPath === '/' || currentPath === '') && navHome) {
     navHome.classList.add('active')
-  } else if (currentView === 'map' && navMap) {
+  } else if (currentPath === '/map' && navMap) {
     navMap.classList.add('active')
   }
 }
@@ -54,7 +56,7 @@ function renderHeaderActions() {
 
   headerActions.innerHTML = ''
 
-  const isLoggedIn = auth.isLoggedIn()
+  const isLoggedIn = appState.get('isAuthenticated')
   const templateKey = isLoggedIn ? 'headerActionsLoggedIn' : 'headerActionsLoggedOut'
   const clone = templateObjects[templateKey].cloneNode(true)
 
@@ -68,20 +70,22 @@ function renderHeaderActions() {
 
     if (btnCreateEvent) {
       btnCreateEvent.addEventListener('click', () => {
-        window.location.href = '../pages/createEvent.html'
+        window.router.navigate('/create-event')
       })
     }
 
     if (btnProfile) {
       btnProfile.addEventListener('click', () => {
-        window.location.href = '../pages/profile.html'
+        window.router.navigate('/profile')
       })
     }
 
     if (btnLogout) {
-      btnLogout.addEventListener('click', () => {
-        auth.logout()
-        window.location.reload()
+      btnLogout.addEventListener('click', async () => {
+        await auth.logout()
+        appState.set('user', null)
+        appState.set('isAuthenticated', false)
+        window.router.navigate('/')
       })
     }
   } else {

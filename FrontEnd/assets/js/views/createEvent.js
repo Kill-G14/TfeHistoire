@@ -1,29 +1,74 @@
-// Script pour la page de création d'événement
+// Vue CreateEvent - Création d'événement
 
-import { renderHeader } from '../components/header.js'
-import { renderLoginModal } from '../components/loginModal.js'
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
+import { appState } from '../store/appState.js'
 import EventManager from '../managers/EventManager.js'
 
-async function init() {
-  await renderHeader()
-  await renderLoginModal()
-  
+// Métadonnées de la vue
+export const meta = {
+  title: 'Créer un événement - EuroFêtes Historiques',
+  description: 'Créez votre événement historique et partagez-le avec toute l\'Europe'
+}
+
+// Template HTML
+const templateObjects = {}
+
+async function loadTemplate(path) {
+  const response = await fetch(path)
+  const htmlContent = await response.text()
+  const parser = new DOMParser()
+  const templateDoc = parser.parseFromString(htmlContent, 'text/html')
+  const templates = templateDoc.querySelectorAll('template')
+
+  templates.forEach((template) => {
+    const templateId = template.id
+    templateObjects[templateId] = template.content
+  })
+}
+
+// Variables locales
+let createEventForm = null
+
+// Fonction mount (appelée lors du chargement de la vue)
+export async function mount(container, params) {
   // Vérifier si l'utilisateur est connecté
-  if (!auth.isLoggedIn()) {
+  if (!appState.get('isAuthenticated')) {
     helpers.showToast('Vous devez être connecté pour créer un événement', 'error')
     setTimeout(() => {
-      window.location.href = '../pages/index.html'
+      window.router.navigate('/')
     }, 1500)
     return
   }
 
+  // Charger le template
+  await loadTemplate('./assets/templates/views/createEvent.html')
+  
+  // Injecter le template
+  const clone = templateObjects['createEventView'].cloneNode(true)
+  container.innerHTML = ''
+  container.appendChild(clone)
+
+  // Attacher les événements
   attachEventListeners()
 }
 
+// Fonction unmount (appelée avant de quitter la vue)
+export async function unmount() {
+  // Nettoyer les event listeners
+  if (createEventForm) {
+    createEventForm.removeEventListener('submit', handleSubmit)
+  }
+  
+  const btnCancel = document.getElementById('btnCancel')
+  if (btnCancel) {
+    btnCancel.removeEventListener('click', handleCancel)
+  }
+}
+
+// Attacher les event listeners
 function attachEventListeners() {
-  const createEventForm = document.getElementById('createEventForm')
+  createEventForm = document.getElementById('createEventForm')
   const btnCancel = document.getElementById('btnCancel')
 
   if (createEventForm) {
@@ -31,12 +76,16 @@ function attachEventListeners() {
   }
 
   if (btnCancel) {
-    btnCancel.addEventListener('click', () => {
-      window.location.href = '../pages/index.html'
-    })
+    btnCancel.addEventListener('click', handleCancel)
   }
 }
 
+// Gérer l'annulation
+function handleCancel() {
+  window.router.navigate('/')
+}
+
+// Gérer la soumission du formulaire
 async function handleSubmit(e) {
   e.preventDefault()
 
@@ -62,13 +111,13 @@ async function handleSubmit(e) {
   }
 
   // Appel API pour créer l'événement
-  const token = auth.getToken()
+  const token = auth.getToken ? auth.getToken() : null
   const result = await EventManager.create(eventData, token)
 
   if (result.success) {
     helpers.showToast('Événement créé avec succès !', 'success')
     setTimeout(() => {
-      window.location.href = '../pages/index.html'
+      window.router.navigate('/')
     }, 1000)
   } else {
     helpers.showToast(result.message || 'Erreur lors de la création de l\'événement', 'error')
@@ -81,8 +130,5 @@ async function handleSubmit(e) {
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init)
-} else {
-  init()
-}
+// Export par défaut
+export default { mount, unmount, meta }

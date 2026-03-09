@@ -16,7 +16,7 @@ async function loadTemplate(path) {
 }
 
 export async function renderEventCards(events, containerId, onEventClick) {
-  await loadTemplate('../assets/components/eventCard.html')
+  await loadTemplate('./assets/components/eventCard.html')
 
   const container = document.getElementById(containerId)
   if (!container) return

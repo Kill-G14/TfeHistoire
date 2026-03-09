@@ -2,6 +2,7 @@
 
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
+import { appState } from '../store/appState.js'
 
 const templateObjects = {}
 let modalInstance = null
@@ -20,7 +21,7 @@ async function loadTemplate(path) {
 }
 
 export async function renderLoginModal() {
-  await loadTemplate('../assets/components/loginModal.html')
+  await loadTemplate('./assets/components/loginModal.html')
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById('loginModalContainer')
@@ -62,10 +63,9 @@ function attachLoginEvents() {
       closeLoginModal()
       helpers.showToast('Connexion réussie !', 'success')
       
-      // Recharger la page pour mettre à jour l'interface
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      // Mettre à jour l'état global
+      appState.set('user', result.data.user)
+      appState.set('isAuthenticated', true)
     } else {
       helpers.showToast('Erreur de connexion', 'error')
     }
@@ -89,10 +89,9 @@ function attachRegisterEvents() {
       closeLoginModal()
       helpers.showToast(`Bienvenue ${name} !`, 'success')
       
-      // Recharger la page pour mettre à jour l'interface
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      // Mettre à jour l'état global
+      appState.set('user', result.data.user)
+      appState.set('isAuthenticated', true)
     } else {
       helpers.showToast('Erreur d\'inscription', 'error')
     }

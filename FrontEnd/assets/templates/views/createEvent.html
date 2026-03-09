@@ -1,0 +1,234 @@
+<template id="createEventView">
+  <div class="container py-5" style="max-width: 900px">
+    <!-- Page Header -->
+    <div class="mb-4">
+      <button
+        class="btn btn-link text-decoration-none mb-3 p-0"
+        data-link
+        href="/"
+      >
+        <i class="bi bi-arrow-left me-2"></i>Retour
+      </button>
+
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <i class="bi bi-calendar-event fs-2 text-accent"></i>
+        <h1 class="page-title mb-0">Créer un événement historique</h1>
+      </div>
+      <p class="text-muted">
+        Partagez votre festivité historique avec toute l'Europe. Remplissez tous
+        les détails pour offrir la meilleure expérience aux participants.
+      </p>
+    </div>
+
+    <!-- Create Event Form -->
+    <form id="createEventForm">
+      <!-- Informations générales -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="bi bi-info-circle text-accent"></i>
+          Informations générales
+        </div>
+
+        <div class="mb-3">
+          <label for="title" class="form-label">Titre de l'événement *</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            placeholder="Ex: Carnaval de Venise 2026"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label"
+            >Description complète *</label
+          >
+          <textarea
+            class="form-control"
+            id="description"
+            rows="5"
+            placeholder="Décrivez votre événement en détail : programme, activités, particularités..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="category" class="form-label">Catégorie *</label>
+            <select class="form-select" id="category" required>
+              <option value="">Sélectionner une catégorie</option>
+              <option value="Festival Médiéval">Festival Médiéval</option>
+              <option value="Carnaval">Carnaval</option>
+              <option value="Reconstitution Historique">
+                Reconstitution Historique
+              </option>
+              <option value="Fête Traditionnelle">Fête Traditionnelle</option>
+              <option value="Célébration Religieuse">
+                Célébration Religieuse
+              </option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="imageUrl" class="form-label">URL de l'image</label>
+            <input
+              type="url"
+              class="form-control"
+              id="imageUrl"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="bi bi-geo-alt text-accent"></i>
+          Localisation
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="country" class="form-label">Pays *</label>
+            <select class="form-select" id="country" required>
+              <option value="">Sélectionner un pays</option>
+              <option value="France">France</option>
+              <option value="Italie">Italie</option>
+              <option value="Espagne">Espagne</option>
+              <option value="Allemagne">Allemagne</option>
+              <option value="Royaume-Uni">Royaume-Uni</option>
+              <option value="Autriche">Autriche</option>
+              <option value="Belgique">Belgique</option>
+              <option value="Pays-Bas">Pays-Bas</option>
+              <option value="Portugal">Portugal</option>
+              <option value="Grèce">Grèce</option>
+              <option value="Pologne">Pologne</option>
+              <option value="République Tchèque">République Tchèque</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="city" class="form-label">Ville *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="city"
+              placeholder="Ex: Venise"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <label for="postalCode" class="form-label">Code postal *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="postalCode"
+              placeholder="Ex: 75001"
+              required
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label for="address" class="form-label">Adresse *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              placeholder="Ex: Place de la République"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Date et horaires -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="bi bi-clock text-accent"></i>
+          Date et horaires
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="date" class="form-label">Date de l'événement *</label>
+            <input type="date" class="form-control" id="date" required />
+          </div>
+
+          <div class="col-md-6">
+            <label for="time" class="form-label">Heure de début *</label>
+            <input type="time" class="form-control" id="time" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Billetterie -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="bi bi-currency-euro text-accent"></i>
+          Billetterie
+        </div>
+
+        <div class="mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="isFree" />
+            <label class="form-check-label" for="isFree">
+              Événement gratuit
+            </label>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="price" class="form-label">Prix du ticket (€)</label>
+            <input
+              type="number"
+              class="form-control"
+              id="price"
+              placeholder="25.00"
+              step="0.01"
+              min="0"
+              value="0"
+            />
+            <small class="text-muted">Laisser à 0 si gratuit</small>
+          </div>
+
+          <div class="col-md-6">
+            <label for="availableTickets" class="form-label"
+              >Nombre de tickets disponibles</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="availableTickets"
+              placeholder="500"
+              min="1"
+            />
+            <small class="text-muted"
+              >Optionnel pour les événements libres</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex gap-3">
+        <button
+          type="button"
+          class="btn btn-outline-secondary flex-fill"
+          id="btnCancel"
+        >
+          <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary flex-fill">
+          <i class="bi bi-check-circle"></i> Créer l'événement
+        </button>
+      </div>
+    </form>
+  </div>
+</template>

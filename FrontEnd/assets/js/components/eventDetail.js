@@ -21,7 +21,7 @@ async function loadTemplate(path) {
 }
 
 export async function showEventDetail(event) {
-  await loadTemplate('../assets/components/eventDetail.html')
+  await loadTemplate('./assets/components/eventDetail.html')
 
   currentEvent = event
   quantity = 1

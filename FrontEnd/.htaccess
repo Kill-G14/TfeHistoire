@@ -1,0 +1,13 @@
+# Configuration Apache pour SPA
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /tfeHistoire/FrontEnd/
+  
+  # Ne pas réécrire les requêtes pour les fichiers réels
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Rediriger toutes les requêtes vers index.html
+  RewriteRule ^ index.html [L]
+</IfModule>

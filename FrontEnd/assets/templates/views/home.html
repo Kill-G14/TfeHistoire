@@ -1,0 +1,51 @@
+<template id="homeView">
+  <div class="container py-5">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+      <h1 class="page-title">Festivités Historiques d'Europe</h1>
+      <p class="page-subtitle">
+        Découvrez et participez aux plus grandes célébrations historiques à
+        travers l'Europe
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filterContainer mb-4">
+      <div class="mb-3">
+        <div class="position-relative">
+          <i
+            class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"
+          ></i>
+          <input
+            type="text"
+            class="form-control ps-5"
+            id="searchInput"
+            placeholder="Rechercher un événement, une ville..."
+          />
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-funnel text-muted"></i>
+            <select class="form-select" id="countrySelect">
+              <option value="all">Tous les pays</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <select class="form-select" id="categorySelect">
+            <option value="all">Toutes les catégories</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="eventsList">
+      <!-- Les cartes d'événements seront injectées ici -->
+    </div>
+  </div>
+</template>
