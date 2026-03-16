@@ -79,9 +79,9 @@ class EventRepository {
   // Créer un nouvel événement
   public function createEvent(Event $event): ?int {
     $query = "INSERT INTO events (user_id, title, description, country, city, postal_code, 
-              address, latitude, longitude, date, time, category, is_free, image_url, created_at, updated_at)
+              address, latitude, longitude, date, time, category, is_free, image_event, created_at, updated_at)
               VALUES (:user_id, :title, :description, :country, :city, :postal_code, 
-              :address, :latitude, :longitude, :date, :time, :category, :is_free, :image_url, NOW(), NOW())";
+              :address, :latitude, :longitude, :date, :time, :category, :is_free, :image_event, NOW(), NOW())";
     
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':user_id', $event->user_id, PDO::PARAM_INT);
@@ -97,7 +97,7 @@ class EventRepository {
     $stmt->bindParam(':time', $event->time);
     $stmt->bindParam(':category', $event->category);
     $stmt->bindParam(':is_free', $event->is_free, PDO::PARAM_INT);
-    $stmt->bindParam(':image_url', $event->image_url);
+    $stmt->bindParam(':image_event', $event->image_event);
     
     if ($stmt->execute()) {
       return (int) $this->getPdo()->lastInsertId();
@@ -121,7 +121,7 @@ class EventRepository {
               time = :time,
               category = :category,
               is_free = :is_free,
-              image_url = :image_url,
+              image_event = :image_event,
               updated_at = NOW()
               WHERE id = :id AND is_deleted = FALSE";
     
@@ -139,7 +139,7 @@ class EventRepository {
     $stmt->bindParam(':time', $event->time);
     $stmt->bindParam(':category', $event->category);
     $stmt->bindParam(':is_free', $event->is_free, PDO::PARAM_INT);
-    $stmt->bindParam(':image_url', $event->image_url);
+    $stmt->bindParam(':image_event', $event->image_event);
     
     return $stmt->execute();
   }

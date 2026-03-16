@@ -117,7 +117,7 @@ class EventService {
     $event->time = $data['time'];
     $event->category = $data['category'];
     $event->is_free = (bool) $data['is_free'];
-    $event->image_url = $data['image_url'] ?? null;
+    $event->image_event = $data['image_event'] ?? null;
 
     // Insérer en base de données
     $eventId = $this->eventRepository->createEvent($event);
@@ -185,7 +185,7 @@ class EventService {
     $event->time = $data['time'];
     $event->category = $data['category'];
     $event->is_free = (bool) $data['is_free'];
-    $event->image_url = $data['image_url'] ?? $event->image_url;
+    $event->image_event = $data['image_event'] ?? $event->image_event;
 
     // Mettre à jour en base de données
     $success = $this->eventRepository->updateEvent($event);

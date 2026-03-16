@@ -83,10 +83,14 @@ class EventValidator {
       }
     }
 
-    // Image URL (optionnel)
-    if (isset($data['image_url']) && !Helpers::isEmpty($data['image_url'])) {
-      if (!Helpers::isValidUrl($data['image_url'])) {
-        $errors['image_url'] = 'L\'URL de l\'image n\'est pas valide';
+    // Image Event (optionnel)
+    if (isset($data['image_event']) && !Helpers::isEmpty($data['image_event'])) {
+      // Vérifier que c'est un nom de fichier valide (avec extension d'image)
+      $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      $extension = strtolower(pathinfo($data['image_event'], PATHINFO_EXTENSION));
+      
+      if (!in_array($extension, $allowedExtensions)) {
+        $errors['image_event'] = 'Le fichier image doit être au format jpg, jpeg, png, gif ou webp';
       }
     }
 

@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS events (
     is_approved BOOLEAN DEFAULT FALSE,
     is_rejected BOOLEAN DEFAULT FALSE,
     is_deleted BOOLEAN DEFAULT FALSE,
-    image_url TEXT,
+    image_event VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -262,7 +262,7 @@ INSERT INTO
         is_approved,
         is_rejected,
         is_deleted,
-        image_url
+        image_event
     )
 VALUES (
         3,
@@ -282,7 +282,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1709717146395-6d368ebc8231'
+        'photo-1709717146395-6d368ebc8231.jpg'
     ),
     (
         3,
@@ -302,7 +302,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1669778631871-7bb6d5411c4b'
+        'photo-1669778631871-7bb6d5411c4b.jpg'
     ),
     (
         3,
@@ -322,7 +322,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1660892367133-82d376bce4fe'
+        'photo-1660892367133-82d376bce4fe.jpg'
     ),
     (
         3,
@@ -342,7 +342,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1527728180910-ce0511918c1f'
+        'photo-1527728180910-ce0511918c1f.jpg'
     ),
     (
         3,
@@ -362,7 +362,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1619429303894-4b40ee7810ba'
+        'photo-1619429303894-4b40ee7810ba.jpg'
     ),
     (
         3,
@@ -382,7 +382,7 @@ VALUES (
         TRUE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1767128312636-de243003b0fe'
+        'photo-1767128312636-de243003b0fe.jpg'
     ),
     (
         3,
@@ -402,7 +402,7 @@ VALUES (
         FALSE,
         FALSE,
         FALSE,
-        'https://images.unsplash.com/photo-1599424419180-e6980d5ee72c'
+        'roman-gvvLRfuJjzs-unsplash.jpg'
     );
 
 -- Insertion de billets pour les événements

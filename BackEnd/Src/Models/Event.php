@@ -21,7 +21,7 @@ class Event {
   public bool $is_approved;
   public bool $is_rejected;
   public bool $is_deleted;
-  public ?string $image_url;
+  public ?string $image_event;
   public string $created_at;
   public string $updated_at;
 }

@@ -22,7 +22,7 @@ class EventDTO {
   public bool $is_pending;
   public bool $is_approved;
   public bool $is_rejected;
-  public ?string $image_url;
+  public ?string $image_event;
   public string $created_at;
 
   public function __construct(Event $event) {
@@ -43,7 +43,7 @@ class EventDTO {
     $this->is_pending = $event->is_pending;
     $this->is_approved = $event->is_approved;
     $this->is_rejected = $event->is_rejected;
-    $this->image_url = $event->image_url;
+    $this->image_event = $event->image_event;
     $this->created_at = $event->created_at;
   }
 
@@ -66,7 +66,7 @@ class EventDTO {
       'is_pending' => $this->is_pending,
       'is_approved' => $this->is_approved,
       'is_rejected' => $this->is_rejected,
-      'image_url' => $this->image_url,
+      'image_event' => $this->image_event,
       'created_at' => $this->created_at
     ];
   }

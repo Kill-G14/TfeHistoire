@@ -74,5 +74,24 @@ export const helpers = {
   getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search)
     return urlParams.get(param)
+  },
+
+  // Construire l'URL de l'image à partir du nom de fichier
+  getImageUrl(imageName) {
+    if (!imageName) return '/assets/images/default-event.jpg' // Image par défaut
+    return `http://localhost/tfeHistoire/BackEnd/Api/imageApi.php?name=${encodeURIComponent(imageName)}`
+  },
+
+  // Transformer un événement pour ajouter l'URL de l'image
+  transformEvent(event) {
+    return {
+      ...event,
+      image: this.getImageUrl(event.image_event)
+    }
+  },
+
+  // Transformer une liste d'événements
+  transformEvents(events) {
+    return events.map(event => this.transformEvent(event))
   }
 }

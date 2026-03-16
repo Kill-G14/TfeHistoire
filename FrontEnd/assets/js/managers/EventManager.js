@@ -1,4 +1,6 @@
 // Manager pour la gestion des événements
+import { helpers } from '../utils/helpers.js'
+
 class EventManager {
   constructor() {
     this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
@@ -17,7 +19,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer les événements pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvents(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors du chargement des événements:', error)
       return {
@@ -41,7 +50,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer l'événement pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvent(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors du chargement de l\'événement:', error)
       return {
@@ -73,7 +89,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer l'événement pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvent(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors de la création de l\'événement:', error)
       return {
@@ -106,7 +129,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer l'événement pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvent(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'événement:', error)
       return {
@@ -162,7 +192,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer les événements pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvents(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors du chargement des événements par pays:', error)
       return {
@@ -186,7 +223,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer les événements pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvents(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors du chargement des événements par catégorie:', error)
       return {
@@ -210,7 +254,14 @@ class EventManager {
         })
       })
 
-      return await response.json()
+      const result = await response.json()
+      
+      // Si succès, transformer les événements pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvents(result.data)
+      }
+      
+      return result
     } catch (error) {
       console.error('Erreur lors de la recherche d\'événements:', error)
       return {

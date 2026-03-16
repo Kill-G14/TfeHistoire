@@ -100,7 +100,7 @@ async function handleSubmit(e) {
     time: document.getElementById('time').value,
     category: document.getElementById('category').value,
     is_free: document.getElementById('isFree')?.checked || false,
-    image_url: document.getElementById('imageUrl')?.value || ''
+    image_event: document.getElementById('imageEvent')?.value || ''
   }
 
   // Désactiver le bouton de soumission
