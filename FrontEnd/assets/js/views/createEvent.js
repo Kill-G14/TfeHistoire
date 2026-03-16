@@ -7,7 +7,7 @@ import EventManager from '../managers/EventManager.js'
 
 // Métadonnées de la vue
 export const meta = {
-  title: 'Créer un événement - EuroFêtes Historiques',
+  title: 'Créer un événement - MemoriaEventia',
   description: 'Créez votre événement historique et partagez-le avec toute l\'Europe'
 }
 

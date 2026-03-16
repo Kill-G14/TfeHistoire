@@ -71,7 +71,7 @@ FrontEnd/
 ```javascript
 // views/home.js
 export const meta = {
-  title: "Accueil - EuroFêtes",
+  title: "Accueil - MemoriaEventia",
   description: "Découvrez les événements historiques",
 };
 

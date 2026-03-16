@@ -1,6 +1,6 @@
 {
   "name": "eurofetes/backend",
-  "description": "Backend pour EuroFêtes Historiques",
+  "description": "Backend pour MemoriaEventia",
   "type": "project",
   "require": {
     "php": ">=8.0",

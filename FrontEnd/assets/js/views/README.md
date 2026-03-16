@@ -17,7 +17,7 @@ Chaque vue doit exporter :
 // views/home.js
 
 export const meta = {
-  title: "Accueil - EuroFêtes",
+  title: "Accueil - MemoriaEventia",
   description: "Description de la page",
 };
 

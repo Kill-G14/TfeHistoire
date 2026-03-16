@@ -2,7 +2,7 @@
 
 // Métadonnées de la vue
 export const meta = {
-  title: 'Carte des événements - EuroFêtes Historiques',
+  title: 'Carte des événements - MemoriaEventia',
   description: 'Visualisez les événements historiques sur une carte interactive de l\'Europe'
 }
 

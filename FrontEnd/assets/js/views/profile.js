@@ -6,7 +6,7 @@ import { appState } from '../store/appState.js'
 
 // Métadonnées de la vue
 export const meta = {
-  title: 'Mon Profil - EuroFêtes Historiques',
+  title: 'Mon Profil - MemoriaEventia',
   description: 'Gérez votre profil et consultez vos réservations'
 }
 

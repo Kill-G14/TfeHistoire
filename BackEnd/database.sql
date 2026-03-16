@@ -1,4 +1,4 @@
--- Base de données pour EuroFêtes Historiques
+-- Base de données pour MemoriaEventia
 -- Création de la base de données
 
 CREATE DATABASE IF NOT EXISTS eurofetes_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -209,7 +209,7 @@ INSERT INTO
 VALUES (
         'admin@eurofetes.com',
         'admin123',
-        'Admin EuroFêtes',
+        'Admin MemoriaEventia',
         TRUE,
         FALSE,
         FALSE,

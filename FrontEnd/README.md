@@ -1,4 +1,4 @@
-# EuroFêtes Historiques - SPA
+# MemoriaEventia - SPA
 
 Application web Single Page Application (SPA) de réservation d'événements historiques européens. Version moderne en vanilla JavaScript avec routeur et Bootstrap 5.
 

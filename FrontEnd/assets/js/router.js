@@ -122,7 +122,7 @@ export class Router {
   }
 
   updateMetadata(meta = {}) {
-    document.title = meta.title || 'EuroFêtes Historiques'
+    document.title = meta.title || 'MemoriaEventia'
 
     const description = document.getElementById('pageDescription')
     if (description) {

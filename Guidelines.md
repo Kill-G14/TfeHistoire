@@ -89,7 +89,7 @@ ou l'initiation de processus. Ils communiquent l'interactivité et doivent avoir
 
 ---
 
-# Directives spécifiques au projet - EuroFêtes Historiques
+# Directives spécifiques au projet - MemoriaEventia
 
 ## Identité visuelle - Thème historique élégant
 
@@ -195,7 +195,7 @@ ou l'initiation de processus. Ils communiquent l'interactivité et doivent avoir
 - `.header` : sticky top, fond blanc, border-bottom, shadow légère
 - Height : auto avec `py-3` (padding vertical)
 - Layout : flexbox space-between
-  - Gauche : Logo + icône + texte "EuroFêtes Historiques"
+  - Gauche : Logo + icône + texte "MemoriaEventia"
   - Centre : Nav links (hidden sur mobile avec `.d-none .d-md-flex`)
   - Droite : Boutons actions (conditionnels logged in/out)
 

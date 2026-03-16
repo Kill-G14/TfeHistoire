@@ -1,4 +1,4 @@
-# Backend EuroFêtes Historiques
+# Backend MemoriaEventia
 
 Backend PHP pour la plateforme d'événements historiques européens.
 

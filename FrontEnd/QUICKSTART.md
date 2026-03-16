@@ -153,7 +153,7 @@ export async function unmount() {
 
 ```javascript
 export const meta = {
-  title: "Ma Vue - EuroFêtes",
+  title: "Ma Vue - MemoriaEventia",
   description: "Description de ma vue",
 };
 

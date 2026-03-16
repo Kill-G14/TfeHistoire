@@ -9,7 +9,7 @@ import EventManager from '../managers/EventManager.js'
 
 // Métadonnées de la vue
 export const meta = {
-  title: 'EuroFêtes Historiques - Événements historiques d\'Europe',
+  title: 'MemoriaEventia - Événements historiques d\'Europe',
   description: 'Découvrez et participez aux plus grandes célébrations historiques à travers l\'Europe'
 }
 
