@@ -3,6 +3,7 @@
 // Imports
 import { Router } from './router.js'
 import { renderHeader } from './components/header.js'
+import { renderFooter } from './components/footer.js'
 import { renderLoginModal } from './components/loginModal.js'
 import { appState } from './store/appState.js'
 import { auth } from './utils/auth.js'
@@ -34,6 +35,7 @@ async function init() {
 
   // Rendre les composants persistants
   await renderHeader()
+  await renderFooter()
   await renderLoginModal()
 
   // Initialiser le routeur
