@@ -16,16 +16,73 @@
   
   /* Fond et textes */
   --color-background: #F5F1E8;
-  --color-text: #2B2B2B;
-  --color-text-muted: #6B6B6B;
+  --color-text: #000000;
+  --color-text-muted: #000000;
 }
 
 /* Styles généraux */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Cormorant Garamond', Georgia, serif;
   background-color: var(--color-background);
   color: var(--color-text);
   min-height: 100vh;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* Typographie - Titres avec Cinzel (alternative à Trajan Pro) */
+h1, h2, h3, h4, h5, h6,
+.page-title,
+.footer-title,
+.modal-title,
+.form-section-title,
+.eventCard .card-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Tailles de texte réduites pour meilleure lisibilité */
+.eventCard .card-text,
+.eventCard small,
+.footer-text,
+.footer-links,
+.footer-contact,
+.nav-link,
+.badge,
+.form-text,
+.text-muted,
+small,
+.small {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.footer-links a,
+.footer-contact li {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btn {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.form-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Assurer que tous les textes sont en gras */
+p, span, a, td, th, li, label, input, textarea, select, .card-text {
+  font-weight: 600;
 }
 
 /* Surcharges Bootstrap */
@@ -88,7 +145,7 @@ body {
 
 .nav-link {
   color: var(--color-primary);
-  font-size: 0.875rem;
+  font-size: 1.2rem;
   transition: color 0.2s;
   text-decoration: none;
 }
@@ -179,7 +236,7 @@ body {
   top: 0.75rem;
   right: 0.75rem;
   background-color: var(--color-primary);
-  font-size: 0.75rem;
+  font-size: 1rem;
 }
 
 .eventCard .card-title {
@@ -192,6 +249,46 @@ body {
   color: var(--color-accent);
 }
 
+/* Augmentation de la taille des informations de localisation/date/heure */
+.eventCard .eventCard-location,
+.eventCard .eventCard-date,
+.eventCard .eventCard-time,
+.eventCard .small,
+.eventCard small {
+  font-size: 1.2rem !important;
+}
+
+/* Textes des cards en noir pour meilleure lisibilité (sauf titres) */
+.eventCard .card-body,
+.eventCard .card-text,
+.eventCard p,
+.eventCard small,
+.eventCard span:not(.badge),
+.card-body,
+.card-text,
+.card p,
+.card small,
+.card span:not(.badge) {
+  color: #000000 !important;
+}
+
+/* Textes en noir sur fonds blancs/beige (sauf titres) */
+.form-section p,
+.form-section span,
+.form-section label:not(.form-section-title),
+.eventDetail-info-box p,
+.eventDetail-info-box span,
+.eventDetail-reservation p,
+.eventDetail-reservation span,
+.filterContainer p,
+.filterContainer span,
+.profile-section p,
+.profile-section span,
+.profile-card p:not(.page-title),
+.profile-card span {
+  color: #000000 !important;
+}
+
 /* Filters */
 .filterContainer {
   background-color: white;
@@ -199,6 +296,21 @@ body {
   border-radius: 0.375rem;
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filterContainer input,
+.filterContainer select,
+.filterContainer .form-control,
+.filterContainer .form-select {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000000 !important;
+}
+
+.filterContainer input::placeholder {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000000 !important;
 }
 
 /* Modal / Dialog */
