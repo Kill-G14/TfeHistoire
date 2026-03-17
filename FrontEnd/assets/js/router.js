@@ -5,6 +5,13 @@ export class Router {
     this.appElement = document.querySelector(appSelector)
     this.currentView = null
     this.params = {}
+    // Détecter le base path depuis la balise <base>
+    const baseTag = document.querySelector('base')
+    this.basePath = baseTag ? new URL(baseTag.href).pathname : '/'
+    // Enlever le slash final du basePath
+    if (this.basePath.endsWith('/') && this.basePath.length > 1) {
+      this.basePath = this.basePath.slice(0, -1)
+    }
   }
 
   init() {
@@ -25,7 +32,12 @@ export class Router {
   }
 
   async navigate(url) {
-    history.pushState(null, null, url)
+    // Ajouter le base path si l'URL ne commence pas déjà par celui-ci
+    let fullUrl = url
+    if (!url.startsWith(this.basePath) && url.startsWith('/')) {
+      fullUrl = this.basePath + url
+    }
+    history.pushState(null, null, fullUrl)
     await this.handleRoute()
   }
 
@@ -68,13 +80,11 @@ export class Router {
   }
 
   matchRoute(path) {
-    // Nettoyer le path (enlever /FrontEnd/ si présent)
+    // Nettoyer le path en enlevant le base path
     let cleanPath = path
     
-    // Essayer de détecter et enlever le base path
-    const basePath = '/tfeHistoire/FrontEnd'
-    if (cleanPath.startsWith(basePath)) {
-      cleanPath = cleanPath.slice(basePath.length)
+    if (cleanPath.startsWith(this.basePath)) {
+      cleanPath = cleanPath.slice(this.basePath.length)
     }
     
     // S'assurer qu'on a au moins un /

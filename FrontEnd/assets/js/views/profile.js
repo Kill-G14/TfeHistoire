@@ -14,18 +14,23 @@ export const meta = {
 const templateObjects = {}
 
 async function loadTemplate(path) {
-  // Vérifier si le template est déjà chargé
-  if (Object.keys(templateObjects).length > 0) {
-    return
-  }
-
   try {
-    const response = await fetch(path)
+    // Forcer le rechargement sans cache
+    const response = await fetch(path, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    })
+    
     if (!response.ok) {
       throw new Error(`Erreur ${response.status}: ${response.statusText}`)
     }
 
     const htmlContent = await response.text()
+    console.log('Template HTML chargé:', htmlContent.substring(0, 200)) // Debug
+    
     const parser = new DOMParser()
     const templateDoc = parser.parseFromString(htmlContent, 'text/html')
     const templates = templateDoc.querySelectorAll('template')
@@ -34,8 +39,12 @@ async function loadTemplate(path) {
       throw new Error('Aucun template trouvé dans le fichier')
     }
 
+    // Vider l'objet templateObjects avant de le remplir
+    Object.keys(templateObjects).forEach(key => delete templateObjects[key])
+
     templates.forEach((template) => {
       const templateId = template.id
+      console.log('Template trouvé:', templateId) // Debug
       templateObjects[templateId] = template.content
     })
   } catch (error) {
@@ -55,8 +64,9 @@ export async function mount(container, params) {
     return
   }
 
-  // Charger le template
-  await loadTemplate('./assets/templates/views/profile.html')
+  // Charger le template avec timestamp pour éviter le cache
+  const timestamp = Date.now()
+  await loadTemplate(`assets/templates/views/profile.html?v=${timestamp}`)
   
   // Vérifier que le template est chargé
   if (!templateObjects['profileView']) {

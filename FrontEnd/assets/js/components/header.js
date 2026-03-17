@@ -64,15 +64,8 @@ function renderHeaderActions() {
 
   // Attacher les événements
   if (isLoggedIn) {
-    const btnCreateEvent = document.getElementById('btnCreateEvent')
     const btnProfile = document.getElementById('btnProfile')
     const btnLogout = document.getElementById('btnLogout')
-
-    if (btnCreateEvent) {
-      btnCreateEvent.addEventListener('click', () => {
-        window.router.navigate('/create-event')
-      })
-    }
 
     if (btnProfile) {
       btnProfile.addEventListener('click', () => {

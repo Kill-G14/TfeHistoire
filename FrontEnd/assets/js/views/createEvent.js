@@ -15,11 +15,6 @@ export const meta = {
 const templateObjects = {}
 
 async function loadTemplate(path) {
-  // Vérifier si le template est déjà chargé
-  if (Object.keys(templateObjects).length > 0) {
-    return
-  }
-
   try {
     const response = await fetch(path)
     if (!response.ok) {
@@ -34,6 +29,9 @@ async function loadTemplate(path) {
     if (templates.length === 0) {
       throw new Error('Aucun template trouvé dans le fichier')
     }
+
+    // Vider l'objet templateObjects avant de le remplir
+    Object.keys(templateObjects).forEach(key => delete templateObjects[key])
 
     templates.forEach((template) => {
       const templateId = template.id
