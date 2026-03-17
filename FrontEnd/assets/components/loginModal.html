@@ -62,6 +62,7 @@
                     placeholder="votre@email.com"
                     required
                   />
+                  <div class="invalid-feedback" id="loginEmailError"></div>
                 </div>
                 <div class="mb-3">
                   <label for="loginPassword" class="form-label"
@@ -74,6 +75,7 @@
                     placeholder="••••••••"
                     required
                   />
+                  <div class="invalid-feedback" id="loginPasswordError"></div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">
                   Se connecter
@@ -95,6 +97,7 @@
                     placeholder="Jean Dupont"
                     required
                   />
+                  <div class="invalid-feedback" id="registerNameError"></div>
                 </div>
                 <div class="mb-3">
                   <label for="registerEmail" class="form-label">Email</label>
@@ -105,6 +108,7 @@
                     placeholder="votre@email.com"
                     required
                   />
+                  <div class="invalid-feedback" id="registerEmailError"></div>
                 </div>
                 <div class="mb-3">
                   <label for="registerPassword" class="form-label"
@@ -117,8 +121,17 @@
                     placeholder="••••••••"
                     required
                   />
+                  <div
+                    class="invalid-feedback"
+                    id="registerPasswordError"
+                  ></div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  id="registerSubmitBtn"
+                  disabled
+                >
                   S'inscrire
                 </button>
               </form>
