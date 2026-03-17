@@ -15,16 +15,34 @@ export const meta = {
 const templateObjects = {}
 
 async function loadTemplate(path) {
-  const response = await fetch(path)
-  const htmlContent = await response.text()
-  const parser = new DOMParser()
-  const templateDoc = parser.parseFromString(htmlContent, 'text/html')
-  const templates = templateDoc.querySelectorAll('template')
+  // Vérifier si le template est déjà chargé
+  if (Object.keys(templateObjects).length > 0) {
+    return
+  }
 
-  templates.forEach((template) => {
-    const templateId = template.id
-    templateObjects[templateId] = template.content
-  })
+  try {
+    const response = await fetch(path)
+    if (!response.ok) {
+      throw new Error(`Erreur ${response.status}: ${response.statusText}`)
+    }
+
+    const htmlContent = await response.text()
+    const parser = new DOMParser()
+    const templateDoc = parser.parseFromString(htmlContent, 'text/html')
+    const templates = templateDoc.querySelectorAll('template')
+
+    if (templates.length === 0) {
+      throw new Error('Aucun template trouvé dans le fichier')
+    }
+
+    templates.forEach((template) => {
+      const templateId = template.id
+      templateObjects[templateId] = template.content
+    })
+  } catch (error) {
+    console.error('Erreur lors du chargement du template:', error)
+    throw error
+  }
 }
 
 // Variables locales
@@ -44,6 +62,13 @@ export async function mount(container, params) {
   // Charger le template
   await loadTemplate('./assets/templates/views/createEvent.html')
   
+  // Vérifier que le template est chargé
+  if (!templateObjects['createEventView']) {
+    console.error('Template createEventView non trouvé')
+    helpers.showToast('Erreur de chargement de la page', 'error')
+    return
+  }
+
   // Injecter le template
   const clone = templateObjects['createEventView'].cloneNode(true)
   container.innerHTML = ''
