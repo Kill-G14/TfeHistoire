@@ -371,10 +371,42 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
   padding: 0.54rem;
 }
 
+.eventDetail-info-box .small,
+.eventDetail-info-box .fw-medium,
+.eventDetail-info-box div {
+  font-size: 1.2rem !important;
+}
+
+.eventDetail-info-box .small,
+.eventDetail-info-box .text-muted {
+  color: #000000 !important;
+}
+
 .eventDetail-reservation {
   background-color: var(--color-background);
   border-radius: 0.5rem;
   padding: 1.08rem;
+}
+
+.eventDetail-reservation .fs-5,
+.eventDetail-reservation .fw-medium,
+.eventDetail-reservation span {
+  font-size: 1.2rem !important;
+}
+
+.eventDetail-reservation .fs-4,
+.eventDetail-info-box .fs-4 {
+  font-size: 1.2rem !important;
+}
+
+/* Quantité en grand pour meilleure visibilité */
+#quantity {
+  font-size: 2rem !important;
+}
+
+/* Description de l'événement en noir */
+#detailDescription {
+  color: #000000 !important;
 }
 
 /* Réduction du padding du conteneur principal */
@@ -406,11 +438,11 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 }
 
 .eventDetail-content .fs-4 {
-  font-size: 0.9rem !important;
+  font-size: 1.2rem !important;
 }
 
 .eventDetail-content .fs-5 {
-  font-size: 0.81rem !important;
+  font-size: 1.2rem !important;
 }
 
 .eventDetail-content .fs-6 {
@@ -561,7 +593,7 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 
 .footer-text {
   color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   line-height: 1.6;
   margin: 0;
 }
@@ -609,7 +641,7 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 .footer-links a {
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -640,7 +672,7 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
   align-items: flex-start;
   gap: 0.75rem;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 
 .footer-contact i {
