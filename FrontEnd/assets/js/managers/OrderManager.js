@@ -27,7 +27,6 @@ class OrderManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement des commandes:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -59,7 +58,6 @@ class OrderManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement de la commande:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -91,7 +89,6 @@ class OrderManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la création de la commande:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -123,7 +120,6 @@ class OrderManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de l\'annulation de la commande:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'

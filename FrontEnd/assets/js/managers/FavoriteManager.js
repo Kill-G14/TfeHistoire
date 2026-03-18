@@ -27,7 +27,6 @@ class FavoriteManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement des favoris:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -58,7 +57,6 @@ class FavoriteManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement des favoris:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -90,7 +88,6 @@ class FavoriteManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de l\'ajout aux favoris:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -122,7 +119,6 @@ class FavoriteManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du retrait des favoris:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -154,7 +150,6 @@ class FavoriteManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la vérification des favoris:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'

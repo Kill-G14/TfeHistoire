@@ -34,7 +34,6 @@ async function loadTemplate(path) {
     }
 
     const htmlContent = await response.text()
-    console.log('Template HTML chargé:', htmlContent.substring(0, 200)) // Debug
     
     const parser = new DOMParser()
     const templateDoc = parser.parseFromString(htmlContent, 'text/html')
@@ -49,11 +48,9 @@ async function loadTemplate(path) {
 
     templates.forEach((template) => {
       const templateId = template.id
-      console.log('Template trouvé:', templateId) // Debug
       templateObjects[templateId] = template.content
     })
   } catch (error) {
-    console.error('Erreur lors du chargement du template:', error)
     throw error
   }
 }
@@ -75,7 +72,6 @@ export async function mount(container, params) {
   
   // Vérifier que le template est chargé
   if (!templateObjects['profileView']) {
-    console.error('Template profileView non trouvé')
     helpers.showToast('Erreur de chargement de la page', 'error')
     return
   }

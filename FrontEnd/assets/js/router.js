@@ -67,7 +67,6 @@ export class Router {
         // Monter la vue
         await this.currentView.mount(this.appElement, this.params)
       } catch (error) {
-        console.error('Erreur lors du chargement de la vue:', error)
         this.show404()
       } finally {
         // Retirer classe de chargement

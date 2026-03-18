@@ -157,7 +157,6 @@ async function addToFavorites(eventId, btnElement) {
       btnElement.style.cursor = 'pointer'
     }
   } catch (error) {
-    console.error('Erreur lors de l\'ajout du favori:', error)
     helpers.showToast('Erreur réseau', 'error')
     // Réactiver le bouton en cas d'erreur
     btnElement.disabled = false

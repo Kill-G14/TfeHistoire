@@ -7,7 +7,6 @@ export const storage = {
       const item = localStorage.getItem(key)
       return item ? JSON.parse(item) : null
     } catch (error) {
-      console.error(`Erreur lors de la récupération de ${key}:`, error)
       return null
     }
   },
@@ -18,7 +17,6 @@ export const storage = {
       localStorage.setItem(key, JSON.stringify(value))
       return true
     } catch (error) {
-      console.error(`Erreur lors de l'enregistrement de ${key}:`, error)
       return false
     }
   },
@@ -29,7 +27,6 @@ export const storage = {
       localStorage.removeItem(key)
       return true
     } catch (error) {
-      console.error(`Erreur lors de la suppression de ${key}:`, error)
       return false
     }
   },
@@ -40,7 +37,6 @@ export const storage = {
       localStorage.clear()
       return true
     } catch (error) {
-      console.error('Erreur lors de la suppression du localStorage:', error)
       return false
     }
   }

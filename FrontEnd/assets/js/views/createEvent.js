@@ -38,7 +38,6 @@ async function loadTemplate(path) {
       templateObjects[templateId] = template.content
     })
   } catch (error) {
-    console.error('Erreur lors du chargement du template:', error)
     throw error
   }
 }
@@ -62,7 +61,6 @@ export async function mount(container, params) {
   
   // Vérifier que le template est chargé
   if (!templateObjects['createEventView']) {
-    console.error('Template createEventView non trouvé')
     helpers.showToast('Erreur de chargement de la page', 'error')
     return
   }

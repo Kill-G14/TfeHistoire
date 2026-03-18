@@ -21,7 +21,6 @@ class AuthManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la connexion:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -47,7 +46,6 @@ class AuthManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de l\'inscription:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -78,7 +76,6 @@ class AuthManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -109,7 +106,6 @@ class AuthManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la récupération de l\'utilisateur:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'

@@ -28,7 +28,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors du chargement des événements:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -59,7 +58,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'événement:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -98,7 +96,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors de la création de l\'événement:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -138,7 +135,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'événement:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -170,7 +166,6 @@ class EventManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'événement:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -201,7 +196,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors du chargement des événements par pays:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -232,7 +226,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors du chargement des événements par catégorie:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -263,7 +256,6 @@ class EventManager {
       
       return result
     } catch (error) {
-      console.error('Erreur lors de la recherche d\'événements:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'

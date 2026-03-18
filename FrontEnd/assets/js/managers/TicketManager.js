@@ -20,7 +20,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement des tickets:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -44,7 +43,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement du ticket:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -76,7 +74,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la création du ticket:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -109,7 +106,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du ticket:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -141,7 +137,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors de la suppression du ticket:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -172,7 +167,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du chargement des tickets achetés:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
@@ -204,7 +198,6 @@ class TicketManager {
 
       return await response.json()
     } catch (error) {
-      console.error('Erreur lors du scan du ticket:', error)
       return {
         success: false,
         message: 'Erreur de connexion au serveur'
