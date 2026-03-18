@@ -7,6 +7,7 @@ import { renderFooter } from './components/footer.js'
 import { renderLoginModal } from './components/loginModal.js'
 import { appState } from './store/appState.js'
 import { auth } from './utils/auth.js'
+import FavoriteManager from './managers/FavoriteManager.js'
 
 // Définition des routes
 const routes = {
@@ -31,6 +32,13 @@ async function init() {
   if (isLoggedIn && user) {
     appState.set('user', user)
     appState.set('isAuthenticated', true)
+    
+    // Charger les favoris de l'utilisateur
+    const token = auth.getToken()
+    const favoritesResult = await FavoriteManager.getByUser(token)
+    if (favoritesResult.success) {
+      appState.set('favorites', favoritesResult.data || [])
+    }
   }
 
   // Rendre les composants persistants
@@ -46,11 +54,21 @@ async function init() {
 }
 
 // Gérer les changements d'utilisateur
-function handleUserChange(user) {
+async function handleUserChange(user) {
   if (user) {
     appState.set('isAuthenticated', true)
+    
+    // Charger les favoris de l'utilisateur
+    const token = auth.getToken()
+    if (token) {
+      const favoritesResult = await FavoriteManager.getByUser(token)
+      if (favoritesResult.success) {
+        appState.set('favorites', favoritesResult.data || [])
+      }
+    }
   } else {
     appState.set('isAuthenticated', false)
+    appState.set('favorites', [])
   }
   // Mettre à jour le header
   renderHeader()

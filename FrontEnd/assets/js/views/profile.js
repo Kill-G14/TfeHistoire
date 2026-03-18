@@ -3,6 +3,8 @@
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
 import { appState } from '../store/appState.js'
+import FavoriteManager from '../managers/FavoriteManager.js'
+import { showEventDetail } from '../components/eventDetail.js'
 
 // Métadonnées de la vue
 export const meta = {
@@ -12,6 +14,9 @@ export const meta = {
 
 // Template HTML
 const templateObjects = {}
+
+// Stocker les événements favoris pour les détails
+let favoriteEvents = []
 
 async function loadTemplate(path) {
   try {
@@ -82,6 +87,12 @@ export async function mount(container, params) {
 
   // Afficher les informations utilisateur
   displayUserInfo()
+  
+  // Charger et afficher les favoris
+  await loadFavorites()
+  
+  // Écouter les changements de favoris
+  appState.subscribe('favorites', loadFavorites)
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
@@ -101,6 +112,156 @@ function displayUserInfo() {
 
   if (userEmailEl && user) {
     userEmailEl.textContent = user.email || ''
+  }
+  
+  // Mettre à jour le compteur de favoris
+  const favorites = appState.get('favorites') || []
+  const statFavorites = document.getElementById('statFavorites')
+  if (statFavorites) {
+    statFavorites.textContent = favorites.length
+  }
+}
+
+// Charger les favoris
+async function loadFavorites() {
+  const token = auth.getToken()
+  if (!token) return
+
+  const favoritesContainer = document.getElementById('userFavorites')
+  if (!favoritesContainer) return
+
+  // Afficher un loader
+  favoritesContainer.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  `
+
+  // Récupérer les favoris avec détails
+  const result = await FavoriteManager.getByUserWithDetails(token)
+
+  if (result.success && result.data && result.data.length > 0) {
+    // Transformer les événements pour avoir le bon format d'image
+    const transformedEvents = helpers.transformEvents(result.data)
+    favoriteEvents = transformedEvents // Stocker pour les détails
+    displayFavorites(transformedEvents)
+  } else {
+    // Aucun favori
+    favoritesContainer.innerHTML = `
+      <div class="text-center py-5">
+        <i class="bi bi-heart text-muted fs-1 mb-2"></i>
+        <p class="text-muted mb-0">Aucun événement en favoris</p>
+      </div>
+    `
+  }
+}
+
+// Afficher les favoris
+function displayFavorites(favorites) {
+  const favoritesContainer = document.getElementById('userFavorites')
+  if (!favoritesContainer) return
+
+  favoritesContainer.innerHTML = `
+    <div class="d-flex flex-wrap gap-3">
+      ${favorites.map(event => {
+        // Gérer le prix
+        const priceDisplay = event.is_free ? 'Gratuit' : 'Voir billets'
+        
+        return `
+        <div class="favorite-card-wrapper" id="favorite-card-${event.id}">
+          <div class="card h-100 shadow-sm hover-card" 
+               onclick="viewEventDetails(${event.id})" 
+               style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="card-body">
+              <h5 class="card-title text-primary mb-3">${event.title}</h5>
+              
+              <div class="mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-geo-alt text-muted"></i>
+                  <span>${event.city}, ${event.country}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-calendar3 text-muted"></i>
+                  <span>${helpers.formatDate(event.date)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-tag text-muted"></i>
+                  <span class="fw-bold text-primary">${priceDisplay}</span>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm flex-grow-1" 
+                        onclick="event.stopPropagation(); viewEventDetails(${event.id})">
+                  <i class="bi bi-eye"></i> Voir détails
+                </button>
+                <button class="btn btn-outline-danger btn-sm" 
+                        onclick="event.stopPropagation(); removeFavoriteFromProfile(${event.id}, this)"
+                        id="remove-fav-${event.id}"
+                        title="Retirer des favoris">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        `
+      }).join('')}
+    </div>
+  `
+}
+
+// Voir les détails d'un événement (fonction globale pour onclick)
+window.viewEventDetails = function(eventId) {
+  const event = favoriteEvents.find(e => e.id === eventId)
+  if (event) {
+    showEventDetail(event)
+  } else {
+    helpers.showToast('Événement non trouvé', 'error')
+  }
+}
+
+// Fonction globale pour retirer un favori depuis le profil
+window.removeFavoriteFromProfile = async function(eventId, btnElement) {
+  if (btnElement.disabled) return
+
+  const token = auth.getToken()
+  
+  // Désactiver le bouton pendant le traitement
+  btnElement.disabled = true
+  btnElement.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Suppression...'
+
+  const result = await FavoriteManager.remove(eventId, token)
+
+  if (result.success) {
+    helpers.showToast('Retiré des favoris', 'success')
+    
+    // Mettre à jour le state
+    const userFavorites = appState.get('favorites') || []
+    const updatedFavorites = userFavorites.filter(fav => fav.event_id != eventId)
+    appState.set('favorites', updatedFavorites)
+    
+    // Animation de suppression de la carte
+    const card = document.getElementById(`favorite-card-${eventId}`)
+    if (card) {
+      card.style.transition = 'opacity 0.3s, transform 0.3s'
+      card.style.opacity = '0'
+      card.style.transform = 'scale(0.8)'
+      
+      setTimeout(() => {
+        // Recharger l'affichage après l'animation
+        loadFavorites()
+      }, 300)
+    } else {
+      // Si la carte n'existe pas, juste recharger
+      loadFavorites()
+    }
+  } else {
+    helpers.showToast(result.message || 'Erreur', 'error')
+    btnElement.disabled = false
+    btnElement.innerHTML = '<i class="bi bi-trash"></i> Retirer des favoris'
   }
 }
 

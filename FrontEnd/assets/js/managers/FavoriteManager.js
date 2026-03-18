@@ -35,6 +35,37 @@ class FavoriteManager {
     }
   }
 
+  // Récupérer les favoris avec détails des événements
+  async getByUserWithDetails(token) {
+    if (!token) {
+      return {
+        success: false,
+        message: 'Non authentifié'
+      }
+    }
+
+    try {
+      const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'getMyFavoritesWithDetails',
+          token: token
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      console.error('Erreur lors du chargement des favoris:', error)
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
+
   // Ajouter un événement aux favoris
   async add(eventId, token) {
     if (!token) {

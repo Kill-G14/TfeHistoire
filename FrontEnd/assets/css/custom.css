@@ -239,6 +239,51 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
   font-size: 1rem;
 }
 
+/* Bouton Favoris */
+.btn-favorite {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #6c757d;
+}
+
+.btn-favorite:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-favorite i {
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-favorite.active {
+  color: #dc3545;
+  background: rgba(255, 255, 255, 1);
+}
+
+.btn-favorite.active i {
+  font-weight: 700;
+}
+
+.btn-favorite.active i.bi-heart::before {
+  content: "\f415"; /* bi-heart-fill */
+}
+
 .eventCard .card-title {
   color: var(--color-primary);
   font-weight: 600;
@@ -1069,4 +1114,29 @@ html {
 
 .invalid-feedback {
   animation: slideDown 0.2s ease-in-out;
+}
+
+/* ============================================
+   HOVER CARDS (Favoris dans Profile)
+   ============================================ */
+
+/* Wrapper pour les cartes de favoris */
+.favorite-card-wrapper {
+  min-width: 450px;
+  max-width: 50%;
+  flex: 1 1 450px;
+}
+
+/* Cartes cliquables avec effet hover */
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Responsive pour favoris */
+@media (max-width: 576px) {
+  .favorite-card-wrapper {
+    min-width: 100%;
+    max-width: 100%;
+  }
 }

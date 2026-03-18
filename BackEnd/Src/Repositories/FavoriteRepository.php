@@ -54,11 +54,35 @@ class FavoriteRepository {
 
   // Ajouter un favori
   public function addFavorite(int $userId, int $eventId): ?int {
-    // Vérifier si déjà en favori
+    // Vérifier si déjà en favori actif
     if ($this->isFavorite($userId, $eventId)) {
       return null;
     }
 
+    // Vérifier si un favori supprimé existe
+    $checkQuery = "SELECT id FROM favorites 
+                   WHERE user_id = :user_id AND event_id = :event_id AND is_deleted = TRUE";
+    $checkStmt = $this->getPdo()->prepare($checkQuery);
+    $checkStmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $checkStmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+    $checkStmt->execute();
+    $existingFavorite = $checkStmt->fetch();
+
+    // Si un favori supprimé existe, le réactiver
+    if ($existingFavorite) {
+      $updateQuery = "UPDATE favorites 
+                      SET is_deleted = FALSE, created_at = NOW() 
+                      WHERE id = :id";
+      $updateStmt = $this->getPdo()->prepare($updateQuery);
+      $updateStmt->bindParam(':id', $existingFavorite['id'], PDO::PARAM_INT);
+      
+      if ($updateStmt->execute()) {
+        return (int) $existingFavorite['id'];
+      }
+      return null;
+    }
+
+    // Sinon, créer un nouveau favori
     $query = "INSERT INTO favorites (user_id, event_id, created_at)
               VALUES (:user_id, :event_id, NOW())";
     

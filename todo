@@ -1,9 +1,11 @@
-limiter le nombre de tentative deconnexion
-
+----Inprogress-----
 intégrer page de Profile
 (avec billet acheter, evenements incrit, evenements mis en ligne par cette utilisateur)
-intégrer page de changement de mot de passe
 intégrer page de création d'event
+
+----Todo-----
 intégrer page de modification d'event
 intégrer page de suppression d'event
 intégrer page de calendrier des evenements
+limiter le nombre de tentative de connection
+intégrer page de changement de mot de passe

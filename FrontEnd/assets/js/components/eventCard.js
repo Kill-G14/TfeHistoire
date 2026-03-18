@@ -1,5 +1,10 @@
 // Composant Event Card
 
+import FavoriteManager from '../managers/FavoriteManager.js'
+import { auth } from '../utils/auth.js'
+import { helpers } from '../utils/helpers.js'
+import { appState } from '../store/appState.js'
+
 const templateObjects = {}
 
 async function loadTemplate(path) {
@@ -49,6 +54,7 @@ export async function renderEventCards(events, containerId, onEventClick) {
     const price = clone.querySelector('.eventCard-price')
     const btn = clone.querySelector('.eventCard-btn')
     const card = clone.querySelector('.eventCard')
+    const btnFavorite = clone.querySelector('.btn-favorite')
 
     if (img) {
       img.src = event.image
@@ -62,12 +68,34 @@ export async function renderEventCards(events, containerId, onEventClick) {
     if (time) time.textContent = event.time
     if (price) price.textContent = event.price
 
-    // Événement de clic
+    // Configurer le bouton favoris
+    if (btnFavorite) {
+      btnFavorite.dataset.eventId = event.id
+      
+      // Vérifier si l'événement est déjà en favoris
+      const userFavorites = appState.get('favorites') || []
+      const isFavorite = userFavorites.some(fav => fav.event_id == event.id)
+      
+      if (isFavorite) {
+        // Si déjà en favoris, cacher le bouton ou le désactiver
+        btnFavorite.style.display = 'none'
+      } else {
+        // Gérer le clic pour ajouter aux favoris
+        btnFavorite.addEventListener('click', async (e) => {
+          e.stopPropagation()
+          await addToFavorites(event.id, btnFavorite)
+        })
+      }
+    }
+
+    // Événement de clic sur la carte
     if (card) {
       card.addEventListener('click', (e) => {
-        if (e.target !== btn && !btn.contains(e.target)) {
-          onEventClick(event)
+        // Ignorer le clic si c'est sur le bouton favoris ou le bouton détails
+        if (e.target.closest('.btn-favorite') || e.target.closest('.eventCard-btn')) {
+          return
         }
+        onEventClick(event)
       })
     }
 
@@ -80,4 +108,60 @@ export async function renderEventCards(events, containerId, onEventClick) {
 
     container.appendChild(clone)
   })
+}
+
+// Fonction pour ajouter un événement aux favoris
+async function addToFavorites(eventId, btnElement) {
+  // Empêcher les clics multiples
+  if (btnElement.disabled) {
+    return
+  }
+
+  const isAuthenticated = appState.get('isAuthenticated')
+  
+  // Si l'utilisateur n'est pas connecté, ouvrir la modale de connexion
+  if (!isAuthenticated) {
+    helpers.showToast('Vous devez être connecté pour ajouter des favoris', 'warning')
+    const loginModal = document.getElementById('loginModal')
+    if (loginModal) {
+      const modal = new bootstrap.Modal(loginModal)
+      modal.show()
+    }
+    return
+  }
+
+  const token = auth.getToken()
+
+  // Désactiver le bouton pendant le traitement
+  btnElement.disabled = true
+  btnElement.style.opacity = '0.6'
+  btnElement.style.cursor = 'not-allowed'
+
+  try {
+    const result = await FavoriteManager.add(eventId, token)
+    
+    if (result.success) {
+      // Masquer le bouton une fois ajouté
+      btnElement.style.display = 'none'
+      helpers.showToast('Ajouté aux favoris', 'success')
+      
+      // Mettre à jour la liste des favoris dans le state
+      const userFavorites = appState.get('favorites') || []
+      userFavorites.push({ event_id: eventId })
+      appState.set('favorites', userFavorites)
+    } else {
+      helpers.showToast(result.message || 'Erreur lors de l\'ajout', 'error')
+      // Réactiver le bouton en cas d'erreur
+      btnElement.disabled = false
+      btnElement.style.opacity = '1'
+      btnElement.style.cursor = 'pointer'
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du favori:', error)
+    helpers.showToast('Erreur réseau', 'error')
+    // Réactiver le bouton en cas d'erreur
+    btnElement.disabled = false
+    btnElement.style.opacity = '1'
+    btnElement.style.cursor = 'pointer'
+  }
 }

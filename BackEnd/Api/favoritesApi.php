@@ -3,6 +3,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -58,6 +59,10 @@ if (!$userId) {
 switch ($request['action']) {
   case 'getMyFavorites':
     $response = $favoriteService->getUserFavorites($userId);
+    break;
+
+  case 'getMyFavoritesWithDetails':
+    $response = $favoriteService->getFavoriteEventsWithDetails($userId);
     break;
 
   case 'add':
