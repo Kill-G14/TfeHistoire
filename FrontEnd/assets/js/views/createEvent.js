@@ -126,7 +126,102 @@ function attachEventListeners() {
     removeImageBtn.addEventListener('click', handleRemoveImage)
   }
 }
-// Vérifier qu'une image a été sélectionnée
+
+// Fonction pour uploader l'image
+async function uploadImage(file) {
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const response = await fetch('http://localhost/tfeHistoire/BackEnd/Api/uploadImageApi.php', {
+      method: 'POST',
+      body: formData
+    })
+
+    return await response.json()
+  } catch (error) {
+    console.error('Erreur upload:', error)
+    return {
+      success: false,
+      message: 'Erreur de connexion au serveur'
+    }
+  }
+}
+
+// Gérer la suppression d'image
+function handleRemoveImage() {
+  selectedImageFile = null
+  uploadedImageFilename = null
+  
+  const imageInput = document.getElementById('imageEvent')
+  const previewContainer = document.getElementById('imagePreview')
+  const previewImg = document.getElementById('previewImg')
+  
+  if (imageInput) {
+    imageInput.value = ''
+  }
+  
+  if (previewImg) {
+    previewImg.src = ''
+  }
+  
+  if (previewContainer) {
+    previewContainer.style.display = 'none'
+  }
+}
+
+// Gérer l'annulation
+function handleCancel() {
+  window.router.navigate('/')
+}
+
+// Gérer la sélection d'image
+function handleImageSelect(e) {
+  const file = e.target.files[0]
+  
+  if (!file) return
+
+  // Valider le type de fichier
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+  if (!allowedTypes.includes(file.type)) {
+    helpers.showToast('Format non autorisé. Utilisez JPG, PNG ou WEBP uniquement.', 'error')
+    e.target.value = ''
+    return
+  }
+
+  // Valider la taille (5 MB max)
+  const maxSize = 5 * 1024 * 1024 // 5 MB
+  if (file.size > maxSize) {
+    helpers.showToast('L\'image est trop lourde. Maximum 5 MB.', 'error')
+    e.target.value = ''
+    return
+  }
+
+  // Stocker le fichier
+  selectedImageFile = file
+
+  // Afficher l'aperçu
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    const previewContainer = document.getElementById('imagePreview')
+    const previewImg = document.getElementById('previewImg')
+    
+    if (previewImg) {
+      previewImg.src = event.target.result
+    }
+    
+    if (previewContainer) {
+      previewContainer.style.display = 'block'
+    }
+  }
+  reader.readAsDataURL(file)
+}
+
+// Gérer la soumission du formulaire
+async function handleSubmit(e) {
+  e.preventDefault()
+
+  // Vérifier qu'une image a été sélectionnée
   if (!selectedImageFile) {
     helpers.showToast('Veuillez sélectionner une image pour votre événement', 'error')
     return
@@ -172,100 +267,6 @@ function attachEventListeners() {
     category: document.getElementById('category').value,
     is_free: document.getElementById('isFree')?.checked || false,
     image_event: uploadedImageFilename
-  }
-
-  // Appel API pour créer l'événement
-  const token = auth.getToken ? auth.getToken() : null
-  const result = await EventManager.create(eventData, token)
-
-  if (result.success) {
-    helpers.showToast('Événement créé avec succès !', 'success')
-    setTimeout(() => {
-      window.router.navigate('/')
-    }, 1000)
-  } else {
-    helpers.showToast(result.message || 'Erreur lors de la création de l\'événement', 'error')
-    
-    // Réactiver le bouton
-    if (submitBtn) {
-      submitBtn.disabled = false
-      submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Créer l\'événement'
-    }
-  }
-}
-
-// Fonction pour uploader l'image
-async function uploadImage(file) {
-  try {
-    const formData = new FormData()
-    formData.append('image', file)
-
-    const response = await fetch('http://localhost/tfeHistoire/BackEnd/Api/uploadImageApi.php', {
-      method: 'POST',
-      body: formData
-    })
-
-    return await response.json()
-  } catch (error) {
-    console.error('Erreur upload:', error)
-    return {
-      success: false,
-      message: 'Erreur de connexion au serveur
-    }
-  }
-  reader.readAsDataURL(file)
-}
-
-// Gérer la suppression d'image
-function handleRemoveImage() {
-  selectedImageFile = null
-  uploadedImageFilename = null
-  
-  const imageInput = document.getElementById('imageEvent')
-  const previewContainer = document.getElementById('imagePreview')
-  const previewImg = document.getElementById('previewImg')
-  
-  if (imageInput) {
-    imageInput.value = ''
-  }
-  
-  if (previewImg) {
-    previewImg.src = ''
-  }
-  
-  if (previewContainer) {
-    previewContainer.style.display = 'none'
-  }
-}
-
-// Gérer l'annulation
-function handleCancel() {
-  window.router.navigate('/')
-}
-
-// Gérer la soumission du formulaire
-async function handleSubmit(e) {
-  e.preventDefault()
-
-  const eventData = {
-    title: document.getElementById('title').value,
-    description: document.getElementById('description').value,
-    country: document.getElementById('country').value,
-    city: document.getElementById('city').value,
-    postal_code: document.getElementById('postalCode')?.value || '',
-    address: document.getElementById('address')?.value || '',
-    date: document.getElementById('date').value,
-    time: document.getElementById('time').value,
-    category: document.getElementById('category').value,
-    is_free: document.getElementById('isFree')?.checked || false,
-    image_event: document.getElementById('imageEvent')?.value || ''
-  }
-
-  // Désactiver le bouton de soumission
-  const submitBtn = createEventForm.querySelector('button[type="submit"]')
-  if (submitBtn) {
-    submitBtn.disabled = true
-    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Création...'
   }
 
   // Appel API pour créer l'événement
