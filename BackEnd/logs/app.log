@@ -34,3 +34,5 @@
 [2026-03-19 13:16:55] [INFO] User registered successfully | Context: {"user_id":5}
 [2026-03-19 13:23:06] [INFO] User logged out successfully
 [2026-03-19 13:27:38] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-03-19 17:08:49] [INFO] Favorite added successfully | Context: {"user_id":5,"event_id":1}
+[2026-03-19 17:10:28] [INFO] Favorite deleted successfully | Context: {"user_id":5,"event_id":1}

@@ -4,6 +4,7 @@ import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
 import { appState } from '../store/appState.js'
 import EventManager from '../managers/EventManager.js'
+import { populateCountrySelect } from '../utils/countries.js'
 
 // Métadonnées de la vue
 export const meta = {
@@ -71,6 +72,10 @@ export async function mount(container, params) {
   const clone = templateObjects['createEventView'].cloneNode(true)
   container.innerHTML = ''
   container.appendChild(clone)
+
+  // Peupler le select des pays dynamiquement
+  const countrySelect = document.getElementById('country')
+  populateCountrySelect(countrySelect)
 
   // Attacher les événements
   attachEventListeners()
