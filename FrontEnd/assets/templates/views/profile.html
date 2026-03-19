@@ -15,10 +15,16 @@
               <h1 class="page-title mb-2" id="userName">Nom d'utilisateur</h1>
               <p class="text-muted mb-2" id="userEmail">email@exemple.com</p>
               <div class="d-flex align-items-center gap-3 flex-wrap">
-                <span class="badge bg-primary" id="memberSince">Membre depuis...</span>
-                <a href="#" class="text-decoration-none text-muted d-flex align-items-center gap-1" 
-                   data-bs-toggle="modal" data-bs-target="#changePasswordModal"
-                   style="font-size: 0.95rem; transition: color 0.2s">
+                <span class="badge bg-primary" id="memberSince"
+                  >Membre depuis...</span
+                >
+                <a
+                  href="#"
+                  class="text-decoration-none text-muted d-flex align-items-center gap-1"
+                  data-bs-toggle="modal"
+                  data-bs-target="#changePasswordModal"
+                  style="font-size: 0.95rem; transition: color 0.2s"
+                >
                   <i class="bi bi-key-fill"></i>
                   <span>Modifier le mot de passe</span>
                 </a>
@@ -169,31 +175,63 @@
   </div>
 
   <!-- Modal Changement de mot de passe -->
-  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="changePasswordModal"
+    tabindex="-1"
+    aria-labelledby="changePasswordModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="changePasswordModalLabel">
             <i class="bi bi-key me-2"></i>Changer de mot de passe
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="modal-body">
           <form id="changePasswordForm">
             <div class="mb-3">
-              <label for="currentPassword" class="form-label">Mot de passe actuel</label>
-              <input type="password" class="form-control" id="currentPassword" required />
+              <label for="currentPassword" class="form-label"
+                >Mot de passe actuel</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="currentPassword"
+                required
+              />
               <div class="invalid-feedback" id="currentPasswordError"></div>
             </div>
             <div class="mb-3">
-              <label for="newPassword" class="form-label">Nouveau mot de passe</label>
-              <input type="password" class="form-control" id="newPassword" required />
+              <label for="newPassword" class="form-label"
+                >Nouveau mot de passe</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="newPassword"
+                required
+              />
               <div class="form-text">Minimum 6 caractères</div>
               <div class="invalid-feedback" id="newPasswordError"></div>
             </div>
             <div class="mb-3">
-              <label for="confirmPassword" class="form-label">Confirmer le nouveau mot de passe</label>
-              <input type="password" class="form-control" id="confirmPassword" required />
+              <label for="confirmPassword" class="form-label"
+                >Confirmer le nouveau mot de passe</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                required
+              />
               <div class="invalid-feedback" id="confirmPasswordError"></div>
             </div>
             <div class="d-grid gap-2">
