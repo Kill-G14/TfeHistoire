@@ -73,18 +73,39 @@
 
           <div class="col-md-6">
             <label for="imageEvent" class="form-label"
-              >Nom du fichier image</label
+              >Image de l'événement *</label
             >
             <input
-              type="text"
+              type="file"
               class="form-control"
               id="imageEvent"
-              placeholder="Ex: mon-evenement.jpg"
+              accept="image/jpeg,image/png,image/webp"
+              required
             />
-            <small class="text-muted"
-              >Le fichier doit être présent dans le dossier
-              BackEnd/Src/img/</small
-            >
+            <small class="text-muted d-block mt-1">
+              <i class="bi bi-info-circle"></i> Formats acceptés : JPG, PNG,
+              WEBP (max 5 MB)
+            </small>
+            <div id="imagePreview" class="mt-2" style="display: none">
+              <img
+                id="previewImg"
+                src=""
+                alt="Aperçu"
+                style="
+                  max-width: 200px;
+                  max-height: 200px;
+                  border-radius: 0.5rem;
+                  border: 2px solid #dee2e6;
+                "
+              />
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger mt-2"
+                id="removeImage"
+              >
+                <i class="bi bi-trash"></i> Retirer
+              </button>
+            </div>
           </div>
         </div>
       </div>

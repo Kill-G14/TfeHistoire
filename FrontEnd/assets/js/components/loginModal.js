@@ -21,7 +21,7 @@ async function loadTemplate(path) {
 }
 
 export async function renderLoginModal() {
-  await loadTemplate('./assets/components/loginModal.html')
+  await loadTemplate('assets/components/loginModal.html')
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById('loginModalContainer')

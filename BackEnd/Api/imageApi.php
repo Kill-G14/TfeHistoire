@@ -31,7 +31,7 @@ if (!$imageName) {
 $imageName = basename($imageName);
 
 // Chemin vers le dossier des images
-$imagePath = __DIR__ . '/../Src/img/' . $imageName;
+$imagePath = __DIR__ . '/../storage/images/' . $imageName;
 
 // Vérifier que le fichier existe
 if (!file_exists($imagePath)) {
