@@ -1,9 +1,10 @@
 ----Inprogress-----
-intégrer page de changement de mot de passe
+intégrer page de calendrier des evenements
+
+
 
 
 ----Todo-----
 intégrer page de modification d'event
 intégrer page de suppression d'event
-intégrer page de calendrier des evenements
 limiter le nombre de tentative de connection
