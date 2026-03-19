@@ -14,34 +14,31 @@
             <div>
               <h1 class="page-title mb-2" id="userName">Nom d'utilisateur</h1>
               <p class="text-muted mb-2" id="userEmail">email@exemple.com</p>
-              <div class="d-flex align-items-center gap-3 flex-wrap">
-                <span class="badge bg-primary" id="memberSince"
-                  >Membre depuis...</span
-                >
-                <a
-                  href="#"
-                  class="text-decoration-none text-muted d-flex align-items-center gap-1"
-                  data-bs-toggle="modal"
-                  data-bs-target="#changePasswordModal"
-                  style="font-size: 0.95rem; transition: color 0.2s"
-                >
-                  <i class="bi bi-key-fill"></i>
-                  <span>Modifier le mot de passe</span>
-                </a>
-              </div>
+              <a
+                href="#"
+                class="text-decoration-none"
+                data-bs-toggle="modal"
+                data-bs-target="#changePasswordModal"
+                style="font-size: 0.95rem; color: #dc3545; border: 1px solid #dc3545; padding: 0.25rem 0.75rem; border-radius: 0.25rem; transition: all 0.2s; display: inline-block"
+              >
+                <span>Modifier le mot de passe</span>
+              </a>
             </div>
           </div>
         </div>
         <div class="col-md-4 text-md-end mt-3 mt-md-0">
-          <a
-            href="/create-event"
-            data-link
-            class="btn btn-primary btn-lg d-flex d-md-inline-flex align-items-center justify-content-center gap-2"
-            style="font-size: 1.1rem"
-          >
-            <i class="bi bi-plus-circle-fill"></i>
-            Créer un événement
-          </a>
+          <div class="d-flex flex-column align-items-md-end align-items-center gap-3">
+            <span class="badge bg-primary" id="memberSince">Membre depuis...</span>
+            <a
+              href="/create-event"
+              data-link
+              class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2"
+              style="font-size: 1.1rem"
+            >
+              <i class="bi bi-plus-circle-fill"></i>
+              Créer un événement
+            </a>
+          </div>
         </div>
       </div>
     </div>

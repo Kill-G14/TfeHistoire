@@ -630,18 +630,14 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 
 /* Lien de changement de mot de passe */
 .profile-header a[data-bs-target="#changePasswordModal"] {
-  opacity: 0.7;
   transition: all 0.3s ease;
 }
 
 .profile-header a[data-bs-target="#changePasswordModal"]:hover {
-  opacity: 1;
-  color: var(--color-primary) !important;
-  transform: translateX(2px);
-}
-
-.profile-header a[data-bs-target="#changePasswordModal"] i {
-  font-size: 1rem;
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: scale(1.02);
 }
 
 .stat-icon {
