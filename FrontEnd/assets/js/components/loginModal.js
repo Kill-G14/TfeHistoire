@@ -39,6 +39,7 @@ export async function renderLoginModal() {
   attachLoginEvents()
   attachRegisterEvents()
   attachValidationEvents()
+  attachForgotPasswordEvents()
 
   // Créer l'instance du modal Bootstrap
   const modalElement = document.getElementById('loginModal')
@@ -98,6 +99,47 @@ function attachRegisterEvents() {
       appState.set('isAuthenticated', true)
     } else {
       helpers.showToast('Erreur d\'inscription', 'error')
+    }
+  })
+}
+
+function attachForgotPasswordEvents() {
+  const forgotPasswordForm = document.getElementById('forgotPasswordForm')
+  if (!forgotPasswordForm) return
+
+  forgotPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+
+    const email = document.getElementById('forgotEmail').value
+    const emailError = document.getElementById('forgotEmailError')
+    const emailInput = document.getElementById('forgotEmail')
+
+    // Réinitialiser les erreurs
+    emailError.textContent = ''
+    emailInput.classList.remove('is-invalid')
+
+    // Validation
+    if (!email || !isValidEmail(email)) {
+      emailError.textContent = 'Veuillez entrer une adresse email valide'
+      emailInput.classList.add('is-invalid')
+      return
+    }
+
+    // Import dynamique de AuthManager
+    const { default: AuthManager } = await import('../managers/AuthManager.js')
+    const result = await AuthManager.requestPasswordReset(email)
+
+    if (result.success) {
+      helpers.showToast(result.message, 'success')
+      
+      // Fermer la modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'))
+      if (modal) modal.hide()
+      
+      // Réinitialiser le formulaire
+      forgotPasswordForm.reset()
+    } else {
+      helpers.showToast(result.message, 'error')
     }
   })
 }

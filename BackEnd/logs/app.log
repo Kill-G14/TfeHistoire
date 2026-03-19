@@ -31,3 +31,6 @@
 [2026-03-18 00:37:52] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":1}
 [2026-03-18 00:37:53] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":6}
 [2026-03-18 00:56:01] [INFO] Favorite added successfully | Context: {"user_id":6,"event_id":3}
+[2026-03-19 13:16:55] [INFO] User registered successfully | Context: {"user_id":5}
+[2026-03-19 13:23:06] [INFO] User logged out successfully
+[2026-03-19 13:27:38] [INFO] User logged in successfully | Context: {"user_id":5}
