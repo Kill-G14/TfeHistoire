@@ -3,8 +3,11 @@
 
 -- Configuration pour éviter les timeouts
 SET SESSION wait_timeout = 28800;
+
 SET SESSION interactive_timeout = 28800;
+
 SET SESSION net_read_timeout = 120;
+
 SET SESSION net_write_timeout = 120;
 
 CREATE DATABASE IF NOT EXISTS eurofetes_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
