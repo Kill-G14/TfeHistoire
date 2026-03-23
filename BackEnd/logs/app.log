@@ -42,3 +42,14 @@
 [2026-03-19 17:08:49] [INFO] Favorite added successfully | Context: {"user_id":5,"event_id":1}
 [2026-03-19 17:10:28] [INFO] Favorite deleted successfully | Context: {"user_id":5,"event_id":1}
 >>>>>>> 6ad3a159f8f979dea95dec6c2e08919c24b15ce3
+[2026-03-23 09:15:48] [INFO] Favorite added successfully | Context: {"user_id":6,"event_id":1}
+[2026-03-23 09:15:49] [INFO] Favorite added successfully | Context: {"user_id":6,"event_id":20}
+[2026-03-23 09:17:11] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":20}
+[2026-03-23 09:17:12] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":1}
+[2026-03-23 09:17:12] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":2}
+[2026-03-23 09:17:13] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":3}
+[2026-03-23 09:17:13] [INFO] Favorite deleted successfully | Context: {"user_id":6,"event_id":6}
+[2026-03-23 09:17:27] [INFO] Favorite added successfully | Context: {"user_id":6,"event_id":20}
+[2026-03-23 09:30:59] [INFO] Favorite added successfully | Context: {"user_id":6,"event_id":1}
+[2026-03-23 09:53:39] [INFO] User logged out successfully
+[2026-03-23 09:58:17] [INFO] User logged in successfully | Context: {"user_id":6}
