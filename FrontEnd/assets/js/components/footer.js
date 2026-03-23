@@ -19,7 +19,7 @@ async function loadTemplate(path) {
 
 // Export de la fonction de rendu
 export async function renderFooter() {
-  await loadTemplate('./assets/components/footer.html')
+  await loadTemplate('assets/components/footer.html')
 
   const element = document.getElementById('footer')
   if (!element) return

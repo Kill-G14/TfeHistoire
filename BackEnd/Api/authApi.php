@@ -65,6 +65,23 @@ switch ($request['action']) {
     }
     break;
 
+  case 'changePassword':
+    if (!isset($request['token'])) {
+      $response = ['success' => false, 'message' => 'Token non fourni'];
+    } else {
+      $userId = $authService->checkToken($request['token']);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide'];
+      } else {
+        $response = $authService->changePassword($userId, $request);
+      }
+    }
+    break;
+
+  case 'requestPasswordReset':
+    $response = $authService->requestPasswordReset($request);
+    break;
+
   default:
     $response = ['success' => false, 'message' => 'Action non reconnue'];
     break;

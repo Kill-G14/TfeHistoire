@@ -87,6 +87,9 @@ export async function mount(container, params) {
   // Charger et afficher les favoris
   await loadFavorites()
   
+  // Attacher les événements
+  attachProfileEvents()
+  
   // Écouter les changements de favoris
   appState.subscribe('favorites', loadFavorites)
 }
@@ -96,11 +99,90 @@ export async function unmount() {
   // Pas de nettoyage nécessaire pour cette vue simple
 }
 
+// Attacher les événements de la page profil
+function attachProfileEvents() {
+  // Formulaire de changement de mot de passe
+  const changePasswordForm = document.getElementById('changePasswordForm')
+  if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', handleChangePassword)
+  }
+}
+
+// Gérer le changement de mot de passe
+async function handleChangePassword(e) {
+  e.preventDefault()
+
+  const currentPassword = document.getElementById('currentPassword').value
+  const newPassword = document.getElementById('newPassword').value
+  const confirmPassword = document.getElementById('confirmPassword').value
+
+  // Réinitialiser les erreurs
+  document.getElementById('currentPasswordError').textContent = ''
+  document.getElementById('newPasswordError').textContent = ''
+  document.getElementById('confirmPasswordError').textContent = ''
+  document.getElementById('currentPassword').classList.remove('is-invalid')
+  document.getElementById('newPassword').classList.remove('is-invalid')
+  document.getElementById('confirmPassword').classList.remove('is-invalid')
+
+  // Validation
+  let hasError = false
+
+  if (!currentPassword) {
+    document.getElementById('currentPasswordError').textContent = 'Le mot de passe actuel est requis'
+    document.getElementById('currentPassword').classList.add('is-invalid')
+    hasError = true
+  }
+
+  if (!newPassword || newPassword.length < 6) {
+    document.getElementById('newPasswordError').textContent = 'Le nouveau mot de passe doit contenir au moins 6 caractères'
+    document.getElementById('newPassword').classList.add('is-invalid')
+    hasError = true
+  }
+
+  if (newPassword !== confirmPassword) {
+    document.getElementById('confirmPasswordError').textContent = 'Les mots de passe ne correspondent pas'
+    document.getElementById('confirmPassword').classList.add('is-invalid')
+    hasError = true
+  }
+
+  if (hasError) return
+
+  // Appel API
+  const token = auth.getToken()
+  if (!token) {
+    helpers.showToast('Vous devez être connecté', 'error')
+    return
+  }
+
+  // Import dynamique de AuthManager
+  const { default: AuthManager } = await import('../managers/AuthManager.js')
+  const result = await AuthManager.changePassword(token, currentPassword, newPassword)
+
+  if (result.success) {
+    helpers.showToast('Mot de passe modifié avec succès', 'success')
+    
+    // Fermer la modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'))
+    if (modal) modal.hide()
+    
+    // Réinitialiser le formulaire
+    document.getElementById('changePasswordForm').reset()
+  } else {
+    if (result.message.includes('actuel')) {
+      document.getElementById('currentPasswordError').textContent = result.message
+      document.getElementById('currentPassword').classList.add('is-invalid')
+    } else {
+      helpers.showToast(result.message, 'error')
+    }
+  }
+}
+
 // Afficher les informations utilisateur
 function displayUserInfo() {
   const user = appState.get('user')
   const userNameEl = document.getElementById('userName')
   const userEmailEl = document.getElementById('userEmail')
+  const memberSinceEl = document.getElementById('memberSince')
 
   if (userNameEl && user) {
     userNameEl.textContent = user.name || 'Utilisateur'
@@ -108,6 +190,13 @@ function displayUserInfo() {
 
   if (userEmailEl && user) {
     userEmailEl.textContent = user.email || ''
+  }
+
+  // Afficher la date d'inscription réelle
+  if (memberSinceEl && user && user.created_at) {
+    const createdDate = new Date(user.created_at)
+    const year = createdDate.getFullYear()
+    memberSinceEl.textContent = `Membre depuis ${year}`
   }
   
   // Mettre à jour le compteur de favoris

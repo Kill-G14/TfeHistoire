@@ -1,5 +1,7 @@
 // Module de gestion des filtres pour les événements
 
+import { europeanCountries } from './countries.js'
+
 export const filters = {
   // État actuel des filtres
   state: {
@@ -110,6 +112,9 @@ export const filters = {
   },
 
   // Obtenir les pays uniques depuis une liste d'événements
+  // Obtenir les pays uniques depuis une liste d'événements
+  // Note: Non utilisé pour le filtre principal (qui utilise europeanCountries)
+  // Conservé pour d'autres usages potentiels (statistiques, analytics, etc.)
   getUniqueCountries(events) {
     return [...new Set(events.map(e => e.country))].sort()
   },
@@ -152,10 +157,12 @@ export const filters = {
 
     const finalConfig = { ...defaultConfig, ...config }
 
-    // Populer le select des pays
+    // Debug: Vérifier que europeanCountries est bien chargé
+    console.log('Nombre de pays européens disponibles:', europeanCountries.length)
+
+    // Populer le select des pays avec TOUS les pays européens
     if (document.getElementById(finalConfig.countrySelectId)) {
-      const countries = this.getUniqueCountries(events)
-      this.populateSelect(finalConfig.countrySelectId, countries, finalConfig.countryText)
+      this.populateSelect(finalConfig.countrySelectId, europeanCountries, finalConfig.countryText)
     }
 
     // Populer le select des catégories

@@ -1,0 +1,82 @@
+<template id="calendarView">
+  <div class="container py-5" style="max-width: 1200px">
+    <!-- En-tête calendrier -->
+    <div class="text-center mb-4">
+      <h1 class="page-title mb-2">Calendrier des Événements</h1>
+      <p class="text-muted">Découvrez tous les événements à venir</p>
+    </div>
+
+    <!-- Navigation du calendrier -->
+    <div class="calendar-navigation mb-4">
+      <div class="d-flex align-items-center justify-content-between">
+        <button class="btn btn-outline-primary" id="prevMonth">
+          <i class="bi bi-chevron-left"></i> Mois précédent
+        </button>
+        <h2 class="mb-0" id="currentMonthYear">Mars 2026</h2>
+        <button class="btn btn-outline-primary" id="nextMonth">
+          Mois suivant <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Calendrier -->
+    <div class="calendar-container">
+      <div class="calendar-grid">
+        <!-- En-têtes des jours -->
+        <div class="calendar-header">
+          <div class="calendar-day-name">Lun</div>
+          <div class="calendar-day-name">Mar</div>
+          <div class="calendar-day-name">Mer</div>
+          <div class="calendar-day-name">Jeu</div>
+          <div class="calendar-day-name">Ven</div>
+          <div class="calendar-day-name">Sam</div>
+          <div class="calendar-day-name">Dim</div>
+        </div>
+
+        <!-- Jours du calendrier -->
+        <div class="calendar-body" id="calendarDays">
+          <!-- Les jours seront injectés dynamiquement -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Légende -->
+    <div class="mt-4 text-center">
+      <div
+        class="d-inline-flex align-items-center gap-3 flex-wrap justify-content-center"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <div
+            class="legend-box"
+            style="
+              background-color: var(--color-primary);
+              width: 20px;
+              height: 20px;
+              border-radius: 4px;
+            "
+          ></div>
+          <span>Jour avec événement(s)</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div
+            class="legend-box"
+            style="
+              background-color: #e9ecef;
+              width: 20px;
+              height: 20px;
+              border-radius: 4px;
+            "
+          ></div>
+          <span>Jour sans événement</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="text-center mt-5">
+      <a href="/" data-link class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Retour aux événements
+      </a>
+    </div>
+  </div>
+</template>

@@ -19,7 +19,7 @@ async function loadTemplate(path) {
 }
 
 export async function renderHeader() {
-  await loadTemplate('./assets/components/header.html')
+  await loadTemplate('assets/components/header.html')
 
   const headerElement = document.getElementById('header')
   if (!headerElement) return

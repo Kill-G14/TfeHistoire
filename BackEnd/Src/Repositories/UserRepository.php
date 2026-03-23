@@ -83,6 +83,15 @@ class UserRepository {
     return $result['count'] > 0;
   }
 
+  // Mettre à jour le mot de passe
+  public function updatePassword(int $id, string $hashedPassword): bool {
+    $query = "UPDATE users SET password = :password, updated_at = NOW() WHERE id = :id";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':password', $hashedPassword);
+    return $stmt->execute();
+  }
+
   // Récupérer tous les utilisateurs
   public function getAllUsers(): array {
     $query = "SELECT * FROM users WHERE is_deleted = FALSE ORDER BY created_at DESC";

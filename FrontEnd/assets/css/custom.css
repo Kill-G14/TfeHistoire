@@ -628,6 +628,18 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Lien de changement de mot de passe */
+.profile-header a[data-bs-target="#changePasswordModal"] {
+  transition: all 0.3s ease;
+}
+
+.profile-header a[data-bs-target="#changePasswordModal"]:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: scale(1.02);
+}
+
 .stat-icon {
   width: 60px;
   height: 60px;
@@ -1138,5 +1150,231 @@ html {
   .favorite-card-wrapper {
     min-width: 100%;
     max-width: 100%;
+  }
+}
+
+/* ============================================
+   CALENDRIER
+   ============================================ */
+
+/* Navigation du calendrier */
+.calendar-navigation {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-navigation h2 {
+  font-family: 'Cinzel', serif;
+  color: var(--color-primary);
+  font-size: 1.75rem;
+}
+
+/* Container du calendrier */
+.calendar-container {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* En-têtes des jours */
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-day-name {
+  text-align: center;
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: 0.75rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Corps du calendrier */
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+/* Jour du calendrier */
+.calendar-day {
+  min-height: 120px;
+  border: 2px solid #e9ecef;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-day.empty {
+  background: #f8f9fa;
+  border-color: transparent;
+}
+
+.calendar-day.today {
+  border-color: var(--color-accent);
+  background: #fff8e1;
+  box-shadow: 0 0 0 2px var(--color-accent) inset;
+}
+
+.calendar-day.has-events {
+  background: linear-gradient(135deg, rgba(15, 94, 89, 0.05) 0%, rgba(15, 94, 89, 0.1) 100%);
+  border-color: var(--color-primary);
+}
+
+.calendar-day.has-events:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 94, 89, 0.2);
+  border-color: var(--color-primary-hover);
+}
+
+/* Numéro du jour */
+.day-number {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  font-family: 'Cinzel', serif;
+}
+
+.calendar-day.today .day-number {
+  color: var(--color-accent);
+  font-size: 1.3rem;
+}
+
+/* Container des événements dans un jour */
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 80px;
+}
+
+/* Badge d'événement */
+.event-badge {
+  background: var(--color-primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.event-badge:hover {
+  background: var(--color-primary-hover);
+  transform: scale(1.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Légende du calendrier */
+.legend-box {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive pour le calendrier */
+@media (max-width: 992px) {
+  .calendar-day {
+    min-height: 100px;
+  }
+  
+  .day-events {
+    max-height: 60px;
+  }
+  
+  .event-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .calendar-day-name {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 80px;
+  }
+  
+  .day-number {
+    font-size: 0.9rem;
+  }
+  
+  .event-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.3rem;
+  }
+  
+  .calendar-day-name {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.2rem;
+  }
+  
+  .day-events {
+    max-height: 50px;
+  }
+  
+  .calendar-navigation h2 {
+    font-size: 1.3rem;
+  }
+  
+  .calendar-navigation .btn {
+    font-size: 0.85rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .calendar-container {
+    padding: 0.75rem;
+  }
+  
+  .calendar-body,
+  .calendar-header {
+    gap: 0.25rem;
+  }
+  
+  .calendar-day {
+    min-height: 60px;
+    padding: 0.25rem;
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+  }
+  
+  .event-badge {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.25rem;
+  }
+  
+  .day-events {
+    max-height: 35px;
+    gap: 0.15rem;
+  }
+  
+  .calendar-day-name {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.1rem;
   }
 }

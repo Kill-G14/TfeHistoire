@@ -1,6 +1,15 @@
 -- Base de données pour MemoriaEventia
 -- Création de la base de données
 
+-- Configuration pour éviter les timeouts
+SET SESSION wait_timeout = 28800;
+
+SET SESSION interactive_timeout = 28800;
+
+SET SESSION net_read_timeout = 120;
+
+SET SESSION net_write_timeout = 120;
+
 CREATE DATABASE IF NOT EXISTS eurofetes_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE eurofetes_db;
@@ -403,6 +412,126 @@ VALUES (
         FALSE,
         FALSE,
         'roman-gvvLRfuJjzs-unsplash.jpg'
+    ),
+    (
+        3,
+        'Fête de la Bastille',
+        'Célébration nationale française commémorant la prise de la Bastille en 1789. Défilé militaire, feux d\'artifice et festivités patriotiques.',
+        'France',
+        'Paris',
+        '75001',
+        'Champs-Élysées',
+        48.86993,
+        2.30769,
+        '2026-07-14',
+        '10:00:00',
+        'Fête Nationale',
+        TRUE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'andreas-rasmussen-wtxPbYHxa5I-unsplash.jpg'
+    ),
+    (
+        3,
+        'Marché de Noël Médiéval',
+        'Marché de Noël traditionnel dans le décor médiéval de Vienne avec artisans, vin chaud et spécialités autrichiennes.',
+        'Autriche',
+        'Vienne',
+        '1010',
+        'Rathausplatz',
+        48.21020,
+        16.35756,
+        '2026-12-10',
+        '15:00:00',
+        'Festival Médiéval',
+        FALSE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'gabriel-martin-bjRrbevBO-4-unsplash.jpg'
+    ),
+    (
+        3,
+        'Festival Viking de Bergen',
+        'Reconstitution historique de la vie viking avec combats, artisanat traditionnel et festins nordiques authentiques.',
+        'Norvège',
+        'Bergen',
+        '5003',
+        'Bryggen',
+        60.39745,
+        5.32415,
+        '2026-06-20',
+        '12:00:00',
+        'Reconstitution Historique',
+        FALSE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'mayer-tawfik-QYdSBsLLQ2A-unsplash.jpg'
+    ),
+    (
+        3,
+        'Renaissance Florentine',
+        'Festival célébrant l\'âge d\'or de Florence avec costumes d\'époque, cortèges historiques et reconstitutions du Calcio Storico.',
+        'Italie',
+        'Florence',
+        '50122',
+        'Piazza della Signoria',
+        43.76956,
+        11.25581,
+        '2026-06-24',
+        '16:00:00',
+        'Festival Médiéval',
+        FALSE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'menderes-kahraman-T4VWZZ6IoZ4-unsplash.jpg'
+    ),
+    (
+        3,
+        'Carnaval de Bâle',
+        'Le Fasnacht de Bâle, l\'un des plus grands carnavals de Suisse, avec ses lanternes colorées, masques et cortèges traditionnels depuis le Moyen Âge.',
+        'Suisse',
+        'Bâle',
+        '4001',
+        'Marktplatz',
+        47.55814,
+        7.57324,
+        '2027-02-22',
+        '04:00:00',
+        'Carnaval',
+        FALSE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'shutter-speed-qMu2LTRZHiA-unsplash.jpg'
+    ),
+    (
+        3,
+        'Festival de la Bière Tchèque',
+        'Célébration de la tradition brassicole tchèque millénaire avec dégustations, musique folklorique et gastronomie traditionnelle.',
+        'République Tchèque',
+        'Prague',
+        '11000',
+        'Letná Park',
+        50.09717,
+        14.41635,
+        '2026-05-16',
+        '14:00:00',
+        'Fête Traditionnelle',
+        FALSE,
+        FALSE,
+        TRUE,
+        FALSE,
+        FALSE,
+        'sofiia-vytrishko-iK6g0pI0FE8-unsplash.jpg'
     );
 
 -- Insertion de billets pour les événements
@@ -624,4 +753,219 @@ VALUES (
         FALSE
     );
 
--- Note: L'événement 6 (Fête de la Renaissance) est gratuit, donc pas de billets
+-- Marché de Noël Médiéval (event_id = 9)
+INSERT INTO
+    tickets (
+        event_id,
+        name,
+        description,
+        price,
+        quantity,
+        start_sale_date,
+        end_sale_date,
+        is_deleted
+    )
+VALUES (
+        9,
+        'Billet Adulte',
+        'Accès au marché de Noël',
+        15.00,
+        400,
+        '2026-11-01 00:00:00',
+        '2026-12-09 23:59:59',
+        FALSE
+    ),
+    (
+        9,
+        'Billet Famille',
+        '2 adultes + 3 enfants',
+        40.00,
+        100,
+        '2026-11-01 00:00:00',
+        '2026-12-09 23:59:59',
+        FALSE
+    ),
+    (
+        9,
+        'Pass VIP',
+        'Accès + dégustation de vin chaud et repas',
+        45.00,
+        80,
+        '2026-11-01 00:00:00',
+        '2026-12-09 23:59:59',
+        FALSE
+    );
+
+-- Festival Viking de Bergen (event_id = 10)
+INSERT INTO
+    tickets (
+        event_id,
+        name,
+        description,
+        price,
+        quantity,
+        start_sale_date,
+        end_sale_date,
+        is_deleted
+    )
+VALUES (
+        10,
+        'Billet Standard',
+        'Accès au festival viking',
+        30.00,
+        350,
+        '2026-04-01 00:00:00',
+        '2026-06-19 23:59:59',
+        FALSE
+    ),
+    (
+        10,
+        'Billet Festin',
+        'Accès + repas viking traditionnel',
+        65.00,
+        120,
+        '2026-04-01 00:00:00',
+        '2026-06-19 23:59:59',
+        FALSE
+    ),
+    (
+        10,
+        'Pass Weekend',
+        'Accès pour tout le weekend',
+        50.00,
+        200,
+        '2026-04-01 00:00:00',
+        '2026-06-19 23:59:59',
+        FALSE
+    );
+
+-- Renaissance Florentine (event_id = 11)
+INSERT INTO
+    tickets (
+        event_id,
+        name,
+        description,
+        price,
+        quantity,
+        start_sale_date,
+        end_sale_date,
+        is_deleted
+    )
+VALUES (
+        11,
+        'Billet Journée',
+        'Accès au festival Renaissance',
+        28.00,
+        400,
+        '2026-05-01 00:00:00',
+        '2026-06-23 23:59:59',
+        FALSE
+    ),
+    (
+        11,
+        'Billet Calcio Storico',
+        'Match de football historique + accès festival',
+        55.00,
+        150,
+        '2026-05-01 00:00:00',
+        '2026-06-23 23:59:59',
+        FALSE
+    ),
+    (
+        11,
+        'Billet Premium',
+        'Cortège historique VIP + banquet',
+        95.00,
+        60,
+        '2026-05-01 00:00:00',
+        '2026-06-23 23:59:59',
+        FALSE
+    );
+
+-- Carnaval de Bâle (event_id = 12)
+INSERT INTO
+    tickets (
+        event_id,
+        name,
+        description,
+        price,
+        quantity,
+        start_sale_date,
+        end_sale_date,
+        is_deleted
+    )
+VALUES (
+        12,
+        'Billet 1 Jour',
+        'Accès pour une journée',
+        35.00,
+        500,
+        '2026-12-01 00:00:00',
+        '2027-02-21 23:59:59',
+        FALSE
+    ),
+    (
+        12,
+        'Pass 3 Jours',
+        'Accès pour les 3 jours du carnaval',
+        80.00,
+        250,
+        '2026-12-01 00:00:00',
+        '2027-02-21 23:59:59',
+        FALSE
+    ),
+    (
+        12,
+        'Billet Tribune',
+        'Place en tribune pour le cortège',
+        50.00,
+        180,
+        '2026-12-01 00:00:00',
+        '2027-02-21 23:59:59',
+        FALSE
+    );
+
+-- Festival de la Bière Tchèque (event_id = 13)
+INSERT INTO
+    tickets (
+        event_id,
+        name,
+        description,
+        price,
+        quantity,
+        start_sale_date,
+        end_sale_date,
+        is_deleted
+    )
+VALUES (
+        13,
+        'Pass Dégustation',
+        'Accès + 5 dégustations de bières',
+        32.00,
+        450,
+        '2026-03-01 00:00:00',
+        '2026-05-15 23:59:59',
+        FALSE
+    ),
+    (
+        13,
+        'Pass VIP',
+        'Accès VIP + dégustations illimitées',
+        75.00,
+        100,
+        '2026-03-01 00:00:00',
+        '2026-05-15 23:59:59',
+        FALSE
+    ),
+    (
+        13,
+        'Pass Gourmet',
+        'Dégustations + menu gastronomique tchèque',
+        95.00,
+        80,
+        '2026-03-01 00:00:00',
+        '2026-05-15 23:59:59',
+        FALSE
+    );
+
+-- Note: L'événement 6 (Fête de la Renaissance) et l'événement 8 (Fête de la Bastille) sont gratuits, donc pas de billets

@@ -112,6 +112,61 @@ class AuthManager {
       }
     }
   }
+
+  // Changer de mot de passe
+  async changePassword(token, currentPassword, newPassword) {
+    if (!token) {
+      return {
+        success: false,
+        message: 'Token manquant'
+      }
+    }
+
+    try {
+      const response = await fetch(`${this.apiUrl}/authApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'changePassword',
+          token: token,
+          currentPassword: currentPassword,
+          newPassword: newPassword
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
+
+  // Demande de réinitialisation de mot de passe
+  async requestPasswordReset(email) {
+    try {
+      const response = await fetch(`${this.apiUrl}/authApi.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'requestPasswordReset',
+          email: email
+        })
+      })
+
+      return await response.json()
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Erreur de connexion au serveur'
+      }
+    }
+  }
 }
 
 export default new AuthManager()

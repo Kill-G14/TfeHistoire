@@ -12,6 +12,7 @@ import FavoriteManager from './managers/FavoriteManager.js'
 // Définition des routes
 const routes = {
   '/': () => import('./views/home.js'),
+  '/calendar': () => import('./views/calendar.js'),
   '/create-event': () => import('./views/createEvent.js'),
   '/profile': () => import('./views/profile.js'),
   '/map': () => import('./views/map.js')
