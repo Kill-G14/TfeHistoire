@@ -5,6 +5,8 @@ import { helpers } from '../utils/helpers.js'
 import { appState } from '../store/appState.js'
 import FavoriteManager from '../managers/FavoriteManager.js'
 import { showEventDetail } from '../components/eventDetail.js'
+import { validateChangePasswordForm } from '../validators/authValidator.js'
+import { setFieldError, clearFieldValidation } from '../validators/formValidator.js'
 
 // Métadonnées de la vue
 export const meta = {
@@ -155,36 +157,39 @@ async function handleChangePassword(e) {
   const newPassword = document.getElementById('newPassword').value
   const confirmPassword = document.getElementById('confirmPassword').value
 
+  // Références aux éléments
+  const currentPasswordInput = document.getElementById('currentPassword')
+  const newPasswordInput = document.getElementById('newPassword')
+  const confirmPasswordInput = document.getElementById('confirmPassword')
+  const currentPasswordError = document.getElementById('currentPasswordError')
+  const newPasswordError = document.getElementById('newPasswordError')
+  const confirmPasswordError = document.getElementById('confirmPasswordError')
+
   // Réinitialiser les erreurs
-  document.getElementById('currentPasswordError').textContent = ''
-  document.getElementById('newPasswordError').textContent = ''
-  document.getElementById('confirmPasswordError').textContent = ''
-  document.getElementById('currentPassword').classList.remove('is-invalid')
-  document.getElementById('newPassword').classList.remove('is-invalid')
-  document.getElementById('confirmPassword').classList.remove('is-invalid')
+  clearFieldValidation(currentPasswordInput, currentPasswordError)
+  clearFieldValidation(newPasswordInput, newPasswordError)
+  clearFieldValidation(confirmPasswordInput, confirmPasswordError)
 
-  // Validation
-  let hasError = false
+  // Validation avec le validator
+  const validation = validateChangePasswordForm({
+    currentPassword,
+    newPassword,
+    confirmPassword
+  })
 
-  if (!currentPassword) {
-    document.getElementById('currentPasswordError').textContent = 'Le mot de passe actuel est requis'
-    document.getElementById('currentPassword').classList.add('is-invalid')
-    hasError = true
+  if (!validation.valid) {
+    // Afficher les erreurs
+    if (validation.errors.currentPassword) {
+      setFieldError(currentPasswordInput, currentPasswordError, validation.errors.currentPassword)
+    }
+    if (validation.errors.newPassword) {
+      setFieldError(newPasswordInput, newPasswordError, validation.errors.newPassword)
+    }
+    if (validation.errors.confirmPassword) {
+      setFieldError(confirmPasswordInput, confirmPasswordError, validation.errors.confirmPassword)
+    }
+    return
   }
-
-  if (!newPassword || newPassword.length < 6) {
-    document.getElementById('newPasswordError').textContent = 'Le nouveau mot de passe doit contenir au moins 6 caractères'
-    document.getElementById('newPassword').classList.add('is-invalid')
-    hasError = true
-  }
-
-  if (newPassword !== confirmPassword) {
-    document.getElementById('confirmPasswordError').textContent = 'Les mots de passe ne correspondent pas'
-    document.getElementById('confirmPassword').classList.add('is-invalid')
-    hasError = true
-  }
-
-  if (hasError) return
 
   // Appel API
   const token = auth.getToken()
@@ -208,8 +213,7 @@ async function handleChangePassword(e) {
     document.getElementById('changePasswordForm').reset()
   } else {
     if (result.message.includes('actuel')) {
-      document.getElementById('currentPasswordError').textContent = result.message
-      document.getElementById('currentPassword').classList.add('is-invalid')
+      setFieldError(currentPasswordInput, currentPasswordError, result.message)
     } else {
       helpers.showToast(result.message, 'error')
     }

@@ -82,6 +82,31 @@ if ($imageInfo === false) {
   exit;
 }
 
+// Vérification des magic bytes (signature binaire) pour une sécurité maximale
+$handle = fopen($file['tmp_name'], 'rb');
+$magicBytes = fread($handle, 12); // Lire les 12 premiers octets
+fclose($handle);
+
+$isValidImage = false;
+
+// JPEG: FF D8 FF
+if (bin2hex(substr($magicBytes, 0, 3)) === 'ffd8ff') {
+  $isValidImage = ($mimeType === 'image/jpeg');
+}
+// PNG: 89 50 4E 47 0D 0A 1A 0A
+elseif (bin2hex(substr($magicBytes, 0, 8)) === '89504e470d0a1a0a') {
+  $isValidImage = ($mimeType === 'image/png');
+}
+// WEBP: RIFF....WEBP
+elseif (substr($magicBytes, 0, 4) === 'RIFF' && substr($magicBytes, 8, 4) === 'WEBP') {
+  $isValidImage = ($mimeType === 'image/webp');
+}
+
+if (!$isValidImage) {
+  echo json_encode(['success' => false, 'message' => 'La signature du fichier ne correspond pas à un format d\'image valide. Le fichier pourrait avoir été renommé.']);
+  exit;
+}
+
 // Vérifier que le dossier de destination existe
 $uploadDir = __DIR__ . '/../storage/images/';
 if (!is_dir($uploadDir)) {

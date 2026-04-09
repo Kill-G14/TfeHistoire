@@ -3,6 +3,8 @@
 import { auth } from '../utils/auth.js'
 import { helpers } from '../utils/helpers.js'
 import { appState } from '../store/appState.js'
+import { validateEmail, validatePassword, validateName } from '../validators/authValidator.js'
+import { setFieldError, setFieldValid, validateField } from '../validators/formValidator.js'
 
 const templateObjects = {}
 let modalInstance = null
@@ -211,87 +213,35 @@ function attachValidationEvents() {
 function validateRegisterName() {
   const nameInput = document.getElementById('registerName')
   const errorDiv = document.getElementById('registerNameError')
-  const value = nameInput.value.trim()
-
-  if (value === '') {
-    setFieldError(nameInput, errorDiv, 'Le nom est requis')
-    return false
-  } else if (value.length < 2) {
-    setFieldError(nameInput, errorDiv, 'Le nom doit contenir au moins 2 caractères')
-    return false
-  } else {
-    setFieldValid(nameInput, errorDiv)
-    return true
-  }
+  return validateField(nameInput, errorDiv, validateName, nameInput.value)
 }
 
 // Validation de l'email (inscription)
 function validateRegisterEmail() {
   const emailInput = document.getElementById('registerEmail')
   const errorDiv = document.getElementById('registerEmailError')
-  const value = emailInput.value.trim()
-
-  if (value === '') {
-    setFieldError(emailInput, errorDiv, 'L\'email est requis')
-    return false
-  } else if (!isValidEmail(value)) {
-    setFieldError(emailInput, errorDiv, 'L\'email n\'est pas valide')
-    return false
-  } else {
-    setFieldValid(emailInput, errorDiv)
-    return true
-  }
+  return validateField(emailInput, errorDiv, validateEmail, emailInput.value)
 }
 
 // Validation du mot de passe (inscription)
 function validateRegisterPassword() {
   const passwordInput = document.getElementById('registerPassword')
   const errorDiv = document.getElementById('registerPasswordError')
-  const value = passwordInput.value
-
-  if (value === '') {
-    setFieldError(passwordInput, errorDiv, 'Le mot de passe est requis')
-    return false
-  } else if (value.length < 6) {
-    setFieldError(passwordInput, errorDiv, 'Le mot de passe doit contenir au moins 6 caractères')
-    return false
-  } else {
-    setFieldValid(passwordInput, errorDiv)
-    return true
-  }
+  return validateField(passwordInput, errorDiv, validatePassword, passwordInput.value)
 }
 
 // Validation de l'email (connexion)
 function validateLoginEmail() {
   const emailInput = document.getElementById('loginEmail')
   const errorDiv = document.getElementById('loginEmailError')
-  const value = emailInput.value.trim()
-
-  if (value === '') {
-    setFieldError(emailInput, errorDiv, 'L\'email est requis')
-    return false
-  } else if (!isValidEmail(value)) {
-    setFieldError(emailInput, errorDiv, 'L\'email n\'est pas valide')
-    return false
-  } else {
-    setFieldValid(emailInput, errorDiv)
-    return true
-  }
+  return validateField(emailInput, errorDiv, validateEmail, emailInput.value)
 }
 
 // Validation du mot de passe (connexion)
 function validateLoginPassword() {
   const passwordInput = document.getElementById('loginPassword')
   const errorDiv = document.getElementById('loginPasswordError')
-  const value = passwordInput.value
-
-  if (value === '') {
-    setFieldError(passwordInput, errorDiv, 'Le mot de passe est requis')
-    return false
-  } else {
-    setFieldValid(passwordInput, errorDiv)
-    return true
-  }
+  return validateField(passwordInput, errorDiv, validatePassword, passwordInput.value)
 }
 
 // Vérifier la validité du formulaire d'inscription
@@ -304,26 +254,6 @@ function checkRegisterFormValidity() {
   if (submitBtn) {
     submitBtn.disabled = !(isNameValid && isEmailValid && isPasswordValid)
   }
-}
-
-// Utilitaires de validation
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
-
-function setFieldError(input, errorDiv, message) {
-  input.classList.add('is-invalid')
-  input.classList.remove('is-valid')
-  errorDiv.textContent = message
-  errorDiv.style.display = 'block'
-}
-
-function setFieldValid(input, errorDiv) {
-  input.classList.remove('is-invalid')
-  input.classList.add('is-valid')
-  errorDiv.textContent = ''
-  errorDiv.style.display = 'none'
 }
 
 // Réinitialiser les formulaires lors du changement d'onglet

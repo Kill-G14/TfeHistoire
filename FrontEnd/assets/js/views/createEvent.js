@@ -5,6 +5,7 @@ import { helpers } from '../utils/helpers.js'
 import { appState } from '../store/appState.js'
 import EventManager from '../managers/EventManager.js'
 import { populateCountrySelect } from '../utils/countries.js'
+import { validateImageFile, createImagePreview } from '../validators/imageValidator.js'
 
 // Métadonnées de la vue
 export const meta = {
@@ -181,23 +182,16 @@ function handleCancel() {
 }
 
 // Gérer la sélection d'image
-function handleImageSelect(e) {
+async function handleImageSelect(e) {
   const file = e.target.files[0]
   
   if (!file) return
 
-  // Valider le type de fichier
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-  if (!allowedTypes.includes(file.type)) {
-    helpers.showToast('Format non autorisé. Utilisez JPG, PNG ou WEBP uniquement.', 'error')
-    e.target.value = ''
-    return
-  }
-
-  // Valider la taille (5 MB max)
-  const maxSize = 5 * 1024 * 1024 // 5 MB
-  if (file.size > maxSize) {
-    helpers.showToast('L\'image est trop lourde. Maximum 5 MB.', 'error')
+  // Valider le fichier image avec le validator dédié
+  const validation = await validateImageFile(file)
+  
+  if (!validation.valid) {
+    helpers.showToast(validation.error, 'error')
     e.target.value = ''
     return
   }
@@ -205,21 +199,24 @@ function handleImageSelect(e) {
   // Stocker le fichier
   selectedImageFile = file
 
-  // Afficher l'aperçu
-  const reader = new FileReader()
-  reader.onload = (event) => {
+  // Afficher l'aperçu avec la fonction utilitaire
+  try {
+    const previewUrl = await createImagePreview(file)
+    
     const previewContainer = document.getElementById('imagePreview')
     const previewImg = document.getElementById('previewImg')
     
     if (previewImg) {
-      previewImg.src = event.target.result
+      previewImg.src = previewUrl
     }
     
     if (previewContainer) {
       previewContainer.style.display = 'block'
     }
+  } catch (error) {
+    helpers.showToast('Erreur lors de la création de l\'aperçu', 'error')
+    e.target.value = ''
   }
-  reader.readAsDataURL(file)
 }
 
 // Gérer la soumission du formulaire
