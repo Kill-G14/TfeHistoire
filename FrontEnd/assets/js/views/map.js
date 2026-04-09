@@ -266,10 +266,10 @@ function createEventPopup(event) {
 
   return `
     <div style="min-width: 250px;">
-      <h6 class="mb-2">${event.name}</h6>
+      <h6 class="mb-2">${event.title}</h6>
       ${distanceText}
       <p class="mb-2 small text-muted">
-        <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.event_date)}
+        <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.date)}
       </p>
       <p class="mb-3 small">${event.description ? event.description.substring(0, 100) + '...' : ''}</p>
       <div class="d-grid gap-2">
@@ -300,9 +300,9 @@ function getFilteredEvents() {
       if (b.distance === undefined) return -1
       return a.distance - b.distance
     } else if (sortBy === 'name') {
-      return a.name.localeCompare(b.name)
+      return a.title.localeCompare(b.title)
     } else if (sortBy === 'date') {
-      return new Date(a.event_date) - new Date(b.event_date)
+      return new Date(a.date) - new Date(b.date)
     }
     return 0
   })
@@ -331,7 +331,7 @@ function renderEventsList() {
   container.innerHTML = filteredEvents.map(event => `
     <div class="card mb-3 event-card" data-event-id="${event.id}">
       <div class="card-body">
-        <h6 class="card-title mb-2">${event.name}</h6>
+        <h6 class="card-title mb-2">${event.title}</h6>
         ${event.distance !== undefined 
           ? `<p class="mb-2 small text-primary">
                <i class="bi bi-geo-alt-fill me-1"></i>${event.distance} km
@@ -339,7 +339,7 @@ function renderEventsList() {
           : ''
         }
         <p class="mb-2 small text-muted">
-          <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.event_date)}
+          <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.date)}
         </p>
         <p class="mb-3 small text-muted">${event.description ? event.description.substring(0, 80) + '...' : ''}</p>
         <div class="d-flex gap-2">
