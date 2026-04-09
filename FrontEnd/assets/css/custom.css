@@ -110,12 +110,15 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 }
 
 /* Header */
-.header {
-  background-color: white;
-  border-bottom: 1px solid #dee2e6;
+#header {
   position: sticky;
   top: 0;
   z-index: 1000;
+}
+
+.header {
+  background-color: white;
+  border-bottom: 1px solid #dee2e6;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 0.75rem 0;
 }
