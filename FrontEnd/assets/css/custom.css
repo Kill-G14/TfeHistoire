@@ -615,17 +615,39 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 /* Cartes de statistiques */
 .profile-stat-card {
   background: linear-gradient(135deg, white 0%, var(--color-background) 100%);
-  border: 1px solid #dee2e6;
+  border: 2px solid transparent;
   border-radius: 0.5rem;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   height: 100%;
 }
 
-.profile-stat-card:hover {
+/* Stat card comme bouton */
+.stat-card-btn {
+  cursor: pointer;
+  text-align: left;
+}
+
+.stat-card-btn:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Bordures colorées selon la section active */
+.stat-card-btn[data-section="events"].active {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(15, 94, 89, 0.2);
+}
+
+.stat-card-btn[data-section="reservations"].active {
+  border-color: #198754;
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
+}
+
+.stat-card-btn[data-section="favorites"].active {
+  border-color: #ffc107;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
 }
 
 /* Lien de changement de mot de passe */

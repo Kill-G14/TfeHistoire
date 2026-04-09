@@ -1,64 +1,37 @@
 <template id="profileView">
   <div class="container py-5" style="max-width: 1000px">
     <!-- En-tête du profil -->
-    <div class="profile-header mb-4">
-      <div class="row align-items-center">
-        <div class="col-md-8">
-          <div class="d-flex align-items-center gap-4">
-            <div
-              class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-              style="width: 100px; height: 100px; flex-shrink: 0"
-            >
-              <i class="bi bi-person fs-1"></i>
-            </div>
-            <div>
-              <h1 class="page-title mb-2" id="userName">Nom d'utilisateur</h1>
-              <p class="text-muted mb-2" id="userEmail">email@exemple.com</p>
-              <a
-                href="#"
-                class="text-decoration-none"
-                data-bs-toggle="modal"
-                data-bs-target="#changePasswordModal"
-                style="
-                  font-size: 0.95rem;
-                  color: #dc3545;
-                  border: 1px solid #dc3545;
-                  padding: 0.25rem 0.75rem;
-                  border-radius: 0.25rem;
-                  transition: all 0.2s;
-                  display: inline-block;
-                "
-              >
-                <span>Modifier le mot de passe</span>
-              </a>
-            </div>
-          </div>
+    <div class="profile-header mb-5">
+      <div class="d-flex align-items-center gap-4">
+        <div
+          class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 100px; height: 100px; flex-shrink: 0"
+        >
+          <i class="bi bi-person fs-1"></i>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-          <div
-            class="d-flex flex-column align-items-md-end align-items-center gap-3"
+        <div class="flex-grow-1">
+          <h1 class="page-title mb-2" id="userName">Nom d'utilisateur</h1>
+          <p class="text-muted mb-3" id="userEmail">email@exemple.com</p>
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#changePasswordModal"
           >
-            <span class="badge bg-primary" id="memberSince"
-              >Membre depuis...</span
-            >
-            <a
-              href="/create-event"
-              data-link
-              class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2"
-              style="font-size: 1.1rem"
-            >
-              <i class="bi bi-plus-circle-fill"></i>
-              Créer un événement
-            </a>
-          </div>
+            Modifier le mot de passe
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Statistiques rapides -->
+    <!-- Statistiques cliquables -->
     <div class="row g-4 mb-4">
       <div class="col-md-4">
-        <div class="profile-stat-card">
+        <button
+          class="profile-stat-card stat-card-btn w-100"
+          data-section="events"
+          type="button"
+        >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon bg-primary">
               <i class="bi bi-calendar-event"></i>
@@ -68,10 +41,14 @@
               <p class="stat-label mb-0">Événements créés</p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
       <div class="col-md-4">
-        <div class="profile-stat-card">
+        <button
+          class="profile-stat-card stat-card-btn w-100"
+          data-section="reservations"
+          type="button"
+        >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon bg-success">
               <i class="bi bi-ticket-perforated"></i>
@@ -81,10 +58,14 @@
               <p class="stat-label mb-0">Réservations</p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
       <div class="col-md-4">
-        <div class="profile-stat-card">
+        <button
+          class="profile-stat-card stat-card-btn w-100 active"
+          data-section="favorites"
+          type="button"
+        >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon bg-warning">
               <i class="bi bi-heart-fill"></i>
@@ -94,69 +75,70 @@
               <p class="stat-label mb-0">Favoris</p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
     </div>
 
-    <!-- Sections principales -->
-    <div class="row g-4">
-      <!-- Mes Événements -->
-      <div class="col-md-6">
-        <div class="profile-section-card">
-          <div class="section-header">
-            <div class="d-flex align-items-center gap-3 mb-3">
-              <div class="section-icon bg-primary">
-                <i class="bi bi-calendar-event"></i>
-              </div>
-              <h2 class="section-title mb-0">Mes Événements</h2>
+    <!-- Section Mes Événements (cachée par défaut) -->
+    <div class="profile-section" id="section-events" style="display: none">
+      <div class="profile-section-card">
+        <div class="section-header">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="section-icon bg-primary">
+              <i class="bi bi-calendar-event"></i>
             </div>
-          </div>
-          <div class="section-content" id="userEvents">
-            <div class="empty-state-small">
-              <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
-              <p class="text-muted mb-3">
-                Vous n'avez pas encore créé d'événements
-              </p>
-              <a
-                href="/create-event"
-                data-link
-                class="btn btn-outline-primary btn-sm"
-              >
-                <i class="bi bi-plus-lg me-2"></i>Créer mon premier événement
-              </a>
-            </div>
+            <h2 class="section-title mb-0">Mes Événements</h2>
           </div>
         </div>
-      </div>
-
-      <!-- Mes Réservations -->
-      <div class="col-md-6">
-        <div class="profile-section-card">
-          <div class="section-header">
-            <div class="d-flex align-items-center gap-3 mb-3">
-              <div class="section-icon bg-success">
-                <i class="bi bi-ticket-perforated"></i>
-              </div>
-              <h2 class="section-title mb-0">Mes Réservations</h2>
-            </div>
-          </div>
-          <div class="section-content" id="userReservations">
-            <div class="empty-state-small">
-              <i class="bi bi-ticket text-muted fs-1 mb-2"></i>
-              <p class="text-muted mb-3">
-                Vous n'avez pas encore de réservations
-              </p>
-              <a href="/" data-link class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-search me-2"></i>Découvrir les événements
-              </a>
-            </div>
+        <div class="section-content" id="userEvents">
+          <div class="empty-state-small">
+            <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+            <p class="text-muted mb-3">
+              Vous n'avez pas encore créé d'événements
+            </p>
+            <a
+              href="/create-event"
+              data-link
+              class="btn btn-outline-primary btn-sm"
+            >
+              <i class="bi bi-plus-lg me-2"></i>Créer mon événement
+            </a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Mes Favoris -->
-    <div class="mt-4">
+    <!-- Section Mes Réservations (cachée par défaut) -->
+    <div
+      class="profile-section"
+      id="section-reservations"
+      style="display: none"
+    >
+      <div class="profile-section-card">
+        <div class="section-header">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="section-icon bg-success">
+              <i class="bi bi-ticket-perforated"></i>
+            </div>
+            <h2 class="section-title mb-0">Mes Réservations</h2>
+          </div>
+        </div>
+        <div class="section-content" id="userReservations">
+          <div class="empty-state-small">
+            <i class="bi bi-ticket text-muted fs-1 mb-2"></i>
+            <p class="text-muted mb-3">
+              Vous n'avez pas encore de réservations
+            </p>
+            <a href="/" data-link class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-search me-2"></i>Découvrir les événements
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Mes Favoris (affichée par défaut) -->
+    <div class="profile-section" id="section-favorites">
       <div class="profile-section-card">
         <div class="section-header">
           <div class="d-flex align-items-center gap-3 mb-3">

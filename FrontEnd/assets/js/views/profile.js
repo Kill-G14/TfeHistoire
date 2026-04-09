@@ -80,15 +80,18 @@ export async function mount(container, params) {
   const clone = templateObjects['profileView'].cloneNode(true)
   container.innerHTML = ''
   container.appendChild(clone)
+  
+  // Attendre que le DOM soit réellement mis à jour
+  await new Promise(resolve => setTimeout(resolve, 50))
 
   // Afficher les informations utilisateur
   displayUserInfo()
   
-  // Charger et afficher les favoris
-  await loadFavorites()
-  
-  // Attacher les événements
+  // Attacher les événements (le DOM est maintenant prêt)
   attachProfileEvents()
+  
+  // Charger et afficher les favoris (après avoir attaché les événements)
+  await loadFavorites()
   
   // Écouter les changements de favoris
   appState.subscribe('favorites', loadFavorites)
@@ -106,6 +109,42 @@ function attachProfileEvents() {
   if (changePasswordForm) {
     changePasswordForm.addEventListener('submit', handleChangePassword)
   }
+  
+  // Navigation entre sections via les stat cards
+  initSectionNavigation()
+}
+
+// Initialiser la navigation entre sections
+function initSectionNavigation() {
+  const statButtons = document.querySelectorAll('.stat-card-btn')
+  
+  if (statButtons.length === 0) return
+  
+  statButtons.forEach((button) => {
+    const section = button.getAttribute('data-section')
+    
+    button.addEventListener('click', function(e) {
+      e.preventDefault()
+      e.stopPropagation()
+      
+      // Retirer la classe active de tous les boutons
+      statButtons.forEach(btn => btn.classList.remove('active'))
+      
+      // Ajouter active au bouton cliqué
+      button.classList.add('active')
+      
+      // Cacher toutes les sections
+      document.querySelectorAll('.profile-section').forEach(sec => {
+        sec.style.display = 'none'
+      })
+      
+      // Afficher la section ciblée
+      const targetElement = document.getElementById(`section-${section}`)
+      if (targetElement) {
+        targetElement.style.display = 'block'
+      }
+    })
+  })
 }
 
 // Gérer le changement de mot de passe
@@ -182,7 +221,6 @@ function displayUserInfo() {
   const user = appState.get('user')
   const userNameEl = document.getElementById('userName')
   const userEmailEl = document.getElementById('userEmail')
-  const memberSinceEl = document.getElementById('memberSince')
 
   if (userNameEl && user) {
     userNameEl.textContent = user.name || 'Utilisateur'
@@ -190,13 +228,6 @@ function displayUserInfo() {
 
   if (userEmailEl && user) {
     userEmailEl.textContent = user.email || ''
-  }
-
-  // Afficher la date d'inscription réelle
-  if (memberSinceEl && user && user.created_at) {
-    const createdDate = new Date(user.created_at)
-    const year = createdDate.getFullYear()
-    memberSinceEl.textContent = `Membre depuis ${year}`
   }
   
   // Mettre à jour le compteur de favoris
