@@ -2,6 +2,25 @@
 
 Backend PHP pour la plateforme d'événements historiques européens.
 
+## ⚙️ Configuration
+
+Le backend utilise un système de configuration centralisé via le fichier `config.php`.
+
+**Première installation :**
+
+```bash
+# Copier le fichier de configuration exemple
+cp config.example.php config.php
+```
+
+Ensuite, éditez `config.php` pour configurer :
+
+- Clé API OpenRouteService (pour calcul d'itinéraires)
+- Paramètres de base de données
+- Configuration de l'application
+
+📖 Voir [README_CONFIG.md](README_CONFIG.md) pour plus de détails
+
 ## Structure
 
 ```

@@ -1,0 +1,38 @@
+# Configuration sensible
+/BackEnd/config.php
+
+# Dépendances
+/BackEnd/vendor/
+/FrontEnd/node_modules/
+
+# Logs
+/BackEnd/logs/*.log
+*.log
+
+# Fichiers temporaires
+*.tmp
+*.temp
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Images uploadées (garder le dossier mais pas les fichiers)
+/BackEnd/storage/images/*
+!/BackEnd/storage/images/.gitkeep
+/BackEnd/Src/img/*
+!/BackEnd/Src/img/.gitkeep
+
+# Tickets générés
+/BackEnd/storage/tickets/*.pdf
+
+# Configuration sensible (optionnel si vous voulez protéger routeApi.php)
+# /BackEnd/Api/routeApi.php

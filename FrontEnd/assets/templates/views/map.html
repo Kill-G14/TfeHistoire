@@ -1,16 +1,74 @@
 <template id="mapView">
-  <div class="container py-5">
-    <div class="text-center" style="max-width: 700px; margin: 0 auto">
-      <div class="bg-white border rounded-3 p-5">
-        <i class="bi bi-map fs-1 text-primary mb-3 d-block"></i>
-        <h2 class="page-title mb-3">Carte interactive</h2>
-        <p class="text-muted">
-          La carte interactive des événements sera disponible prochainement avec
-          une visualisation géographique de tous les événements en Europe.
-        </p>
-        <a href="/" data-link class="btn btn-primary mt-3">
-          <i class="bi bi-arrow-left me-2"></i>Retour aux événements
-        </a>
+  <div class="container-fluid px-0">
+    <div class="row g-0">
+      <!-- Panneau latéral gauche -->
+      <div
+        class="col-lg-4 col-xl-3 border-end bg-white"
+        style="height: calc(100vh - 76px); overflow-y: auto"
+      >
+        <div class="p-4">
+          <h2 class="page-title mb-3">
+            <i class="bi bi-map me-2"></i>Carte interactive
+          </h2>
+          <p class="text-muted mb-4">
+            Découvrez les événements autour de vous et calculez votre itinéraire
+          </p>
+
+          <!-- Contrôles de filtrage -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h6 class="card-title mb-3">
+                <i class="bi bi-funnel me-2"></i>Filtrer par distance
+              </h6>
+              <div class="mb-3">
+                <label for="distanceFilter" class="form-label">
+                  Distance maximale : <span id="distanceValue">500</span> km
+                </label>
+                <input
+                  type="range"
+                  class="form-range"
+                  id="distanceFilter"
+                  min="50"
+                  max="2000"
+                  step="50"
+                  value="500"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Trier par :</label>
+                <select class="form-select" id="sortBy">
+                  <option value="distance">Distance (proche → loin)</option>
+                  <option value="name">Nom (A → Z)</option>
+                  <option value="date">Date</option>
+                </select>
+              </div>
+              <div class="d-flex gap-2 align-items-center">
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  id="centerOnUser"
+                >
+                  <i class="bi bi-geo-alt-fill me-1"></i>Me localiser
+                </button>
+                <div id="locationStatus" class="small text-muted"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liste des événements -->
+          <div id="eventsList">
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+              </div>
+              <p class="text-muted mt-3">Chargement des événements...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte -->
+      <div class="col-lg-8 col-xl-9">
+        <div id="map" style="height: calc(100vh - 76px)"></div>
       </div>
     </div>
   </div>
