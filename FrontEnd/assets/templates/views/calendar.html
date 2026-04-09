@@ -80,3 +80,44 @@
     </div>
   </div>
 </template>
+
+<!-- Modal pour afficher les événements d'un jour -->
+<template id="dayEventsModal">
+  <div
+    class="modal fade"
+    id="dayEventsModalElement"
+    tabindex="-1"
+    aria-labelledby="dayEventsModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="dayEventsModalLabel">
+            Événements du <span id="modalDate"></span>
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div id="modalEventsList">
+            <!-- Les événements seront injectés ici -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

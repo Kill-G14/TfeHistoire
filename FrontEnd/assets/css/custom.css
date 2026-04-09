@@ -1235,8 +1235,12 @@ html {
 
 .calendar-day.has-events:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(15, 94, 89, 0.2);
+  box-shadow: 0 4px 16px rgba(15, 94, 89, 0.3);
   border-color: var(--color-primary-hover);
+}
+
+.calendar-day.has-events:hover .day-events {
+  opacity: 0.95;
 }
 
 /* Numéro du jour */
@@ -1275,13 +1279,71 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
   transition: all 0.2s ease;
-  cursor: pointer;
+  pointer-events: none;
 }
 
-.event-badge:hover {
-  background: var(--color-primary-hover);
-  transform: scale(1.02);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* Indicateur "plus d'événements" */
+.event-more-indicator {
+  background: var(--color-accent);
+  color: #5a4214;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.event-more-indicator i {
+  font-size: 0.85rem;
+}
+
+/* Modal événements du jour */
+.modal-event-card {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.modal-event-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.modal-event-card:last-child {
+  margin-bottom: 0;
+}
+
+.modal-event-title {
+  color: var(--color-primary);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.modal-event-location {
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.modal-event-location i {
+  color: var(--color-accent);
+}
+
+.modal-event-description {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
 }
 
 /* Légende du calendrier */

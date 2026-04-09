@@ -69,10 +69,16 @@ export async function mount(container, params) {
     return
   }
 
-  // Injecter le template
+  // Injecter le template de la vue
   const clone = templateObjects['calendarView'].cloneNode(true)
   container.innerHTML = ''
   container.appendChild(clone)
+  
+  // Injecter la modal dans le body (si pas déjà présente)
+  if (!document.getElementById('dayEventsModalElement')) {
+    const modalClone = templateObjects['dayEventsModal'].cloneNode(true)
+    document.body.appendChild(modalClone)
+  }
 
   // Charger les événements
   await loadEvents()
@@ -86,7 +92,74 @@ export async function mount(container, params) {
 
 // Fonction unmount (appelée avant de quitter la vue)
 export async function unmount() {
-  // Nettoyage si nécessaire
+  // Supprimer la modal du DOM
+  const modal = document.getElementById('dayEventsModalElement')
+  if (modal) {
+    modal.remove()
+  }
+}
+
+// Ouvrir la modal avec les événements d'un jour
+function openDayEventsModal(date, events) {
+  const modal = document.getElementById('dayEventsModalElement')
+  if (!modal) return
+  
+  // Formater la date
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+  const dateStr = date.toLocaleDateString('fr-FR', options)
+  
+  // Mettre à jour le titre
+  const modalDate = document.getElementById('modalDate')
+  if (modalDate) {
+    modalDate.textContent = dateStr
+  }
+  
+  // Liste des événements
+  const eventsList = document.getElementById('modalEventsList')
+  if (eventsList) {
+    eventsList.innerHTML = ''
+    
+    if (events.length === 0) {
+      eventsList.innerHTML = '<p class="text-muted text-center">Aucun événement pour cette date.</p>'
+    } else {
+      events.forEach(event => {
+        const eventCard = document.createElement('div')
+        eventCard.className = 'modal-event-card'
+        eventCard.innerHTML = `
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <h6 class="modal-event-title">${event.title}</h6>
+              <p class="modal-event-location mb-1">
+                <i class="bi bi-geo-alt"></i> ${event.location || 'Lieu non spécifié'}
+              </p>
+              ${event.description ? `<p class="modal-event-description">${event.description.substring(0, 150)}${event.description.length > 150 ? '...' : ''}</p>` : ''}
+            </div>
+            <button class="btn btn-sm btn-primary ms-3" data-event-id="${event.id}">
+              Voir détails
+            </button>
+          </div>
+        `
+        
+        // Bouton voir détails
+        const detailBtn = eventCard.querySelector('button')
+        detailBtn.addEventListener('click', () => {
+          // Fermer la modal
+          const bsModal = bootstrap.Modal.getInstance(modal)
+          if (bsModal) {
+            bsModal.hide()
+          }
+          // Afficher le détail de l'événement
+          showEventDetail(helpers.transformEvents([event])[0])
+        })
+        
+        eventsList.appendChild(eventCard)
+      })
+    }
+  }
+  
+  // Ouvrir la modal
+  const bsModal = new bootstrap.Modal(modal)
+  bsModal.show()
 }
 
 // Charger les événements
@@ -170,28 +243,40 @@ function createDayElement(day, date) {
   
   if (eventsOnThisDay.length > 0) {
     dayEl.classList.add('has-events')
+    dayEl.style.cursor = 'pointer'
+    dayEl.dataset.date = date.toISOString()
     
     // Container pour les événements
     const eventsContainer = document.createElement('div')
     eventsContainer.className = 'day-events'
     
-    eventsOnThisDay.forEach(event => {
+    // Limiter l'affichage à 2 événements
+    const maxDisplay = 2
+    const eventsToShow = eventsOnThisDay.slice(0, maxDisplay)
+    const remainingCount = eventsOnThisDay.length - maxDisplay
+    
+    eventsToShow.forEach(event => {
       const eventBadge = document.createElement('div')
       eventBadge.className = 'event-badge'
       eventBadge.textContent = event.title
-      eventBadge.style.cursor = 'pointer'
       eventBadge.dataset.eventId = event.id
-      
-      // Cliquer sur l'événement pour voir les détails
-      eventBadge.addEventListener('click', (e) => {
-        e.stopPropagation()
-        showEventDetail(helpers.transformEvents([event])[0])
-      })
-      
       eventsContainer.appendChild(eventBadge)
     })
     
+    // Afficher un indicateur s'il y a plus de 3 événements
+    if (remainingCount > 0) {
+      const moreIndicator = document.createElement('div')
+      moreIndicator.className = 'event-more-indicator'
+      moreIndicator.innerHTML = `<i class="bi bi-plus-circle"></i> ${remainingCount} autre${remainingCount > 1 ? 's' : ''}`
+      eventsContainer.appendChild(moreIndicator)
+    }
+    
     dayEl.appendChild(eventsContainer)
+    
+    // Cliquer sur le jour pour ouvrir la modal
+    dayEl.addEventListener('click', () => {
+      openDayEventsModal(date, eventsOnThisDay)
+    })
   }
   
   return dayEl
