@@ -53,18 +53,29 @@ switch ($request['action']) {
     }
 
     // Construire l'URL de l'API OpenRouteService
-    $url = $config['openroute']['base_url'] . '/directions/driving-car';
-    $url .= '?api_key=' . $config['openroute']['api_key'];
-    $url .= '&start=' . $startLng . ',' . $startLat;
-    $url .= '&end=' . $endLng . ',' . $endLat;
+    $url = $config['openroute']['base_url'] . '/directions/driving-car/geojson';
+
+    // Préparer le body JSON avec les coordonnées
+    $bodyData = [
+      'coordinates' => [
+        [$startLng, $startLat],  // Point de départ [longitude, latitude]
+        [$endLng, $endLat]        // Point d'arrivée [longitude, latitude]
+      ]
+    ];
 
     // Initialiser cURL
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($bodyData));
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Désactiver vérification SSL (dev local uniquement)
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Désactiver vérification host (dev local uniquement)
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-      'Accept: application/json'
+      'Accept: application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+      'Content-Type: application/json; charset=utf-8',
+      'Authorization: ' . $config['openroute']['api_key']
     ]);
 
     // Exécuter la requête
@@ -77,15 +88,18 @@ switch ($request['action']) {
     if ($curlError) {
       $response = [
         'success' => false,
-        'message' => 'Erreur de connexion à OpenRouteService'
+        'message' => 'Erreur de connexion à OpenRouteService: ' . $curlError
       ];
       break;
     }
 
     if ($httpCode !== 200) {
+      // Ajouter plus de détails sur l'erreur
+      $errorData = json_decode($result, true);
+      $errorMsg = isset($errorData['error']) ? $errorData['error']['message'] : 'Code HTTP: ' . $httpCode;
       $response = [
         'success' => false,
-        'message' => 'Impossible de calculer l\'itinéraire'
+        'message' => 'Erreur OpenRouteService: ' . $errorMsg
       ];
       break;
     }
