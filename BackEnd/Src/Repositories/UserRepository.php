@@ -100,4 +100,21 @@ class UserRepository {
     $stmt->setFetchMode(PDO::FETCH_CLASS, User::class);
     return $stmt->fetchAll();
   }
+
+  // Mettre à jour les droits d'un utilisateur (admin)
+  public function updateUserRoles(int $id, bool $isAdmin, bool $isOrganizer, bool $isModerator): bool {
+    $query = "UPDATE users SET 
+              is_admin = :is_admin, 
+              is_organizer = :is_organizer, 
+              is_moderator = :is_moderator,
+              updated_at = NOW() 
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':is_admin', $isAdmin, PDO::PARAM_INT);
+    $stmt->bindParam(':is_organizer', $isOrganizer, PDO::PARAM_INT);
+    $stmt->bindParam(':is_moderator', $isModerator, PDO::PARAM_INT);
+    return $stmt->execute();
+  }
 }
+

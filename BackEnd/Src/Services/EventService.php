@@ -262,4 +262,105 @@ class EventService {
       'data' => $eventDTOs
     ];
   }
+
+  // Récupérer les événements en attente (admin)
+  public function getPendingEvents(): array {
+    $events = $this->eventRepository->getPendingEvents();
+    
+    $eventDTOs = array_map(function($event) {
+      return (new EventDTO($event))->toArray();
+    }, $events);
+
+    return [
+      'success' => true,
+      'data' => $eventDTOs
+    ];
+  }
+
+  // Approuver un événement (admin)
+  public function approveEvent(int $id): array {
+    $event = $this->eventRepository->getEventById($id);
+
+    if (!$event) {
+      return [
+        'success' => false,
+        'message' => 'Événement non trouvé'
+      ];
+    }
+
+    $success = $this->eventRepository->approveEvent($id);
+
+    if (!$success) {
+      Logger::error('Failed to approve event', ['event_id' => $id]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de l\'approbation de l\'événement'
+      ];
+    }
+
+    Logger::info('Event approved successfully', ['event_id' => $id]);
+
+    return [
+      'success' => true,
+      'message' => 'Événement approuvé avec succès'
+    ];
+  }
+
+  // Rejeter un événement (admin)
+  public function rejectEvent(int $id): array {
+    $event = $this->eventRepository->getEventById($id);
+
+    if (!$event) {
+      return [
+        'success' => false,
+        'message' => 'Événement non trouvé'
+      ];
+    }
+
+    $success = $this->eventRepository->rejectEvent($id);
+
+    if (!$success) {
+      Logger::error('Failed to reject event', ['event_id' => $id]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors du rejet de l\'événement'
+      ];
+    }
+
+    Logger::info('Event rejected successfully', ['event_id' => $id]);
+
+    return [
+      'success' => true,
+      'message' => 'Événement rejeté avec succès'
+    ];
+  }
+
+  // Supprimer un événement (admin - hard delete)
+  public function adminDeleteEvent(int $id): array {
+    $event = $this->eventRepository->getEventById($id);
+
+    if (!$event) {
+      return [
+        'success' => false,
+        'message' => 'Événement non trouvé'
+      ];
+    }
+
+    $success = $this->eventRepository->deleteEvent($id);
+
+    if (!$success) {
+      Logger::error('Failed to delete event', ['event_id' => $id]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la suppression de l\'événement'
+      ];
+    }
+
+    Logger::info('Event deleted by admin', ['event_id' => $id]);
+
+    return [
+      'success' => true,
+      'message' => 'Événement supprimé avec succès'
+    ];
+  }
 }

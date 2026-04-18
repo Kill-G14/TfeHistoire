@@ -1,12 +1,13 @@
 // Imports
-import { auth } from '../utils/auth.js'
 import AuthManager from '../managers/AuthManager.js'
+import { storage } from '../utils/helpers.js'
 
 // Fonction init
 async function init() {
   // Vérifier si l'utilisateur est déjà connecté
-  if (auth.isAuthenticated()) {
-    window.location.href = 'index.html'
+  const token = storage.getToken()
+  if (token) {
+    window.location.href = 'dashboard.html'
     return
   }
 
@@ -50,18 +51,19 @@ async function handleLogin() {
 
   if (result.success) {
     // Vérifier le rôle
-    if (result.data.role !== 'admin' && result.data.role !== 'moderator') {
+    const user = result.data.user || result.data
+    if (!user.is_admin && !user.is_moderator) {
       showError('Accès refusé. Seuls les administrateurs et modérateurs peuvent se connecter.')
       submitBtn.disabled = false
       submitBtn.innerHTML = 'Connexion'
       return
     }
 
-    // Sauvegarder les données d'authentification
-    auth.saveAuthData(result.data.token, result.data.user, remember)
+    // Sauvegarder le token
+    storage.setToken(result.data.token)
 
     // Rediriger vers le dashboard
-    window.location.href = 'index.html'
+    window.location.href = 'dashboard.html'
   } else {
     showError(result.message || 'Email ou mot de passe incorrect')
     submitBtn.disabled = false
