@@ -1,44 +1,46 @@
-import EventManager from '../managers/EventManager.js'
-import { storage, helpers } from '../utils/helpers.js'
+import EventManager from "../managers/EventManager.js";
+import { storage, helpers } from "../utils/helpers.js";
 
-let allEvents = []
+let allEvents = [];
 
 // Vérifier l'authentification
 async function checkAuth() {
-  const token = storage.getToken()
+  const token = storage.getToken();
   if (!token) {
-    window.location.href = 'login.html'
-    return
+    window.location.href = "login.html";
+    return;
   }
 }
 
 // Charger tous les événements
 async function loadEvents() {
-  const token = storage.getToken()
+  const token = storage.getToken();
 
   // Charger tous les événements
-  const allResult = await EventManager.getAll(token)
+  const allResult = await EventManager.getAll(token);
   if (allResult.success) {
-    allEvents = allResult.data
-    renderAllEvents()
-    renderApprovedEvents()
+    allEvents = allResult.data;
+    renderAllEvents();
+    renderApprovedEvents();
   }
 
   // Charger les événements en attente
-  const pendingResult = await EventManager.getPending(token)
+  const pendingResult = await EventManager.getPending(token);
   if (pendingResult.success) {
-    renderPendingEvents(pendingResult.data)
-    document.getElementById('pendingCount').textContent = pendingResult.data.length
+    renderPendingEvents(pendingResult.data);
+    document.getElementById("pendingCount").textContent =
+      pendingResult.data.length;
   }
 }
 
 // Rendre les événements en attente
 function renderPendingEvents(events) {
-  const tbody = document.getElementById('pendingEventsList')
+  const tbody = document.getElementById("pendingEventsList");
 
   if (events.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun événement en attente</td></tr>'
-    return
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="text-center">Aucun événement en attente</td></tr>';
+    return;
   }
 
   tbody.innerHTML = events
@@ -62,19 +64,20 @@ function renderPendingEvents(events) {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
-    .join('')
+    .join("");
 }
 
 // Rendre les événements approuvés
 function renderApprovedEvents() {
-  const approvedEvents = allEvents.filter((e) => e.is_approved)
-  const tbody = document.getElementById('approvedEventsList')
+  const approvedEvents = allEvents.filter((e) => e.is_approved);
+  const tbody = document.getElementById("approvedEventsList");
 
   if (approvedEvents.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun événement approuvé</td></tr>'
-    return
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="text-center">Aucun événement approuvé</td></tr>';
+    return;
   }
 
   tbody.innerHTML = approvedEvents
@@ -92,18 +95,19 @@ function renderApprovedEvents() {
         </button>
       </td>
     </tr>
-  `
+  `,
     )
-    .join('')
+    .join("");
 }
 
 // Rendre tous les événements
 function renderAllEvents() {
-  const tbody = document.getElementById('allEventsList')
+  const tbody = document.getElementById("allEventsList");
 
   if (allEvents.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun événement</td></tr>'
-    return
+    tbody.innerHTML =
+      '<tr><td colspan="6" class="text-center">Aucun événement</td></tr>';
+    return;
   }
 
   tbody.innerHTML = allEvents
@@ -122,7 +126,7 @@ function renderAllEvents() {
               ? '<span class="badge badge-success">Approuvé</span>'
               : event.is_rejected
                 ? '<span class="badge badge-danger">Rejeté</span>'
-                : ''
+                : ""
         }
       </td>
       <td>
@@ -136,90 +140,100 @@ function renderAllEvents() {
             <i class="fas fa-times"></i> Rejeter
           </button>
         `
-            : ''
+            : ""
         }
         <button class="btn btn-sm btn-danger" onclick="window.deleteEvent(${event.id})">
           <i class="fas fa-trash"></i> Supprimer
         </button>
       </td>
     </tr>
-  `
+  `,
     )
-    .join('')
+    .join("");
 }
 
 // Approuver un événement
 window.approveEvent = async function (eventId) {
-  if (!confirm('Êtes-vous sûr de vouloir approuver cet événement ?')) {
-    return
+  if (!confirm("Êtes-vous sûr de vouloir approuver cet événement ?")) {
+    return;
   }
 
-  const token = storage.getToken()
-  const result = await EventManager.approve(eventId, token)
+  const token = storage.getToken();
+  const result = await EventManager.approve(eventId, token);
 
   if (result.success) {
-    helpers.showToast('Événement approuvé avec succès', 'success')
-    await loadEvents()
+    helpers.showToast("Événement approuvé avec succès", "success");
+    await loadEvents();
   } else {
-    helpers.showToast(result.message || 'Erreur lors de l\'approbation', 'error')
+    helpers.showToast(
+      result.message || "Erreur lors de l'approbation",
+      "error",
+    );
   }
-}
+};
 
 // Rejeter un événement
 window.rejectEvent = async function (eventId) {
-  if (!confirm('Êtes-vous sûr de vouloir rejeter cet événement ?')) {
-    return
+  if (!confirm("Êtes-vous sûr de vouloir rejeter cet événement ?")) {
+    return;
   }
 
-  const token = storage.getToken()
-  const result = await EventManager.reject(eventId, token)
+  const token = storage.getToken();
+  const result = await EventManager.reject(eventId, token);
 
   if (result.success) {
-    helpers.showToast('Événement rejeté avec succès', 'success')
-    await loadEvents()
+    helpers.showToast("Événement rejeté avec succès", "success");
+    await loadEvents();
   } else {
-    helpers.showToast(result.message || 'Erreur lors du rejet', 'error')
+    helpers.showToast(result.message || "Erreur lors du rejet", "error");
   }
-}
+};
 
 // Supprimer un événement
 window.deleteEvent = async function (eventId) {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement cet événement ?')) {
-    return
+  if (
+    !confirm(
+      "Êtes-vous sûr de vouloir supprimer définitivement cet événement ?",
+    )
+  ) {
+    return;
   }
 
-  const token = storage.getToken()
-  const result = await EventManager.adminDelete(eventId, token)
+  const token = storage.getToken();
+  const result = await EventManager.adminDelete(eventId, token);
 
   if (result.success) {
-    helpers.showToast('Événement supprimé avec succès', 'success')
-    await loadEvents()
+    helpers.showToast("Événement supprimé avec succès", "success");
+    await loadEvents();
   } else {
-    helpers.showToast(result.message || 'Erreur lors de la suppression', 'error')
+    helpers.showToast(
+      result.message || "Erreur lors de la suppression",
+      "error",
+    );
   }
-}
+};
 
 // Déconnexion
 function logout() {
-  storage.removeToken()
-  window.location.href = 'login.html'
+  storage.removeToken();
+  window.location.href = "login.html";
 }
 
 // Initialisation
 async function init() {
-  await checkAuth()
-  await loadEvents()
+  await checkAuth();
+  await loadEvents();
 
   // Event listener pour la déconnexion
-  document.getElementById('logoutBtn').addEventListener('click', (e) => {
-    e.preventDefault()
-    logout()
-  })
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    logout();
+  });
 }
 
 // Lancer l'initialisation
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init)
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
 } else {
-  init()
+  init();
 }

@@ -42,6 +42,7 @@ Page de connexion réservée aux administrateurs et modérateurs.
 **Accès** : Seuls les utilisateurs avec `is_admin = true` ou `is_moderator = true` peuvent se connecter.
 
 **Fonctionnalités** :
+
 - Connexion avec email et mot de passe
 - Option "Se souvenir de moi" (stocke le token dans localStorage)
 - Redirection automatique vers dashboard si déjà connecté
@@ -51,12 +52,14 @@ Page de connexion réservée aux administrateurs et modérateurs.
 Page d'accueil du back office avec statistiques globales.
 
 **Statistiques affichées** :
+
 - Nombre total d'événements
 - Nombre d'événements en attente
 - Nombre d'événements approuvés
 - Nombre total d'utilisateurs
 
 **Actions rapides** :
+
 - Bouton vers la gestion des événements
 - Bouton vers la gestion des utilisateurs
 
@@ -65,23 +68,29 @@ Page d'accueil du back office avec statistiques globales.
 Page de gestion complète des événements avec 3 onglets :
 
 #### Onglet "En Attente"
+
 Liste des événements en attente de modération (`is_pending = true`).
 
 **Actions disponibles** :
+
 - ✅ **Approuver** : Valide l'événement (`is_approved = true`, `is_pending = false`)
 - ❌ **Rejeter** : Refuse l'événement (`is_rejected = true`, `is_pending = false`)
 - 🗑️ **Supprimer** : Supprime définitivement l'événement
 
 #### Onglet "Approuvés"
+
 Liste des événements déjà approuvés (`is_approved = true`).
 
 **Actions disponibles** :
+
 - 🗑️ **Supprimer** : Supprime l'événement
 
 #### Onglet "Tous"
+
 Liste complète de tous les événements avec leur statut.
 
 **Statuts possibles** :
+
 - 🟡 En attente
 - 🟢 Approuvé
 - 🔴 Rejeté
@@ -91,11 +100,13 @@ Liste complète de tous les événements avec leur statut.
 Page de gestion des utilisateurs et de leurs droits.
 
 **Informations affichées** :
+
 - ID, Nom, Email
 - Rôles (Admin, Organisateur, Modérateur)
 - Date de création
 
 **Actions disponibles** :
+
 - ✏️ **Modifier les droits** : Ouvre une modal pour gérer les rôles
 - 🗑️ **Supprimer** : Supprime l'utilisateur (avec protection du dernier admin)
 
@@ -123,6 +134,7 @@ Page de gestion des utilisateurs et de leurs droits.
 Toutes les actions administratives passent par une seule API avec un système de **ressources** et **actions**.
 
 **Format de requête** :
+
 ```json
 {
   "resource": "events|users",
@@ -133,6 +145,7 @@ Toutes les actions administratives passent par une seule API avec un système de
 ```
 
 **Sécurité** :
+
 - Vérification obligatoire du token
 - Vérification des droits admin/modérateur
 - Certaines actions nécessitent le rôle admin uniquement
@@ -140,6 +153,7 @@ Toutes les actions administratives passent par une seule API avec un système de
 #### Ressource : `events`
 
 Actions disponibles :
+
 - `getAll` : Récupère tous les événements (admin/modérateur)
 - `getPending` : Récupère les événements en attente (admin/modérateur)
 - `approve` : Approuve un événement (admin uniquement)
@@ -149,6 +163,7 @@ Actions disponibles :
 #### Ressource : `users`
 
 Actions disponibles (admin uniquement) :
+
 - `getAll` : Récupère tous les utilisateurs
 - `getById` : Récupère un utilisateur par ID
 - `updateRoles` : Met à jour les droits d'un utilisateur
@@ -178,6 +193,7 @@ Actions disponibles (admin uniquement) :
 ### Vérifications Backend
 
 Toutes les actions sensibles vérifient :
+
 1. Présence du token
 2. Validité du token
 3. Droits administrateur/modérateur
@@ -213,6 +229,7 @@ Toutes les actions sensibles vérifient :
 ## Design
 
 Le back office utilise **AdminLTE 3.2** pour une interface moderne et responsive :
+
 - Sidebar de navigation
 - Statistiques avec des cards colorées
 - Tableaux pour les listes
@@ -224,4 +241,3 @@ Le back office utilise **AdminLTE 3.2** pour une interface moderne et responsive
 - **Frontend** : JavaScript ES6+, Bootstrap 4, AdminLTE 3.2
 - **Backend** : PHP 8+, PDO, Architecture MVC
 - **Base de données** : MySQL
-

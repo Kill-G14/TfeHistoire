@@ -1,31 +1,31 @@
 // Manager pour la gestion des événements côté admin
 class EventManager {
   constructor() {
-    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api/adminApi.php'
+    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api/adminApi.php";
   }
 
   // Récupérer tous les événements
   async getAll(token) {
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          resource: 'events',
-          action: 'getAll',
-          token: token
-        })
-      })
+          resource: "events",
+          action: "getAll",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
-      console.error('Erreur lors du chargement des événements:', error)
+      console.error("Erreur lors du chargement des événements:", error);
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -33,24 +33,27 @@ class EventManager {
   async getPending(token) {
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          resource: 'events',
-          action: 'getPending',
-          token: token
-        })
-      })
+          resource: "events",
+          action: "getPending",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
-      console.error('Erreur lors du chargement des événements en attente:', error)
+      console.error(
+        "Erreur lors du chargement des événements en attente:",
+        error,
+      );
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -58,25 +61,25 @@ class EventManager {
   async approve(eventId, token) {
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          resource: 'events',
-          action: 'approve',
+          resource: "events",
+          action: "approve",
           id: eventId,
-          token: token
-        })
-      })
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
-      console.error('Erreur lors de l\'approbation de l\'événement:', error)
+      console.error("Erreur lors de l'approbation de l'événement:", error);
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -84,25 +87,25 @@ class EventManager {
   async reject(eventId, token) {
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          resource: 'events',
-          action: 'reject',
+          resource: "events",
+          action: "reject",
           id: eventId,
-          token: token
-        })
-      })
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
-      console.error('Erreur lors du rejet de l\'événement:', error)
+      console.error("Erreur lors du rejet de l'événement:", error);
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -110,28 +113,28 @@ class EventManager {
   async adminDelete(eventId, token) {
     try {
       const response = await fetch(this.apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          resource: 'events',
-          action: 'delete',
+          resource: "events",
+          action: "delete",
           id: eventId,
-          token: token
-        })
-      })
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'événement:', error)
+      console.error("Erreur lors de la suppression de l'événement:", error);
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 }
 
 // Export d'une instance singleton
-export default new EventManager()
+export default new EventManager();
