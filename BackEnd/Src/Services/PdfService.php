@@ -295,4 +295,164 @@ class PdfService {
     // 5️⃣ Sécurité : Liste blanche des logos
     return self::ALLOWED_LOGOS[$logoKey] ?? null;
   }
+
+  /**
+   * Génère une facture PDF pour une commande
+   * 
+   * @param int $orderId ID de la commande
+   * @param int $userId ID de l'utilisateur (pour vérification des droits)
+   * @return array ['success' => bool, 'message' => string, 'data' => array]
+   */
+  public function generateInvoicePdf(int $orderId, int $userId): array {
+    // TODO: Ajouter OrderRepository et UserRepository en dépendances
+    // Pour l'instant, on crée une structure de base
+    
+    // Récupérer les données de la commande
+    // $order = $this->orderRepository->getOrderById($orderId);
+    // $user = $this->userRepository->getUserById($userId);
+    // $orderItems = $this->orderItemRepository->getOrderItemsByOrderId($orderId);
+    // $payment = $this->paymentRepository->getPaymentsByOrderId($orderId)[0];
+    
+    // Pour l'instant, retourner un message de succès
+    return [
+      'success' => true,
+      'message' => 'Facture générée (à implémenter complètement)',
+      'data' => [
+        'invoice_path' => 'TODO',
+        'filename' => 'invoice_' . $orderId . '.pdf'
+      ]
+    ];
+  }
+
+  /**
+   * Crée le fichier PDF de facture avec TCPDF
+   * 
+   * @param array $orderData Données de la commande
+   * @param array $userData Données de l'utilisateur
+   * @param array $items Articles de la commande
+   * @param array $paymentData Données du paiement
+   * @return string Chemin du fichier PDF généré
+   */
+  private function createInvoicePdf(array $orderData, array $userData, array $items, array $paymentData): string {
+    // Initialisation de TCPDF
+    $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+
+    // Configuration du document
+    $pdf->SetCreator('MemoriaEventia');
+    $pdf->SetAuthor('MemoriaEventia');
+    $pdf->SetTitle('Facture #' . $orderData['id']);
+    $pdf->SetSubject('Facture de commande');
+
+    // Supprimer header et footer par défaut
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+
+    // Marges
+    $pdf->SetMargins(15, 15, 15);
+    $pdf->SetAutoPageBreak(true, 15);
+
+    // Ajout d'une page
+    $pdf->AddPage();
+
+    // En-tête de facture
+    $pdf->SetFont('helvetica', 'B', 26);
+    $pdf->Cell(0, 15, 'FACTURE', 0, 1, 'R');
+
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->Cell(0, 6, 'Facture N° : ' . str_pad($orderData['id'], 6, '0', STR_PAD_LEFT), 0, 1, 'R');
+    $pdf->Cell(0, 6, 'Date : ' . date('d/m/Y', strtotime($orderData['created_at'])), 0, 1, 'R');
+    $pdf->Cell(0, 6, 'Paiement : ' . ucfirst($paymentData['payment_method'] ?? 'Carte bancaire'), 0, 1, 'R');
+
+    $pdf->Ln(10);
+
+    // Informations vendeur (à gauche)
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell(90, 6, 'De :', 0, 0);
+    
+    // Informations client (à droite)
+    $pdf->Cell(90, 6, 'Facture pour :', 0, 1);
+
+    $pdf->SetFont('helvetica', '', 10);
+    
+    // Colonne vendeur
+    $pdf->MultiCell(90, 5, "MemoriaEventia\nHistoire et Evenements\nBelgique", 0, 'L', 0, 0);
+    
+    // Colonne client
+    $pdf->MultiCell(90, 5, 
+      htmlspecialchars($userData['name'], ENT_QUOTES, 'UTF-8') . "\n" .
+      htmlspecialchars($userData['email'], ENT_QUOTES, 'UTF-8'),
+      0, 'L', 0, 1
+    );
+
+    $pdf->Ln(10);
+
+    // Tableau des articles
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell(0, 8, 'Details de la commande', 0, 1);
+
+    $pdf->Ln(2);
+
+    // En-têtes du tableau
+    $pdf->SetFillColor(240, 240, 240);
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(90, 8, 'Description', 1, 0, 'L', true);
+    $pdf->Cell(20, 8, 'Qte', 1, 0, 'C', true);
+    $pdf->Cell(35, 8, 'Prix unit.', 1, 0, 'R', true);
+    $pdf->Cell(35, 8, 'Total', 1, 1, 'R', true);
+
+    // Lignes du tableau
+    $pdf->SetFont('helvetica', '', 9);
+    $total = 0;
+
+    foreach ($items as $item) {
+      $itemTotal = $item['quantity'] * $item['unit_price'];
+      $total += $itemTotal;
+
+      $pdf->Cell(90, 7, htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'), 1, 0, 'L');
+      $pdf->Cell(20, 7, $item['quantity'], 1, 0, 'C');
+      $pdf->Cell(35, 7, number_format($item['unit_price'], 2, ',', ' ') . ' EUR', 1, 0, 'R');
+      $pdf->Cell(35, 7, number_format($itemTotal, 2, ',', ' ') . ' EUR', 1, 1, 'R');
+    }
+
+    // Total
+    $pdf->SetFont('helvetica', 'B', 11);
+    $pdf->Cell(145, 8, 'TOTAL', 1, 0, 'R', true);
+    $pdf->Cell(35, 8, number_format($total, 2, ',', ' ') . ' EUR', 1, 1, 'R', true);
+
+    $pdf->Ln(10);
+
+    // Informations de paiement
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(0, 6, 'Informations de paiement', 0, 1);
+    
+    $pdf->SetFont('helvetica', '', 9);
+    $pdf->Cell(0, 5, 'Statut : ' . ($paymentData['status'] === 'succeeded' ? 'PAYEE' : strtoupper($paymentData['status'])), 0, 1);
+    $pdf->Cell(0, 5, 'Mode de paiement : Stripe (' . ucfirst($paymentData['payment_method'] ?? 'card') . ')', 0, 1);
+    $pdf->Cell(0, 5, 'ID de transaction : ' . htmlspecialchars($paymentData['stripe_payment_intent_id'] ?? '', ENT_QUOTES, 'UTF-8'), 0, 1);
+    
+    if (!empty($paymentData['receipt_url'])) {
+      $pdf->Cell(0, 5, 'Recu Stripe : Disponible dans votre compte', 0, 1);
+    }
+
+    $pdf->Ln(15);
+
+    // Mentions légales
+    $pdf->SetFont('helvetica', 'I', 8);
+    $pdf->MultiCell(0, 4, 
+      "Merci pour votre achat !\n" .
+      "Cette facture est generee automatiquement et ne necessite pas de signature.\n" .
+      "Pour toute question, contactez-nous a contact@memoriaeventia.com",
+      0, 'C'
+    );
+
+    // Génération d'un nom de fichier sécurisé
+    $timestamp = time();
+    $filename = 'invoice_' . str_pad($orderData['id'], 6, '0', STR_PAD_LEFT) . '_' . $timestamp . '.pdf';
+    $filepath = self::STORAGE_PATH . $filename;
+
+    // Sauvegarder le PDF
+    $pdf->Output($filepath, 'F');
+
+    return $filepath;
+  }
 }

@@ -21,6 +21,16 @@ return [
     'password' => 'mot_de_passe'
   ],
 
+  // Stripe
+  'stripe' => [
+    'secret_key' => 'sk_test_VOTRE_CLE_SECRETE_ICI', // Clé secrète Stripe (test)
+    'publishable_key' => 'pk_test_VOTRE_CLE_PUBLIQUE_ICI', // Clé publique Stripe (test)
+    'webhook_secret' => 'whsec_VOTRE_SECRET_WEBHOOK_ICI', // Secret webhook Stripe
+    'currency' => 'eur', // Devise par défaut
+    'success_url' => 'http://localhost/tfeHistoire/FrontEnd/#/payment/success', // URL de succès
+    'cancel_url' => 'http://localhost/tfeHistoire/FrontEnd/#/payment/cancel' // URL d'annulation
+  ],
+
   // Autres configurations
   'app' => [
     'name' => 'MemoriaEventia',
