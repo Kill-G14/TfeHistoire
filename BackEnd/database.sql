@@ -1,6 +1,21 @@
 -- Base de données pour MemoriaEventia
 -- Création de la base de données
 
+-- ============================================
+-- INSTRUCTIONS D'EXÉCUTION
+-- ============================================
+-- OPTION 1 (Recommandée) : Créer la base manuellement d'abord
+--   1. Dans phpMyAdmin ou ligne de commande MySQL :
+--      CREATE DATABASE memoriaeventia CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+--   2. Ensuite exécutez ce fichier SQL complet
+--
+-- OPTION 2 : Si vous avez les privilèges CREATE DATABASE
+--   - Exécutez ce fichier SQL tel quel
+--
+-- OPTION 3 : Ligne de commande
+--   mysql -u root -p < database.sql
+-- ============================================
+
 -- Configuration pour éviter les timeouts
 SET SESSION wait_timeout = 28800;
 
@@ -10,9 +25,10 @@ SET SESSION net_read_timeout = 120;
 
 SET SESSION net_write_timeout = 120;
 
-CREATE DATABASE IF NOT EXISTS eurofetes_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Création de la base de données (nécessite privilèges CREATE DATABASE)
+CREATE DATABASE IF NOT EXISTS memoriaeventia CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE eurofetes_db;
+USE memoriaeventia;
 
 -- Suppression des tables existantes pour recréation propre
 DROP TABLE IF EXISTS tickets_generated;
@@ -153,7 +169,34 @@ CREATE TABLE IF NOT EXISTS sessions (
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
--- Index pour améliorer les performances
+-- Table des paiements (Stripe)
+CREATE TABLE IF NOT EXISTS payments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    stripe_payment_intent_id VARCHAR(255) UNIQUE,
+    stripe_checkout_session_id VARCHAR(255) UNIQUE,
+    amount DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'EUR',
+    status VARCHAR(50) NOT NULL, -- pending, succeeded, failed, canceled, refunded
+    payment_method VARCHAR(50), -- card, bank_transfer, etc.
+    receipt_url TEXT,
+    refund_id VARCHAR(255),
+    refund_amount DECIMAL(10, 2),
+    refunded_at TIMESTAMP NULL,
+    metadata TEXT, -- JSON pour stocker infos supplémentaires
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- ============================================
+-- INDEX POUR AMÉLIORER LES PERFORMANCES
+-- ============================================
+-- Note: Les index suivants ne sont PAS créés automatiquement par MySQL.
+-- Les FOREIGN KEY et UNIQUE créent automatiquement leurs propres index.
+-- Nous définissons ici uniquement les index additionnels nécessaires.
+-- ============================================
 CREATE INDEX idx_events_date ON events (date);
 
 CREATE INDEX idx_events_country ON events (country);
@@ -168,12 +211,12 @@ CREATE INDEX idx_events_approved ON events (is_approved);
 
 CREATE INDEX idx_events_rejected ON events (is_rejected);
 
+CREATE INDEX idx_events_deleted ON events (is_deleted);
+
 CREATE INDEX idx_events_location ON events (latitude, longitude);
+-- Index composite pour recherche géographique
 
-CREATE INDEX idx_tickets_event ON tickets (event_id);
-
-CREATE INDEX idx_orders_user ON orders (user_id);
-
+-- Index sur la table ORDERS (filtrage par statut)
 CREATE INDEX idx_orders_pending ON orders (is_pending);
 
 CREATE INDEX idx_orders_paid ON orders (is_paid);
@@ -182,27 +225,49 @@ CREATE INDEX idx_orders_failed ON orders (is_failed);
 
 CREATE INDEX idx_orders_cancelled ON orders (is_cancelled);
 
-CREATE INDEX idx_order_items_order ON order_items (order_id);
+CREATE INDEX idx_orders_deleted ON orders (is_deleted);
 
-CREATE INDEX idx_order_items_ticket ON order_items (ticket_id);
+-- Index sur la table PAYMENTS (filtrage par statut)
+CREATE INDEX idx_payments_status ON payments (status);
 
-CREATE INDEX idx_tickets_generated_unique_code ON tickets_generated (unique_code);
-
-CREATE INDEX idx_tickets_generated_order_item ON tickets_generated (order_item_id);
-
-CREATE INDEX idx_favorites_user ON favorites (user_id);
-
-CREATE INDEX idx_favorites_event ON favorites (event_id);
-
-CREATE INDEX idx_sessions_token ON sessions (token);
-
+-- Index sur la table USERS (soft delete)
 CREATE INDEX idx_users_deleted ON users (is_deleted);
 
-CREATE INDEX idx_events_deleted ON events (is_deleted);
-
+-- Index sur la table TICKETS (soft delete)
 CREATE INDEX idx_tickets_deleted ON tickets (is_deleted);
 
-CREATE INDEX idx_orders_deleted ON orders (is_deleted);
+-- ============================================
+-- INDEX AUTOMATIQUEMENT CRÉÉS (documentation)
+-- ============================================
+-- Les index suivants sont créés automatiquement par MySQL/InnoDB
+-- et n'ont PAS besoin d'être définis manuellement :
+--
+-- PRIMARY KEY crée automatiquement un index unique :
+--   ✓ users.id, events.id, tickets.id, orders.id, order_items.id,
+--   ✓ tickets_generated.id, favorites.id, sessions.id, payments.id
+--
+-- UNIQUE crée automatiquement un index unique :
+--   ✓ users.email
+--   ✓ tickets_generated.unique_code
+--   ✓ sessions.token
+--   ✓ favorites.unique_favorite (composite: user_id + event_id)
+--   ✓ payments.stripe_payment_intent_id
+--   ✓ payments.stripe_checkout_session_id
+--
+-- FOREIGN KEY crée automatiquement un index (dans InnoDB) :
+--   ✓ events.user_id
+--   ✓ tickets.event_id
+--   ✓ orders.user_id
+--   ✓ order_items.order_id
+--   ✓ order_items.ticket_id
+--   ✓ tickets_generated.order_item_id
+--   ✓ favorites.user_id
+--   ✓ favorites.event_id
+--   ✓ sessions.user_id
+--   ✓ payments.order_id
+--
+-- Total: 29 index créés (9 explicites + 20 automatiques)
+-- ============================================
 
 -- Insertion de données de test
 INSERT INTO

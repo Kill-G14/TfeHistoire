@@ -96,7 +96,7 @@ BackEnd/
 
 ```php
 private const DB_HOST = 'localhost';
-private const DB_NAME = 'eurofetes_db';
+private const DB_NAME = 'memoriaeventia';
 private const DB_USER = 'root';
 private const DB_PASS = '';
 ```

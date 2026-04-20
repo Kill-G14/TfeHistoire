@@ -6,17 +6,13 @@ Vos clés API Stripe de test sont maintenant configurées et prêtes à l'emploi
 
 ---
 
-## 📋 ÉTAPE 1 : CRÉER LA TABLE `payments`
+## 📋 ÉTAPE 1 : BASE DE DONNÉES
 
-**Exécuter le script SQL :**
+**La table `payments` est déjà incluse dans `BackEnd/database.sql` !**
 
-1. Ouvre phpMyAdmin : `http://localhost/phpmyadmin`
-2. Sélectionne la base de données `eurofetes_db`
-3. Va dans l'onglet **SQL**
-4. Copie-colle le contenu du fichier `BackEnd/database_stripe.sql`
-5. Clique sur **Exécuter**
+✅ Si vous avez exécuté le fichier `BackEnd/database.sql`, la table `payments` est déjà créée.
 
-✅ La table `payments` sera créée avec tous les champs nécessaires.
+⚠️ **Note** : Le fichier `BackEnd/database_stripe.sql` n'est plus nécessaire, tout est intégré dans le fichier principal.
 
 ---
 
