@@ -270,6 +270,15 @@ CREATE INDEX idx_tickets_deleted ON tickets (is_deleted);
 -- ============================================
 
 -- Insertion de données de test
+-- NOTE: Les mots de passe sont hashés avec BCrypt (PASSWORD_DEFAULT de PHP)
+-- Mot de passe pour TOUS les utilisateurs de test : password
+-- Hash BCrypt : $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+--
+-- Comptes disponibles :
+--   admin@memoriaeventia.com    → Administrateur
+--   moderator@memoriaeventia.com → Modérateur
+--   organizer@example.com       → Organisateur
+--   user@example.com            → Utilisateur simple
 INSERT INTO
     users (
         email,
@@ -281,8 +290,8 @@ INSERT INTO
         is_deleted
     )
 VALUES (
-        'admin@eurofetes.com',
-        'admin123',
+        'admin@memoriaeventia.com',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'Admin MemoriaEventia',
         TRUE,
         FALSE,
@@ -290,8 +299,8 @@ VALUES (
         FALSE
     ),
     (
-        'moderator@eurofetes.com',
-        'moderator123',
+        'moderator@memoriaeventia.com',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'Modérateur',
         FALSE,
         FALSE,
@@ -300,7 +309,7 @@ VALUES (
     ),
     (
         'organizer@example.com',
-        'organizer123',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'Organisateur Test',
         FALSE,
         TRUE,
@@ -309,7 +318,7 @@ VALUES (
     ),
     (
         'user@example.com',
-        'user123',
+        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
         'Utilisateur Test',
         FALSE,
         FALSE,
