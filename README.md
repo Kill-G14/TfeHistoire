@@ -1,365 +1,301 @@
-## Résumé du projet – Plateforme de découverte et réservation d’événements historiques
+# MemoriaEventia - SPA
 
-## ⚠️ IMPORTANT - CHANGEMENT D'ARCHITECTURE
+Application web Single Page Application (SPA) de réservation d'événements historiques européens. Version moderne en vanilla JavaScript avec routeur et Bootstrap 5.
 
-**Date :** 09/03/2026  
-**Nouvelle architecture :** **SPA (Single Page Application)**
+## 🎯 Fonctionnalités
 
-Le projet a été re-documenté pour suivre une architecture **SPA moderne** au lieu du modèle multi-pages initial.
+- **SPA Navigation** : Navigation fluide sans rechargement de page
+- **Liste d'événements** : Affichage de tous les événements historiques d'Europe
+- **Filtres avancés** : Recherche par nom, filtrage par pays et catégorie
+- **Détails d'événement** : Vue détaillée avec réservation de tickets
+- **Création d'événement** : Formulaire complet pour créer de nouveaux événements
+- **Authentification** : Système de connexion/inscription
+- **Profil utilisateur** : Gestion des réservations et événements créés
+- **Carte interactive** : Visualisation géographique
+- **State Management** : Gestion d'état centralisée avec appState
 
-📖 **Voir documentation :**
+## 🛠️ Technologies utilisées
 
-- `AGENTS.md` : Standards frontend SPA complets
-- `MIGRATION_SPA.md` : Guide de migration détaillé
-- `PROJECT_STATUS.md` : État de la migration
-- `FrontEnd/README.md` : Documentation SPA
+- **HTML5** : Structure (index.html unique)
+- **CSS3** : Styles personnalisés + animations de transitions
+- **JavaScript ES6+** : Modules, async/await, arrow functions, Router SPA
+- **Bootstrap 5.3** : Framework CSS
+- **Bootstrap Icons** : Icônes
+- **History API** : Navigation SPA sans rechargement
+- **LocalStorage** : Persistance des données
 
-**Principaux changements :**
+## 📁 Structure du projet (SPA)
 
-- ✅ Un seul fichier HTML (`index.html`)
-- ✅ Routeur JavaScript avec History API
-- ✅ Navigation sans rechargement de page
-- ✅ State management centralisé
+```
+index.html           # SEUL fichier HTML de l'application
+
+assets/
+  ├── css/
+  │   └── custom.css       # Styles personnalisés + transitions SPA
+  ├── js/
+  │   ├── app.js               # Point d'entrée principal
+  │   ├── router.js            # Routeur SPA (History API)
+  │   ├── components/
+  │   │   ├── navbar.js        # Navbar persistante
+  │   │   ├── footer.js        # Footer persistant
+  │   │   ├── eventCard.js     # Carte d'événement
+  │   │   ├── loginModal.js    # Modal de connexion
+  │   │   └── eventDetail.js   # Détail d'événement
+  │   ├── views/
+  │   │   ├── home.js          # Vue accueil
+  │   │   ├── createEvent.js   # Vue création événement
+  │   │   ├── profile.js       # Vue profil
+  │   │   └── map.js           # Vue carte
+  │   ├── managers/
+  │   │   ├── EventManager.js  # Appels API événements
+  │   │   ├── AuthManager.js   # Appels API auth
+  │   │   └── ...
+  │   ├── store/
+  │   │   └── appState.js      # State management centralisé
+  │   └── utils/
+  │       ├── auth.js          # Gestion authentification
+  │       ├── storage.js       # Gestion localStorage
+  │       └── helpers.js       # Fonctions utilitaires
+  └── templates/
+      ├── navbar.html          # Template navbar
+      ├── footer.html          # Template footer
+      ├── eventCard.html       # Template carte événement
+      ├── loginModal.html      # Template modal login
+      ├── eventDetail.html     # Template détail événement
+      └── views/
+          ├── home.html        # Template vue accueil
+          ├── createEvent.html # Template vue création
+          ├── profile.html     # Template vue profil
+          └── map.html         # Template vue carte
+```
+
+## 🚀 Installation et démarrage
+
+### Prérequis
+
+- Un serveur web local (WAMP, XAMPP, Live Server, etc.)
+- Un navigateur web moderne compatible ES6+
+
+### Installation
+
+1. Cloner ou télécharger le projet
+2. Placer le dossier dans le répertoire de votre serveur web
+3. Ouvrir le projet avec votre serveur local
+
+### Utilisation avec WAMP
+
+```
+c:\wamp64\www\tfeHistoire\
+```
+
+Accéder à : `http://localhost/tfeHistoire/`
+
+### Utilisation avec Live Server (VS Code)
+
+1. Installer l'extension "Live Server"
+2. Ouvrir le dossier du projet
+3. Clic droit sur `index.html` → "Open with Live Server"
+
+## 📖 Guide d'utilisation
+
+### Navigation SPA
+
+- **URLs propres** : `/`, `/products`, `/product/123`
+- **Pas de rechargement** : Navigation instantanée
+- **Boutons précédent/suivant** : Fonctionnels (History API)
+- **Transitions fluides** : Animations CSS entre les vues
+
+### Routes disponibles
+
+- `/` : Page d'accueil avec liste d'événements
+- `/events` : Liste complète des événements
+- `/event/:id` : Détails d'un événement spécifique
+- `/create-event` : Création d'événement (authentification requise)
+- `/profile` : Profil utilisateur (authentification requise)
+- `/map` : Carte interactive des événements
+
+### Fonctionnalités principales
+
+#### Voir les événements
+
+1. Accéder à la page d'accueil (`/`)
+2. Utiliser les filtres pour affiner la recherche
+3. Cliquer sur une carte pour voir les détails (navigation SPA)
+
+#### Réserver un événement
+
+1. Cliquer sur "Voir détails" d'un événement
+2. Ajuster la quantité de tickets
+3. Cliquer sur "Réserver maintenant"
+4. Se connecter si nécessaire
+
+#### Créer un événement
+
+1. Se connecter avec le bouton "Connexion"
+2. Cliquer sur "Créer un événement"
+3. Remplir le formulaire
+4. Cliquer sur "Publier l'événement"
+
+#### S'authentifier
+
+1. Cliquer sur "Connexion"
+2. Choisir "Connexion" ou "Inscription"
+3. Remplir les champs
+4. La navbar se met à jour automatiquement (state management)
+
+## 🎨 Personnalisation
+
+### Couleurs
+
+Modifier les variables CSS dans `assets/css/custom.css` :
+
+```css
+:root {
+  --color-primary: #1a3a52;
+  --color-accent: #c9a961;
+  --color-background: #f8f9fa;
+}
+```
+
+### Transitions SPA
+
+Modifier les animations de transitions dans `assets/css/custom.css` :
+
+```css
+#app {
+  transition: opacity 0.3s ease-in-out;
+}
+
+#app.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+```
+
+### Événements
+
+Les événements sont stockés dans le store centralisé `appState` et en localStorage.
+
+## 🔧 Architecture technique (SPA)
+
+### app.js (Point d'entrée)
+
+- Définition des routes
+- Instanciation du routeur
+- Chargement des composants persistants (navbar, footer)
+- Initialisation de l'application
+
+### router.js (Routeur SPA)
+
+- Gestion de l'historique (History API)
+- Correspondance URL ↔ Vue
+- Lazy loading des vues
+- Support des paramètres dynamiques (`:id`)
+- Mise à jour des métadonnées (title, description)
+
+### Views (Vues)
+
+Chaque vue suit le pattern :
+
+- Export `meta` : métadonnées (title, description)
+- Export `mount(container, params)` : montage de la vue
+- Export `unmount()` : démontage et nettoyage
+- Chargement des données via Managers
+- Gestion locale des event listeners
+
+### Components (Composants)
+
+Composants réutilisables :
+
+- **Persistants** : navbar, footer (chargés une seule fois)
+- **Dynamiques** : cards, modals (rechargés à la demande)
+- Chargement de templates HTML
+- Gestion d'événements
+- Abonnement au state
+
+### State Management (Store)
+
+- **appState.js** : Store centralisé
+- Pattern subscribe/notify
+- État global : user, cart, events, favorites
+- Synchronisation automatique des composants
+- Persistance dans localStorage
+
+### Managers
+
+- Centralisation des appels API
+- Retour standardisé : `{ success, message, data }`
+- Gestion des erreurs
+- Un manager par domaine métier
+
+### Utilitaires
+
+- **auth.js** : Gestion de l'authentification
+- **storage.js** : Abstraction du localStorage
+- **helpers.js** : Fonctions utilitaires (formatage, filtres, toasts)
+
+## 📱 Responsive Design
+
+L'application est entièrement responsive grâce à Bootstrap :
+
+- Mobile first
+- Breakpoints adaptés
+- Grille flexible
+- Navigation mobile adaptée
+
+## 🌐 Compatibilité navigateurs
+
+- Chrome/Edge : ✅
+- Firefox : ✅
+- Safari : ✅
+- Opera : ✅
+
+Nécessite un navigateur compatible :
+
+- ES6+ Modules
+- History API
+- Async/await
+- DOMParser
+
+## 📝 Conventions de code
+
+- **Nommage** : camelCase pour variables/fonctions, PascalCase pour classes
+- **Indentation** : 2 espaces
+- **Modules** : ES6 import/export + import() dynamique
+- **Async** : async/await (pas de .then())
+- **DOM** : querySelector/getElementById
+- **Navigation** : History API + data-link
+- **URLs** : Sans .html (`/products`, `/product/123`)
+
+## 🔄 Cycle de vie d'une vue
+
+1. **Navigation** : Utilisateur clique sur un lien avec `data-link`
+2. **Unmount** : La vue précédente est démontée (nettoyage)
+3. **Lazy load** : La nouvelle vue est chargée via `import()`
+4. **Mount** : La nouvelle vue est montée (template + données + événements)
+5. **Update** : Mise à jour des métadonnées (title, description)
+
+## 🤝 Contribution
+
+Respecter les conventions définies dans `AGENTS.md` (architecture SPA) pour toute modification.
+
+## 🆕 Changements SPA vs Multi-pages
+
+- ✅ Un seul fichier HTML au lieu de plusieurs
+- ✅ Routeur JavaScript pour la navigation
 - ✅ Lazy loading des vues
-- ✅ URLs propres sans `.html`
+- ✅ State management centralisé
+- ✅ Transitions fluides sans rechargement
+- ✅ URLs propres sans .html
+- ✅ Support boutons précédent/suivant
+- ✅ Métadonnées dynamiques
 
----
+## 📄 Licence
 
-Vue générale du projet
+Projet éducatif - Libre d'utilisation
 
-Ce projet consiste à développer une plateforme web permettant de découvrir et réserver des événements historiques.
+## 🎓 Crédits
 
-La plateforme s’inspire de l’expérience utilisateur des sites de réservation comme Booking, mais elle est spécialisée dans les événements historiques, les reconstitutions historiques, les festivals médiévaux, les événements fantasy et les événements culturels similaires.
-
-L’objectif est de permettre aux utilisateurs de :
-
-découvrir des événements
-
-filtrer et rechercher des événements
-
-visualiser les événements sur une carte
-
-réserver des billets
-
-recevoir leurs billets numériques
-
-La plateforme inclut trois rôles principaux :
-
-user
-
-organizer
-
-admin / moderator
-
-Découverte des événements
-
-Les utilisateurs peuvent :
-
-parcourir les événements
-
-filtrer les événements par type
-
-trier les événements par distance
-
-rechercher par ville ou localisation
-
-voir les événements sur une carte
-
-Les événements sont affichés dans une interface inspirée des plateformes de réservation :
-
-filtres sur le côté
-
-liste d'événements
-
-carte interactive
-
-Intégration de la carte
-
-La plateforme utilise l’API Google Maps.
-
-Chaque événement possède :
-
-latitude
-
-longitude
-
-Ces coordonnées permettent :
-
-d’afficher les événements sur une carte
-
-de calculer la distance entre l’utilisateur et l’événement
-
-d’afficher des marqueurs interactifs
-
-Si l’utilisateur autorise la géolocalisation, le site récupère sa position et trie automatiquement les événements du plus proche au plus éloigné.
-
-Comptes utilisateurs
-
-Les utilisateurs peuvent :
-
-créer un compte
-
-se connecter
-
-gérer leur profil
-
-consulter leurs réservations
-
-consulter leurs billets
-
-ajouter des événements à leurs favoris
-
-Création d’événements (Organizers)
-
-Les utilisateurs ayant le rôle organizer peuvent :
-
-créer un événement
-
-ajouter une description
-
-définir une adresse
-
-définir une date de début et de fin
-
-ajouter des images
-
-créer différents types de billets
-
-modifier leurs événements
-
-supprimer leurs événements
-
-Cependant, toutes les créations et modifications doivent être validées par un administrateur ou un modérateur avant d’être publiées.
-
-Système de modération
-
-Les événements utilisent un système de validation.
-
-Champ :
-
-status
-
-Valeurs possibles :
-
-pending
-approved
-rejected
-
-Lorsqu’un organizer crée un événement :
-
-status = pending
-
-L’événement n’est pas visible publiquement tant qu’un admin ou moderator ne l’a pas validé.
-
-Le même système est utilisé pour les modifications d’événements.
-
-Système de billets
-
-Un événement peut être :
-
-entièrement gratuit
-
-entièrement payant
-
-mixte (événement gratuit avec certaines activités payantes)
-
-Champ dans la table events :
-
-is_free
-
-Les billets sont définis dans la table tickets.
-
-Chaque billet possède :
-
-id
-event_id
-name
-description
-price
-quantity
-start_sale_date
-end_sale_date
-
-Exemples de billets :
-
-Adult ticket
-
-Child ticket
-
-Weekend pass
-
-Concert ticket
-
-Si un événement est gratuit et ne contient aucun billet, aucune section de réservation n’est affichée.
-
-Si un événement possède des billets, ils peuvent être réservés directement sur la plateforme.
-
-Système de réservation
-
-Lorsqu’un utilisateur réserve :
-
-il choisit un ou plusieurs billets
-
-il procède au paiement
-
-une commande est créée dans la table orders
-
-Champs principaux de orders :
-
-id
-user_id
-total_price
-payment_status
-payment_provider
-created_at
-
-Valeurs possibles pour payment_status :
-
-pending
-paid
-failed
-cancelled
-
-Le paiement est traité via :
-
-payment_provider = stripe
-
-Les billets achetés sont stockés dans order_items.
-
-Génération des billets
-
-Après un paiement réussi :
-
-des billets individuels sont générés
-
-chaque billet possède un code unique
-
-un QR code est généré
-
-un billet PDF est créé
-
-Table utilisée :
-
-tickets_generated
-
-Champs :
-
-id
-order_item_id
-qr_code
-unique_code
-is_used
-created_at
-
-Chaque billet contient :
-
-un unique_code
-
-un QR code
-
-les informations de l’événement
-
-Validation des billets
-
-Lorsqu’un billet est scanné :
-
-Le système vérifie :
-
-si le billet existe
-
-si le billet est valide
-
-si le billet n’a pas déjà été utilisé
-
-Champ utilisé :
-
-is_used
-
-Si le billet est valide, il peut être marqué comme utilisé.
-
-Envoi d’emails
-
-Après une réservation réussie :
-
-Le système envoie un email à l’utilisateur contenant :
-
-confirmation de réservation
-
-billet PDF
-
-QR code
-
-détails de l’événement
-
-Le service utilisé pour l’envoi d’emails est :
-
-SendGrid
-Paiements
-
-Les paiements sont gérés via :
-
-Stripe
-
-Le système doit gérer :
-
-la création du paiement
-
-la confirmation via webhook
-
-la mise à jour de payment_status
-
-Favoris
-
-Les utilisateurs peuvent ajouter des événements à leurs favoris.
-
-Table utilisée :
-
-favorites
-
-Champs :
-
-user_id
-event_id
-created_at
-Localisation et distance
-
-Si l’utilisateur autorise la géolocalisation :
-
-Le site récupère :
-
-latitude
-longitude
-
-Le tri par distance est effectué pour afficher les événements les plus proches en premier.
-
-Internationalisation
-
-La plateforme sera initialement disponible uniquement en français.
-
-Cependant, l’architecture doit être préparée pour supporter une future internationalisation.
-
-Cela signifie que le système doit pouvoir évoluer vers une version multilingue sans modification majeure de la base de données ou de la structure du projet.
-
-Zone géographique
-
-La plateforme cible principalement :
-
-la France
-
-la Belgique
-
-Cependant, le système doit pouvoir accepter des événements provenant de n’importe quel pays.
-
-Objectif du projet
-
-Créer une plateforme moderne et intuitive permettant de découvrir facilement des événements historiques et de réserver des billets en ligne.
-
-L’interface doit rester :
-
-moderne
-
-épurée
-
-inspirée des plateformes de réservation comme Booking
-
-Le contenu des événements apportera l’identité historique, tandis que l’interface restera moderne et claire.
+Images : Unsplash
+Icons : Bootstrap Icons
+Framework : Bootstrap 5.3
