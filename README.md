@@ -36,34 +36,44 @@ assets/
   │   ├── app.js               # Point d'entrée principal
   │   ├── router.js            # Routeur SPA (History API)
   │   ├── components/
-  │   │   ├── navbar.js        # Navbar persistante
+  │   │   ├── header.js        # Header persistant
   │   │   ├── footer.js        # Footer persistant
   │   │   ├── eventCard.js     # Carte d'événement
   │   │   ├── loginModal.js    # Modal de connexion
   │   │   └── eventDetail.js   # Détail d'événement
   │   ├── views/
   │   │   ├── home.js          # Vue accueil
+  │   │   ├── calendar.js      # Vue calendrier
   │   │   ├── createEvent.js   # Vue création événement
   │   │   ├── profile.js       # Vue profil
   │   │   └── map.js           # Vue carte
   │   ├── managers/
   │   │   ├── EventManager.js  # Appels API événements
   │   │   ├── AuthManager.js   # Appels API auth
-  │   │   └── ...
+  │   │   ├── FavoriteManager.js
+  │   │   ├── TicketManager.js
+  │   │   └── CheckoutManager.js
+  │   ├── validators/
+  │   │   ├── authValidator.js     # Validation auth frontend
+  │   │   ├── formValidator.js     # Validation formulaires
+  │   │   └── imageValidator.js    # Validation images
   │   ├── store/
   │   │   └── appState.js      # State management centralisé
   │   └── utils/
   │       ├── auth.js          # Gestion authentification
   │       ├── storage.js       # Gestion localStorage
+  │       ├── config.js        # Configuration app
   │       └── helpers.js       # Fonctions utilitaires
+  ├── components/
+  │   ├── header.html          # Template header
+  │   ├── footer.html          # Template footer
+  │   ├── eventCard.html       # Template carte événement
+  │   ├── loginModal.html      # Template modal login
+  │   └── eventDetail.html     # Template détail événement
   └── templates/
-      ├── navbar.html          # Template navbar
-      ├── footer.html          # Template footer
-      ├── eventCard.html       # Template carte événement
-      ├── loginModal.html      # Template modal login
-      ├── eventDetail.html     # Template détail événement
       └── views/
           ├── home.html        # Template vue accueil
+          ├── calendar.html    # Template vue calendrier
           ├── createEvent.html # Template vue création
           ├── profile.html     # Template vue profil
           └── map.html         # Template vue carte
@@ -100,19 +110,21 @@ Accéder à : `http://localhost/tfeHistoire/`
 
 ### Navigation SPA
 
-- **URLs propres** : `/`, `/products`, `/product/123`
+- **URLs propres** : `/`, `/calendar`, `/create-event`, `/profile`
 - **Pas de rechargement** : Navigation instantanée
 - **Boutons précédent/suivant** : Fonctionnels (History API)
 - **Transitions fluides** : Animations CSS entre les vues
 
 ### Routes disponibles
 
-- `/` : Page d'accueil avec liste d'événements
-- `/events` : Liste complète des événements
-- `/event/:id` : Détails d'un événement spécifique
+- `/` : Page d'accueil avec liste d'événements et filtres
+- `/calendar` : Calendrier des événements
 - `/create-event` : Création d'événement (authentification requise)
 - `/profile` : Profil utilisateur (authentification requise)
 - `/map` : Carte interactive des événements
+- `/checkout` : Page de paiement (authentification requise)
+- `/payment/success` : Confirmation de paiement réussi
+- `/payment/cancel` : Paiement annulé
 
 ### Fonctionnalités principales
 

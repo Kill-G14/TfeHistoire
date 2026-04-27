@@ -3,7 +3,7 @@
 
 # Dépendances
 /BackEnd/vendor/
-/FrontEnd/node_modules/
+/node_modules/
 
 # Logs
 /BackEnd/logs/*.log
