@@ -3,7 +3,7 @@
         'name' => 'eurofetes/backend',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '7bacd31961be7c0e630ba74f1d6ea38d05ea1c5c',
+        'reference' => '9cceb38c67676ebf6055cf5491074656839de008',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'eurofetes/backend' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '7bacd31961be7c0e630ba74f1d6ea38d05ea1c5c',
+            'reference' => '9cceb38c67676ebf6055cf5491074656839de008',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
