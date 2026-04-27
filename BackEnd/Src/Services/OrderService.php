@@ -67,9 +67,12 @@ class OrderService {
       ];
     }
 
+    // Charger les items de la commande avec les détails des événements
+    $items = $this->orderItemRepository->getOrderItemsWithTicketDetails($id);
+
     return [
       'success' => true,
-      'data' => (new OrderDTO($order))->toArray()
+      'data' => (new OrderDTO($order, $items))->toArray()
     ];
   }
 

@@ -108,7 +108,7 @@ async function loadOrderData() {
   const token = auth.getToken();
   if (!token) return;
 
-  const result = await OrderManager.getOrderById(token, orderId);
+  const result = await OrderManager.getById(orderId, token);
 
   if (result.success && result.data) {
     orderData = result.data;
@@ -145,8 +145,8 @@ function renderOrderSummary() {
         <small>Quantité : ${item.quantity}</small>
       </div>
       <div class="text-end">
-        <div>${item.subtotal.toFixed(2)} €</div>
-        <small class="text-muted">${item.unit_price.toFixed(2)} € x ${item.quantity}</small>
+        <div>${parseFloat(item.subtotal).toFixed(2)} €</div>
+        <small class="text-muted">${parseFloat(item.unit_price).toFixed(2)} € x ${item.quantity}</small>
       </div>
     </div>
   `,
@@ -154,7 +154,7 @@ function renderOrderSummary() {
       .join("") || '<p class="text-muted">Aucun article</p>';
 
   // Afficher le total
-  totalElement.textContent = `${orderData.total_price.toFixed(2)} €`;
+  totalElement.textContent = `${parseFloat(orderData.total_price).toFixed(2)} €`;
 }
 
 // Attacher les event listeners

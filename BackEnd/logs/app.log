@@ -75,3 +75,10 @@
 [2026-04-27 14:15:44] [INFO] Favorite added successfully | Context: {"user_id":5,"event_id":1}
 [2026-04-27 14:38:44] [INFO] Event created successfully | Context: {"event_id":14}
 [2026-04-27 14:43:39] [INFO] Event approved successfully | Context: {"event_id":14}
+[2026-04-27 15:32:12] [INFO] Order created successfully | Context: {"order_id":8}
+[2026-04-27 15:35:43] [INFO] Order created successfully | Context: {"order_id":13}
+[2026-04-27 15:36:14] [INFO] Order created successfully | Context: {"order_id":14}
+[2026-04-27 15:38:27] [INFO] Order created successfully | Context: {"order_id":15}
+[2026-04-27 15:43:15] [INFO] Order created successfully | Context: {"order_id":16}
+[2026-04-27 15:43:23] [INFO] Order created successfully | Context: {"order_id":17}
+[2026-04-27 15:44:06] [INFO] Order created successfully | Context: {"order_id":18}

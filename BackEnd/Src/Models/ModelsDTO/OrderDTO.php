@@ -15,8 +15,9 @@ class OrderDTO {
   public string $payment_provider;
   public ?string $payment_id;
   public string $created_at;
+  public array $items;
 
-  public function __construct(Order $order) {
+  public function __construct(Order $order, array $items = []) {
     $this->id = $order->id;
     $this->user_id = $order->user_id;
     $this->total_price = $order->total_price;
@@ -27,6 +28,7 @@ class OrderDTO {
     $this->payment_provider = $order->payment_provider;
     $this->payment_id = $order->payment_id;
     $this->created_at = $order->created_at;
+    $this->items = $items;
   }
 
   public function toArray(): array {
@@ -40,7 +42,8 @@ class OrderDTO {
       'is_cancelled' => $this->is_cancelled,
       'payment_provider' => $this->payment_provider,
       'payment_id' => $this->payment_id,
-      'created_at' => $this->created_at
+      'created_at' => $this->created_at,
+      'items' => $this->items
     ];
   }
 }

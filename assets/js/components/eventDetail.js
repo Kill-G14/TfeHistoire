@@ -207,7 +207,7 @@ async function handleReservation() {
 
     if (result.success) {
       // Stocker l'ID de commande et rediriger vers le checkout
-      appState.set("currentOrderId", result.data.order_id);
+      appState.set("currentOrderId", result.data.id);
       closeEventDetail();
       window.router.navigate(`/checkout`);
     } else {

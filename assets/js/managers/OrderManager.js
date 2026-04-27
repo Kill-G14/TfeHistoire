@@ -50,7 +50,7 @@ class OrderManager {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'getById',
+          action: 'getOrderById',
           token: token,
           id: orderId
         })

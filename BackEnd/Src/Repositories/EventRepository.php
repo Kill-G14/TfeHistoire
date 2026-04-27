@@ -234,11 +234,12 @@ class EventRepository {
 
   // Décrémenter la quantité de tickets disponibles
   public function decrementTicketQuantity(int $eventId, int $quantity): bool {
-    $query = "UPDATE events SET ticket_quantity = ticket_quantity - :quantity 
-              WHERE id = :id AND is_deleted = FALSE AND ticket_quantity >= :quantity";
+    $query = "UPDATE events SET ticket_quantity = ticket_quantity - :quantity1 
+              WHERE id = :id AND is_deleted = FALSE AND ticket_quantity >= :quantity2";
     $stmt = $this->getPdo()->prepare($query);
-    $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
-    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+    $stmt->bindValue(':id', $eventId, PDO::PARAM_INT);
+    $stmt->bindValue(':quantity1', $quantity, PDO::PARAM_INT);
+    $stmt->bindValue(':quantity2', $quantity, PDO::PARAM_INT);
     return $stmt->execute();
   }
 

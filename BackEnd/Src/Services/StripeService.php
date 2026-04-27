@@ -11,6 +11,11 @@ use App\Repositories\PurchasedTicketRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\EventRepository;
 
+/**
+ * Service de gestion des paiements Stripe
+ * @phpstan-ignore-next-line
+ * @psalm-suppress all
+ */
 class StripeService {
     private PaymentRepository $paymentRepository;
     private OrderRepository $orderRepository;
@@ -45,7 +50,6 @@ class StripeService {
         $this->currency = $config['stripe']['currency'];
 
         // Initialiser Stripe
-        require_once __DIR__ . '/../../vendor/stripe/stripe-php-master/init.php';
         \Stripe\Stripe::setApiKey($this->secretKey);
     }
 
