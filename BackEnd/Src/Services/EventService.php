@@ -3,21 +3,17 @@
 namespace App\Services;
 
 use App\Models\Event;
-use App\Models\Ticket;
 use App\Models\ModelsDTO\EventDTO;
 use App\Repositories\EventRepository;
-use App\Repositories\TicketRepository;
 use App\Validators\EventValidator;
 use App\Utils\Logger;
 
 class EventService {
   private EventRepository $eventRepository;
-  private TicketRepository $ticketRepository;
   private EventValidator $eventValidator;
 
-  public function __construct(EventRepository $eventRepository, TicketRepository $ticketRepository, EventValidator $eventValidator) {
+  public function __construct(EventRepository $eventRepository, EventValidator $eventValidator) {
     $this->eventRepository = $eventRepository;
-    $this->ticketRepository = $ticketRepository;
     $this->eventValidator = $eventValidator;
   }
 
@@ -121,6 +117,8 @@ class EventService {
     $event->time = $data['time'];
     $event->category = $data['category'];
     $event->is_free = (bool) $data['is_free'];
+    $event->ticket_price = isset($data['ticket_price']) ? (float) $data['ticket_price'] : 0.00;
+    $event->ticket_quantity = isset($data['ticket_quantity']) ? (int) $data['ticket_quantity'] : 0;
     $event->image_event = $data['image_event'] ?? null;
 
     // Insérer en base de données
@@ -132,27 +130,6 @@ class EventService {
         'success' => false,
         'message' => 'Erreur lors de la création de l\'événement'
       ];
-    }
-
-    // Créer le ticket associé si prix et quantité fournis
-    if (isset($data['ticket_price']) && isset($data['ticket_quantity'])) {
-      $ticket = new Ticket();
-      $ticket->event_id = $eventId;
-      $ticket->name = 'Ticket Standard'; // Nom par défaut
-      $ticket->description = 'Billet pour ' . $data['title'];
-      $ticket->price = (float) $data['ticket_price'];
-      $ticket->quantity = (int) $data['ticket_quantity'];
-      $ticket->start_sale_date = null;
-      $ticket->end_sale_date = null;
-      $ticket->is_deleted = false;
-
-      $ticketId = $this->ticketRepository->createTicket($ticket);
-
-      if (!$ticketId) {
-        Logger::warning('Failed to create ticket for event', ['event_id' => $eventId]);
-      } else {
-        Logger::info('Ticket created for event', ['event_id' => $eventId, 'ticket_id' => $ticketId]);
-      }
     }
 
     // Récupérer l'événement créé
@@ -210,6 +187,8 @@ class EventService {
     $event->time = $data['time'];
     $event->category = $data['category'];
     $event->is_free = (bool) $data['is_free'];
+    $event->ticket_price = isset($data['ticket_price']) ? (float) $data['ticket_price'] : $event->ticket_price;
+    $event->ticket_quantity = isset($data['ticket_quantity']) ? (int) $data['ticket_quantity'] : $event->ticket_quantity;
     $event->image_event = $data['image_event'] ?? $event->image_event;
 
     // Mettre à jour en base de données

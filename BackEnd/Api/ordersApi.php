@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 // repositories 
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderItemRepository;
-use App\Repositories\TicketRepository;
+use App\Repositories\EventRepository;
 use App\Repositories\PurchasedTicketRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
@@ -26,7 +26,7 @@ use App\Services\SessionService;
 // repositories 
 $orderRepository = new OrderRepository();
 $orderItemRepository = new OrderItemRepository();
-$ticketRepository = new TicketRepository();
+$eventRepository = new EventRepository();
 $purchasedTicketRepository = new PurchasedTicketRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
@@ -36,7 +36,7 @@ $userValidator = new UserValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
-$orderService = new OrderService($orderRepository, $orderItemRepository, $ticketRepository, $purchasedTicketRepository, $orderValidator);
+$orderService = new OrderService($orderRepository, $orderItemRepository, $eventRepository, $purchasedTicketRepository, $orderValidator);
 
 $request = json_decode(file_get_contents("php://input"), true);
 

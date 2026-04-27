@@ -8,7 +8,7 @@ use App\Models\TicketGenerated;
 use App\Models\ModelsDTO\OrderDTO;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderItemRepository;
-use App\Repositories\TicketRepository;
+use App\Repositories\EventRepository;
 use App\Repositories\PurchasedTicketRepository;
 use App\Validators\OrderValidator;
 use App\Utils\Logger;
@@ -16,20 +16,20 @@ use App\Utils\Logger;
 class OrderService {
   private OrderRepository $orderRepository;
   private OrderItemRepository $orderItemRepository;
-  private TicketRepository $ticketRepository;
+  private EventRepository $eventRepository;
   private PurchasedTicketRepository $purchasedTicketRepository;
   private OrderValidator $orderValidator;
 
   public function __construct(
     OrderRepository $orderRepository,
     OrderItemRepository $orderItemRepository,
-    TicketRepository $ticketRepository,
+    EventRepository $eventRepository,
     PurchasedTicketRepository $purchasedTicketRepository,
     OrderValidator $orderValidator
   ) {
     $this->orderRepository = $orderRepository;
     $this->orderItemRepository = $orderItemRepository;
-    $this->ticketRepository = $ticketRepository;
+    $this->eventRepository = $eventRepository;
     $this->purchasedTicketRepository = $purchasedTicketRepository;
     $this->orderValidator = $orderValidator;
   }
@@ -90,30 +90,30 @@ class OrderService {
     $itemsToCreate = [];
 
     foreach ($data['items'] as $item) {
-      // Vérifier que le billet existe
-      $ticket = $this->ticketRepository->getTicketById($item['ticket_id']);
-      if (!$ticket) {
+      // Vérifier que l'événement existe
+      $event = $this->eventRepository->getEventById($item['event_id']);
+      if (!$event) {
         return [
           'success' => false,
-          'message' => 'Billet avec ID ' . $item['ticket_id'] . ' non trouvé'
+          'message' => 'Événement avec ID ' . $item['event_id'] . ' non trouvé'
         ];
       }
 
       // Vérifier la disponibilité
-      if ($ticket->quantity < $item['quantity']) {
+      if ($event->ticket_quantity < $item['quantity']) {
         return [
           'success' => false,
-          'message' => 'Quantité insuffisante pour le billet ' . $ticket->name
+          'message' => 'Quantité insuffisante pour l\'événement ' . $event->title
         ];
       }
 
-      $subtotal = $ticket->price * $item['quantity'];
+      $subtotal = $event->ticket_price * $item['quantity'];
       $totalPrice += $subtotal;
 
       $itemsToCreate[] = [
-        'ticket' => $ticket,
+        'event' => $event,
         'quantity' => $item['quantity'],
-        'unit_price' => $ticket->price,
+        'unit_price' => $event->ticket_price,
         'subtotal' => $subtotal
       ];
     }
@@ -143,7 +143,8 @@ class OrderService {
     foreach ($itemsToCreate as $itemData) {
       $orderItem = new OrderItem();
       $orderItem->order_id = $orderId;
-      $orderItem->ticket_id = $itemData['ticket']->id;
+      $orderItem->event_id = $itemData['event']->id;
+      $orderItem->ticket_name = 'Billet Standard'; // Nom par défaut
       $orderItem->quantity = $itemData['quantity'];
       $orderItem->unit_price = $itemData['unit_price'];
       $orderItem->subtotal = $itemData['subtotal'];
@@ -156,7 +157,7 @@ class OrderService {
       }
 
       // Décrémenter la quantité de billets disponibles
-      $this->ticketRepository->decrementQuantity($itemData['ticket']->id, $itemData['quantity']);
+      $this->eventRepository->decrementTicketQuantity($itemData['event']->id, $itemData['quantity']);
     }
 
     // Récupérer la commande créée
@@ -203,7 +204,7 @@ class OrderService {
 
     // Remettre les quantités de billets
     foreach ($orderItems as $orderItem) {
-      $this->ticketRepository->incrementQuantity($orderItem->ticket_id, $orderItem->quantity);
+      $this->eventRepository->incrementTicketQuantity($orderItem->event_id, $orderItem->quantity);
     }
 
     // Annuler la commande

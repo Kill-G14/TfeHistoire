@@ -40,12 +40,13 @@ class OrderItemRepository {
 
   // Créer un article de commande
   public function createOrderItem(OrderItem $orderItem): ?int {
-    $query = "INSERT INTO order_items (order_id, ticket_id, quantity, unit_price, subtotal, created_at)
-              VALUES (:order_id, :ticket_id, :quantity, :unit_price, :subtotal, NOW())";
+    $query = "INSERT INTO order_items (order_id, event_id, ticket_name, quantity, unit_price, subtotal, created_at)
+              VALUES (:order_id, :event_id, :ticket_name, :quantity, :unit_price, :subtotal, NOW())";
     
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':order_id', $orderItem->order_id, PDO::PARAM_INT);
-    $stmt->bindParam(':ticket_id', $orderItem->ticket_id, PDO::PARAM_INT);
+    $stmt->bindParam(':event_id', $orderItem->event_id, PDO::PARAM_INT);
+    $stmt->bindParam(':ticket_name', $orderItem->ticket_name);
     $stmt->bindParam(':quantity', $orderItem->quantity, PDO::PARAM_INT);
     $stmt->bindParam(':unit_price', $orderItem->unit_price);
     $stmt->bindParam(':subtotal', $orderItem->subtotal);
@@ -67,10 +68,9 @@ class OrderItemRepository {
 
   // Récupérer les tickets d'une commande avec leurs détails
   public function getOrderItemsWithTicketDetails(int $orderId): array {
-    $query = "SELECT oi.*, t.name as ticket_name, t.event_id, e.title as event_title 
+    $query = "SELECT oi.*, e.title as event_title 
               FROM order_items oi
-              INNER JOIN tickets t ON oi.ticket_id = t.id
-              INNER JOIN events e ON t.event_id = e.id
+              INNER JOIN events e ON oi.event_id = e.id
               WHERE oi.order_id = :order_id AND oi.is_deleted = FALSE
               ORDER BY oi.id ASC";
     

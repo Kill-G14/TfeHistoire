@@ -11,7 +11,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use App\Repositories\PurchasedTicketRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\EventRepository;
-use App\Repositories\TicketRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
@@ -27,7 +26,6 @@ use App\Services\PdfService;
 $purchasedTicketRepository = new PurchasedTicketRepository();
 $orderRepository = new OrderRepository();
 $eventRepository = new EventRepository();
-$ticketRepository = new TicketRepository();
 $orderItemRepository = new OrderItemRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
@@ -36,7 +34,7 @@ $userValidator = new UserValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
-$pdfService = new PdfService($eventRepository, $ticketRepository, $orderItemRepository);
+$pdfService = new PdfService($eventRepository, $orderItemRepository);
 
 $request = json_decode(file_get_contents("php://input"), true);
 

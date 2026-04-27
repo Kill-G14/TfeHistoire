@@ -69,3 +69,4 @@
 [2026-04-27 12:54:06] [INFO] User logged in successfully | Context: {"user_id":1}
 [2026-04-27 12:54:23] [INFO] Event approved successfully | Context: {"event_id":14}
 [2026-04-27 13:28:57] [INFO] User logged in successfully | Context: {"user_id":1}
+[2026-04-27 14:00:22] [INFO] User logged out successfully

@@ -9,7 +9,6 @@ require __DIR__ . '/../vendor/autoload.php';
 // Models
 // repositories 
 use App\Repositories\EventRepository;
-use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 // Validator
@@ -23,7 +22,6 @@ use App\Services\SessionService;
 // Models
 // repositories 
 $eventRepository = new EventRepository();
-$ticketRepository = new TicketRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
 // Validator
@@ -32,7 +30,7 @@ $userValidator = new UserValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
-$eventService = new EventService($eventRepository, $ticketRepository, $eventValidator);
+$eventService = new EventService($eventRepository, $eventValidator);
 
 $request = json_decode(file_get_contents("php://input"), true);
 

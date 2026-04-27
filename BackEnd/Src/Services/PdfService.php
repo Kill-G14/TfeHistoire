@@ -5,7 +5,6 @@ namespace App\Services;
 use TCPDF;
 use App\Models\TicketGenerated;
 use App\Repositories\EventRepository;
-use App\Repositories\TicketRepository;
 use App\Repositories\OrderItemRepository;
 
 /**
@@ -21,7 +20,6 @@ use App\Repositories\OrderItemRepository;
  */
 class PdfService {
   private EventRepository $eventRepository;
-  private TicketRepository $ticketRepository;
   private OrderItemRepository $orderItemRepository;
   
   // Chemin de stockage sécurisé (hors du dossier public)
@@ -34,11 +32,9 @@ class PdfService {
 
   public function __construct(
     EventRepository $eventRepository,
-    TicketRepository $ticketRepository,
     OrderItemRepository $orderItemRepository
   ) {
     $this->eventRepository = $eventRepository;
-    $this->ticketRepository = $ticketRepository;
     $this->orderItemRepository = $orderItemRepository;
   }
 
@@ -67,15 +63,7 @@ class PdfService {
       ];
     }
 
-    $ticket = $this->ticketRepository->getTicketById($orderItem->ticket_id);
-    if (!$ticket) {
-      return [
-        'success' => false,
-        'message' => 'Type de billet introuvable'
-      ];
-    }
-
-    $event = $this->eventRepository->getEventById($ticket->event_id);
+    $event = $this->eventRepository->getEventById($orderItem->event_id);
     if (!$event) {
       return [
         'success' => false,
@@ -95,9 +83,9 @@ class PdfService {
       'event_country' => $event->country,
       'event_date' => $event->date,
       'event_time' => $event->time,
-      'ticket_name' => $ticket->name,
-      'ticket_description' => $ticket->description ?? '',
-      'ticket_price' => number_format($ticket->price, 2, ',', ' ') . ' €',
+      'ticket_name' => $orderItem->ticket_name,
+      'ticket_description' => 'Billet pour ' . $event->title,
+      'ticket_price' => number_format($orderItem->unit_price, 2, ',', ' ') . ' €',
       'unique_code' => $ticketGenerated->unique_code,
       'qr_code_url' => $ticketGenerated->qr_code
     ]);

@@ -15,7 +15,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use App\Repositories\PaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderItemRepository;
-use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 // Validator
@@ -29,7 +28,6 @@ use App\Services\StripeService;
 $paymentRepository = new PaymentRepository();
 $orderRepository = new OrderRepository();
 $orderItemRepository = new OrderItemRepository();
-$ticketRepository = new TicketRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
 // Validator
