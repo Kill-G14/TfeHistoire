@@ -24,6 +24,11 @@ class EventDTO {
   public bool $is_rejected;
   public ?string $image_event;
   public string $created_at;
+  
+  // Informations de billetterie
+  public ?int $ticket_id;
+  public ?float $ticket_price;
+  public ?int $ticket_quantity;
 
   public function __construct(Event $event) {
     $this->id = $event->id;
@@ -45,6 +50,11 @@ class EventDTO {
     $this->is_rejected = $event->is_rejected;
     $this->image_event = $event->image_event;
     $this->created_at = $event->created_at;
+    
+    // Informations de billetterie
+    $this->ticket_id = $event->ticket_id ?? null;
+    $this->ticket_price = $event->ticket_price ?? null;
+    $this->ticket_quantity = $event->ticket_quantity ?? null;
   }
 
   public function toArray(): array {
@@ -67,7 +77,11 @@ class EventDTO {
       'is_approved' => $this->is_approved,
       'is_rejected' => $this->is_rejected,
       'image_event' => $this->image_event,
-      'created_at' => $this->created_at
+      'created_at' => $this->created_at,
+      // Informations de billetterie
+      'ticket_id' => $this->ticket_id,
+      'ticket_price' => $this->ticket_price,
+      'ticket_quantity' => $this->ticket_quantity
     ];
   }
 }

@@ -17,24 +17,64 @@ class EventRepository {
     return $this->pdo;
   }
 
+  // Méthode helper pour mapper les résultats avec tickets
+  private function mapResultToEvent(array $row): Event {
+    $event = new Event();
+    $event->id = (int) $row['id'];
+    $event->user_id = (int) $row['user_id'];
+    $event->title = $row['title'];
+    $event->description = $row['description'];
+    $event->country = $row['country'];
+    $event->city = $row['city'];
+    $event->postal_code = $row['postal_code'];
+    $event->address = $row['address'];
+    $event->latitude = isset($row['latitude']) ? (float) $row['latitude'] : null;
+    $event->longitude = isset($row['longitude']) ? (float) $row['longitude'] : null;
+    $event->date = $row['date'];
+    $event->time = $row['time'];
+    $event->category = $row['category'];
+    $event->is_free = (bool) $row['is_free'];
+    $event->is_pending = (bool) $row['is_pending'];
+    $event->is_approved = (bool) $row['is_approved'];
+    $event->is_rejected = (bool) $row['is_rejected'];
+    $event->is_deleted = (bool) $row['is_deleted'];
+    $event->image_event = $row['image_event'] ?? null;
+    $event->created_at = $row['created_at'];
+    $event->updated_at = $row['updated_at'];
+    
+    // Données de tickets (peut être null si pas de ticket)
+    $event->ticket_id = isset($row['ticket_id']) ? (int) $row['ticket_id'] : null;
+    $event->ticket_price = isset($row['ticket_price']) ? (float) $row['ticket_price'] : null;
+    $event->ticket_quantity = isset($row['ticket_quantity']) ? (int) $row['ticket_quantity'] : null;
+    
+    return $event;
+  }
+
   // Récupérer un événement par ID
   public function getEventById(int $id): ?Event {
-    $query = "SELECT * FROM events WHERE id = :id AND is_deleted = FALSE";
+    $query = "SELECT e.*, t.id as ticket_id, t.price as ticket_price, t.quantity as ticket_quantity
+              FROM events e
+              LEFT JOIN tickets t ON e.id = t.event_id AND t.is_deleted = FALSE
+              WHERE e.id = :id AND e.is_deleted = FALSE
+              LIMIT 1";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    $event = $stmt->fetch();
-    return $event ?: null;
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? $this->mapResultToEvent($row) : null;
   }
 
   // Récupérer tous les événements (approuvés uniquement)
   public function getAllEvents(): array {
-    $query = "SELECT * FROM events WHERE is_deleted = FALSE AND is_approved = TRUE ORDER BY date ASC";
+    $query = "SELECT e.*, t.id as ticket_id, t.price as ticket_price, t.quantity as ticket_quantity
+              FROM events e
+              LEFT JOIN tickets t ON e.id = t.event_id AND t.is_deleted = FALSE
+              WHERE e.is_deleted = FALSE AND e.is_approved = TRUE 
+              ORDER BY e.date ASC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_map([$this, 'mapResultToEvent'], $rows);
   }
 
   // Récupérer les événements en attente de modération
@@ -48,32 +88,44 @@ class EventRepository {
 
   // Récupérer les événements par pays
   public function getEventsByCountry(string $country): array {
-    $query = "SELECT * FROM events WHERE country = :country AND is_deleted = FALSE AND is_approved = TRUE ORDER BY date ASC";
+    $query = "SELECT e.*, t.id as ticket_id, t.price as ticket_price, t.quantity as ticket_quantity
+              FROM events e
+              LEFT JOIN tickets t ON e.id = t.event_id AND t.is_deleted = FALSE
+              WHERE e.country = :country AND e.is_deleted = FALSE AND e.is_approved = TRUE 
+              ORDER BY e.date ASC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':country', $country);
     $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_map([$this, 'mapResultToEvent'], $rows);
   }
 
   // Récupérer les événements par catégorie
   public function getEventsByCategory(string $category): array {
-    $query = "SELECT * FROM events WHERE category = :category AND is_deleted = FALSE AND is_approved = TRUE ORDER BY date ASC";
+    $query = "SELECT e.*, t.id as ticket_id, t.price as ticket_price, t.quantity as ticket_quantity
+              FROM events e
+              LEFT JOIN tickets t ON e.id = t.event_id AND t.is_deleted = FALSE
+              WHERE e.category = :category AND e.is_deleted = FALSE AND e.is_approved = TRUE 
+              ORDER BY e.date ASC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':category', $category);
     $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_map([$this, 'mapResultToEvent'], $rows);
   }
 
   // Récupérer les événements par utilisateur
   public function getEventsByUserId(int $userId): array {
-    $query = "SELECT * FROM events WHERE user_id = :user_id AND is_deleted = FALSE ORDER BY date ASC";
+    $query = "SELECT e.*, t.id as ticket_id, t.price as ticket_price, t.quantity as ticket_quantity
+              FROM events e
+              LEFT JOIN tickets t ON e.id = t.event_id AND t.is_deleted = FALSE
+              WHERE e.user_id = :user_id AND e.is_deleted = FALSE 
+              ORDER BY e.date ASC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
     $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_map([$this, 'mapResultToEvent'], $rows);
   }
 
   // Créer un nouvel événement

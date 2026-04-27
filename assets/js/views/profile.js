@@ -1,102 +1,110 @@
 // Vue Profile - Profil utilisateur
 
-import { auth } from '../utils/auth.js'
-import { helpers } from '../utils/helpers.js'
-import { appState } from '../store/appState.js'
-import FavoriteManager from '../managers/FavoriteManager.js'
-import { showEventDetail } from '../components/eventDetail.js'
-import { validateChangePasswordForm } from '../validators/authValidator.js'
-import { setFieldError, clearFieldValidation } from '../validators/formValidator.js'
+import { auth } from "../utils/auth.js";
+import { helpers } from "../utils/helpers.js";
+import { appState } from "../store/appState.js";
+import FavoriteManager from "../managers/FavoriteManager.js";
+import EventManager from "../managers/EventManager.js";
+import { showEventDetail } from "../components/eventDetail.js";
+import { validateChangePasswordForm } from "../validators/authValidator.js";
+import {
+  setFieldError,
+  clearFieldValidation,
+} from "../validators/formValidator.js";
 
 // Métadonnées de la vue
 export const meta = {
-  title: 'Mon Profil - MemoriaEventia',
-  description: 'Gérez votre profil et consultez vos réservations'
-}
+  title: "Mon Profil - MemoriaEventia",
+  description: "Gérez votre profil et consultez vos réservations",
+};
 
 // Template HTML
-const templateObjects = {}
+const templateObjects = {};
 
-// Stocker les événements favoris pour les détails
-let favoriteEvents = []
+// Stocker les événements favoris et créés pour les détails
+let favoriteEvents = [];
+let createdEvents = [];
 
 async function loadTemplate(path) {
   try {
     // Forcer le rechargement sans cache
     const response = await fetch(path, {
-      cache: 'no-store',
+      cache: "no-store",
       headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    })
-    
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
+
     if (!response.ok) {
-      throw new Error(`Erreur ${response.status}: ${response.statusText}`)
+      throw new Error(`Erreur ${response.status}: ${response.statusText}`);
     }
 
-    const htmlContent = await response.text()
-    
-    const parser = new DOMParser()
-    const templateDoc = parser.parseFromString(htmlContent, 'text/html')
-    const templates = templateDoc.querySelectorAll('template')
+    const htmlContent = await response.text();
+
+    const parser = new DOMParser();
+    const templateDoc = parser.parseFromString(htmlContent, "text/html");
+    const templates = templateDoc.querySelectorAll("template");
 
     if (templates.length === 0) {
-      throw new Error('Aucun template trouvé dans le fichier')
+      throw new Error("Aucun template trouvé dans le fichier");
     }
 
     // Vider l'objet templateObjects avant de le remplir
-    Object.keys(templateObjects).forEach(key => delete templateObjects[key])
+    Object.keys(templateObjects).forEach((key) => delete templateObjects[key]);
 
     templates.forEach((template) => {
-      const templateId = template.id
-      templateObjects[templateId] = template.content
-    })
+      const templateId = template.id;
+      templateObjects[templateId] = template.content;
+    });
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Vérifier si l'utilisateur est connecté
-  if (!appState.get('isAuthenticated')) {
-    helpers.showToast('Vous devez être connecté pour accéder à votre profil', 'error')
+  if (!appState.get("isAuthenticated")) {
+    helpers.showToast(
+      "Vous devez être connecté pour accéder à votre profil",
+      "error",
+    );
     setTimeout(() => {
-      window.router.navigate('/')
-    }, 1500)
-    return
+      window.router.navigate("/");
+    }, 1500);
+    return;
   }
 
   // Charger le template avec timestamp pour éviter le cache
-  const timestamp = Date.now()
-  await loadTemplate(`assets/templates/views/profile.html?v=${timestamp}`)
-  
+  const timestamp = Date.now();
+  await loadTemplate(`assets/templates/views/profile.html?v=${timestamp}`);
+
   // Vérifier que le template est chargé
-  if (!templateObjects['profileView']) {
-    helpers.showToast('Erreur de chargement de la page', 'error')
-    return
+  if (!templateObjects["profileView"]) {
+    helpers.showToast("Erreur de chargement de la page", "error");
+    return;
   }
 
   // Injecter le template
-  const clone = templateObjects['profileView'].cloneNode(true)
-  container.innerHTML = ''
-  container.appendChild(clone)
-  
+  const clone = templateObjects["profileView"].cloneNode(true);
+  container.innerHTML = "";
+  container.appendChild(clone);
+
   // Attendre que le DOM soit réellement mis à jour
-  await new Promise(resolve => setTimeout(resolve, 50))
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
   // Afficher les informations utilisateur
-  displayUserInfo()
-  
+  displayUserInfo();
+
   // Attacher les événements (le DOM est maintenant prêt)
-  attachProfileEvents()
-  
-  // Charger et afficher les favoris (après avoir attaché les événements)
-  await loadFavorites()
-  
+  attachProfileEvents();
+
+  // Charger et afficher les données utilisateur
+  await Promise.all([loadFavorites(), loadCreatedEvents()]);
+
   // Écouter les changements de favoris
-  appState.subscribe('favorites', loadFavorites)
+  appState.subscribe("favorites", loadFavorites);
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
@@ -107,148 +115,282 @@ export async function unmount() {
 // Attacher les événements de la page profil
 function attachProfileEvents() {
   // Formulaire de changement de mot de passe
-  const changePasswordForm = document.getElementById('changePasswordForm')
+  const changePasswordForm = document.getElementById("changePasswordForm");
   if (changePasswordForm) {
-    changePasswordForm.addEventListener('submit', handleChangePassword)
+    changePasswordForm.addEventListener("submit", handleChangePassword);
   }
-  
+
   // Navigation entre sections via les stat cards
-  initSectionNavigation()
+  initSectionNavigation();
 }
 
 // Initialiser la navigation entre sections
 function initSectionNavigation() {
-  const statButtons = document.querySelectorAll('.stat-card-btn')
-  
-  if (statButtons.length === 0) return
-  
+  const statButtons = document.querySelectorAll(".stat-card-btn");
+
+  if (statButtons.length === 0) return;
+
   statButtons.forEach((button) => {
-    const section = button.getAttribute('data-section')
-    
-    button.addEventListener('click', function(e) {
-      e.preventDefault()
-      e.stopPropagation()
-      
+    const section = button.getAttribute("data-section");
+
+    button.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
       // Retirer la classe active de tous les boutons
-      statButtons.forEach(btn => btn.classList.remove('active'))
-      
+      statButtons.forEach((btn) => btn.classList.remove("active"));
+
       // Ajouter active au bouton cliqué
-      button.classList.add('active')
-      
+      button.classList.add("active");
+
       // Cacher toutes les sections
-      document.querySelectorAll('.profile-section').forEach(sec => {
-        sec.style.display = 'none'
-      })
-      
+      document.querySelectorAll(".profile-section").forEach((sec) => {
+        sec.style.display = "none";
+      });
+
       // Afficher la section ciblée
-      const targetElement = document.getElementById(`section-${section}`)
+      const targetElement = document.getElementById(`section-${section}`);
       if (targetElement) {
-        targetElement.style.display = 'block'
+        targetElement.style.display = "block";
       }
-    })
-  })
+    });
+  });
 }
 
 // Gérer le changement de mot de passe
 async function handleChangePassword(e) {
-  e.preventDefault()
+  e.preventDefault();
 
-  const currentPassword = document.getElementById('currentPassword').value
-  const newPassword = document.getElementById('newPassword').value
-  const confirmPassword = document.getElementById('confirmPassword').value
+  const currentPassword = document.getElementById("currentPassword").value;
+  const newPassword = document.getElementById("newPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
 
   // Références aux éléments
-  const currentPasswordInput = document.getElementById('currentPassword')
-  const newPasswordInput = document.getElementById('newPassword')
-  const confirmPasswordInput = document.getElementById('confirmPassword')
-  const currentPasswordError = document.getElementById('currentPasswordError')
-  const newPasswordError = document.getElementById('newPasswordError')
-  const confirmPasswordError = document.getElementById('confirmPasswordError')
+  const currentPasswordInput = document.getElementById("currentPassword");
+  const newPasswordInput = document.getElementById("newPassword");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const currentPasswordError = document.getElementById("currentPasswordError");
+  const newPasswordError = document.getElementById("newPasswordError");
+  const confirmPasswordError = document.getElementById("confirmPasswordError");
 
   // Réinitialiser les erreurs
-  clearFieldValidation(currentPasswordInput, currentPasswordError)
-  clearFieldValidation(newPasswordInput, newPasswordError)
-  clearFieldValidation(confirmPasswordInput, confirmPasswordError)
+  clearFieldValidation(currentPasswordInput, currentPasswordError);
+  clearFieldValidation(newPasswordInput, newPasswordError);
+  clearFieldValidation(confirmPasswordInput, confirmPasswordError);
 
   // Validation avec le validator
   const validation = validateChangePasswordForm({
     currentPassword,
     newPassword,
-    confirmPassword
-  })
+    confirmPassword,
+  });
 
   if (!validation.valid) {
     // Afficher les erreurs
     if (validation.errors.currentPassword) {
-      setFieldError(currentPasswordInput, currentPasswordError, validation.errors.currentPassword)
+      setFieldError(
+        currentPasswordInput,
+        currentPasswordError,
+        validation.errors.currentPassword,
+      );
     }
     if (validation.errors.newPassword) {
-      setFieldError(newPasswordInput, newPasswordError, validation.errors.newPassword)
+      setFieldError(
+        newPasswordInput,
+        newPasswordError,
+        validation.errors.newPassword,
+      );
     }
     if (validation.errors.confirmPassword) {
-      setFieldError(confirmPasswordInput, confirmPasswordError, validation.errors.confirmPassword)
+      setFieldError(
+        confirmPasswordInput,
+        confirmPasswordError,
+        validation.errors.confirmPassword,
+      );
     }
-    return
+    return;
   }
 
   // Appel API
-  const token = auth.getToken()
+  const token = auth.getToken();
   if (!token) {
-    helpers.showToast('Vous devez être connecté', 'error')
-    return
+    helpers.showToast("Vous devez être connecté", "error");
+    return;
   }
 
   // Import dynamique de AuthManager
-  const { default: AuthManager } = await import('../managers/AuthManager.js')
-  const result = await AuthManager.changePassword(token, currentPassword, newPassword)
+  const { default: AuthManager } = await import("../managers/AuthManager.js");
+  const result = await AuthManager.changePassword(
+    token,
+    currentPassword,
+    newPassword,
+  );
 
   if (result.success) {
-    helpers.showToast('Mot de passe modifié avec succès', 'success')
-    
+    helpers.showToast("Mot de passe modifié avec succès", "success");
+
     // Fermer la modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'))
-    if (modal) modal.hide()
-    
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("changePasswordModal"),
+    );
+    if (modal) modal.hide();
+
     // Réinitialiser le formulaire
-    document.getElementById('changePasswordForm').reset()
+    document.getElementById("changePasswordForm").reset();
   } else {
-    if (result.message.includes('actuel')) {
-      setFieldError(currentPasswordInput, currentPasswordError, result.message)
+    if (result.message.includes("actuel")) {
+      setFieldError(currentPasswordInput, currentPasswordError, result.message);
     } else {
-      helpers.showToast(result.message, 'error')
+      helpers.showToast(result.message, "error");
     }
   }
 }
 
 // Afficher les informations utilisateur
 function displayUserInfo() {
-  const user = appState.get('user')
-  const userNameEl = document.getElementById('userName')
-  const userEmailEl = document.getElementById('userEmail')
+  const user = appState.get("user");
+  const userNameEl = document.getElementById("userName");
+  const userEmailEl = document.getElementById("userEmail");
 
   if (userNameEl && user) {
-    userNameEl.textContent = user.name || 'Utilisateur'
+    userNameEl.textContent = user.name || "Utilisateur";
   }
 
   if (userEmailEl && user) {
-    userEmailEl.textContent = user.email || ''
+    userEmailEl.textContent = user.email || "";
   }
-  
+
   // Mettre à jour le compteur de favoris
-  const favorites = appState.get('favorites') || []
-  const statFavorites = document.getElementById('statFavorites')
+  const favorites = appState.get("favorites") || [];
+  const statFavorites = document.getElementById("statFavorites");
   if (statFavorites) {
-    statFavorites.textContent = favorites.length
+    statFavorites.textContent = favorites.length;
   }
 }
 
+// Charger les événements créés par l'utilisateur
+async function loadCreatedEvents() {
+  const token = auth.getToken();
+  if (!token) return;
+
+  const eventsContainer = document.getElementById("userEvents");
+  if (!eventsContainer) return;
+
+  // Afficher un loader
+  eventsContainer.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  `;
+
+  // Récupérer les événements créés
+  const result = await EventManager.getMyEvents(token);
+
+  if (result.success && result.data && result.data.length > 0) {
+    createdEvents = result.data;
+    displayCreatedEvents(createdEvents);
+
+    // Mettre à jour le compteur
+    const statEvents = document.getElementById("statEvents");
+    if (statEvents) {
+      statEvents.textContent = createdEvents.length;
+    }
+  } else {
+    // Aucun événement créé
+    eventsContainer.innerHTML = `
+      <div class="empty-state-small">
+        <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
+        <p class="text-muted mb-3">Vous n'avez pas encore créé d'événements</p>
+        <a href="/create-event" data-link class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-plus-lg me-2"></i>Créer mon premier événement
+        </a>
+      </div>
+    `;
+  }
+}
+
+// Afficher les événements créés
+function displayCreatedEvents(events) {
+  const eventsContainer = document.getElementById("userEvents");
+  if (!eventsContainer) return;
+
+  eventsContainer.innerHTML = `
+    <div class="d-flex flex-wrap gap-3">
+      ${events
+        .map((event) => {
+          // Déterminer le statut de l'événement
+          let statusBadge = "";
+          if (event.is_pending) {
+            statusBadge = '<span class="badge bg-warning">En attente</span>';
+          } else if (event.is_approved) {
+            statusBadge = '<span class="badge bg-success">Approuvé</span>';
+          } else if (event.is_rejected) {
+            statusBadge = '<span class="badge bg-danger">Rejeté</span>';
+          }
+
+          const priceDisplay = event.is_free ? "Gratuit" : "Voir billets";
+
+          return `
+        <div class="favorite-card-wrapper" id="created-event-${event.id}">
+          <div class="card h-100 shadow-sm hover-card" 
+               onclick="viewCreatedEventDetails(${event.id})" 
+               style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="card-title text-primary mb-0">${event.title}</h5>
+                ${statusBadge}
+              </div>
+              
+              <div class="mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-geo-alt text-muted"></i>
+                  <span class="small">${event.city}, ${event.country}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-calendar3 text-muted"></i>
+                  <span class="small">${helpers.formatDate(event.date)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-tag text-muted"></i>
+                  <span class="fw-bold text-primary small">${priceDisplay}</span>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm flex-grow-1" 
+                        onclick="event.stopPropagation(); viewCreatedEventDetails(${event.id})">
+                  <i class="bi bi-eye"></i> Voir détails
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+// Voir les détails d'un événement créé (fonction globale pour onclick)
+window.viewCreatedEventDetails = function (eventId) {
+  const event = createdEvents.find((e) => e.id === eventId);
+  if (event) {
+    showEventDetail(event);
+  } else {
+    helpers.showToast("Événement non trouvé", "error");
+  }
+};
+
 // Charger les favoris
 async function loadFavorites() {
-  const token = auth.getToken()
-  if (!token) return
+  const token = auth.getToken();
+  if (!token) return;
 
-  const favoritesContainer = document.getElementById('userFavorites')
-  if (!favoritesContainer) return
+  const favoritesContainer = document.getElementById("userFavorites");
+  if (!favoritesContainer) return;
 
   // Afficher un loader
   favoritesContainer.innerHTML = `
@@ -257,16 +399,16 @@ async function loadFavorites() {
         <span class="visually-hidden">Chargement...</span>
       </div>
     </div>
-  `
+  `;
 
   // Récupérer les favoris avec détails
-  const result = await FavoriteManager.getByUserWithDetails(token)
+  const result = await FavoriteManager.getByUserWithDetails(token);
 
   if (result.success && result.data && result.data.length > 0) {
     // Transformer les événements pour avoir le bon format d'image
-    const transformedEvents = helpers.transformEvents(result.data)
-    favoriteEvents = transformedEvents // Stocker pour les détails
-    displayFavorites(transformedEvents)
+    const transformedEvents = helpers.transformEvents(result.data);
+    favoriteEvents = transformedEvents; // Stocker pour les détails
+    displayFavorites(transformedEvents);
   } else {
     // Aucun favori
     favoritesContainer.innerHTML = `
@@ -274,22 +416,23 @@ async function loadFavorites() {
         <i class="bi bi-heart text-muted fs-1 mb-2"></i>
         <p class="text-muted mb-0">Aucun événement en favoris</p>
       </div>
-    `
+    `;
   }
 }
 
 // Afficher les favoris
 function displayFavorites(favorites) {
-  const favoritesContainer = document.getElementById('userFavorites')
-  if (!favoritesContainer) return
+  const favoritesContainer = document.getElementById("userFavorites");
+  if (!favoritesContainer) return;
 
   favoritesContainer.innerHTML = `
     <div class="d-flex flex-wrap gap-3">
-      ${favorites.map(event => {
-        // Gérer le prix
-        const priceDisplay = event.is_free ? 'Gratuit' : 'Voir billets'
-        
-        return `
+      ${favorites
+        .map((event) => {
+          // Gérer le prix
+          const priceDisplay = event.is_free ? "Gratuit" : "Voir billets";
+
+          return `
         <div class="favorite-card-wrapper" id="favorite-card-${event.id}">
           <div class="card h-100 shadow-sm hover-card" 
                onclick="viewEventDetails(${event.id})" 
@@ -327,63 +470,67 @@ function displayFavorites(favorites) {
             </div>
           </div>
         </div>
-        `
-      }).join('')}
+        `;
+        })
+        .join("")}
     </div>
-  `
+  `;
 }
 
 // Voir les détails d'un événement (fonction globale pour onclick)
-window.viewEventDetails = function(eventId) {
-  const event = favoriteEvents.find(e => e.id === eventId)
+window.viewEventDetails = function (eventId) {
+  const event = favoriteEvents.find((e) => e.id === eventId);
   if (event) {
-    showEventDetail(event)
+    showEventDetail(event);
   } else {
-    helpers.showToast('Événement non trouvé', 'error')
+    helpers.showToast("Événement non trouvé", "error");
   }
-}
+};
 
 // Fonction globale pour retirer un favori depuis le profil
-window.removeFavoriteFromProfile = async function(eventId, btnElement) {
-  if (btnElement.disabled) return
+window.removeFavoriteFromProfile = async function (eventId, btnElement) {
+  if (btnElement.disabled) return;
 
-  const token = auth.getToken()
-  
+  const token = auth.getToken();
+
   // Désactiver le bouton pendant le traitement
-  btnElement.disabled = true
-  btnElement.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Suppression...'
+  btnElement.disabled = true;
+  btnElement.innerHTML =
+    '<span class="spinner-border spinner-border-sm"></span> Suppression...';
 
-  const result = await FavoriteManager.remove(eventId, token)
+  const result = await FavoriteManager.remove(eventId, token);
 
   if (result.success) {
-    helpers.showToast('Retiré des favoris', 'success')
-    
+    helpers.showToast("Retiré des favoris", "success");
+
     // Mettre à jour le state
-    const userFavorites = appState.get('favorites') || []
-    const updatedFavorites = userFavorites.filter(fav => fav.event_id != eventId)
-    appState.set('favorites', updatedFavorites)
-    
+    const userFavorites = appState.get("favorites") || [];
+    const updatedFavorites = userFavorites.filter(
+      (fav) => fav.event_id != eventId,
+    );
+    appState.set("favorites", updatedFavorites);
+
     // Animation de suppression de la carte
-    const card = document.getElementById(`favorite-card-${eventId}`)
+    const card = document.getElementById(`favorite-card-${eventId}`);
     if (card) {
-      card.style.transition = 'opacity 0.3s, transform 0.3s'
-      card.style.opacity = '0'
-      card.style.transform = 'scale(0.8)'
-      
+      card.style.transition = "opacity 0.3s, transform 0.3s";
+      card.style.opacity = "0";
+      card.style.transform = "scale(0.8)";
+
       setTimeout(() => {
         // Recharger l'affichage après l'animation
-        loadFavorites()
-      }, 300)
+        loadFavorites();
+      }, 300);
     } else {
       // Si la carte n'existe pas, juste recharger
-      loadFavorites()
+      loadFavorites();
     }
   } else {
-    helpers.showToast(result.message || 'Erreur', 'error')
-    btnElement.disabled = false
-    btnElement.innerHTML = '<i class="bi bi-trash"></i> Retirer des favoris'
+    helpers.showToast(result.message || "Erreur", "error");
+    btnElement.disabled = false;
+    btnElement.innerHTML = '<i class="bi bi-trash"></i> Retirer des favoris';
   }
-}
+};
 
 // Export par défaut
-export default { mount, unmount, meta }
+export default { mount, unmount, meta };

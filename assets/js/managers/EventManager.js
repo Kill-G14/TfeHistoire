@@ -1,37 +1,37 @@
 // Manager pour la gestion des événements
-import { helpers } from '../utils/helpers.js'
+import { helpers } from "../utils/helpers.js";
 
 class EventManager {
   constructor() {
-    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
   }
 
   // Récupérer tous les événements
   async getAll() {
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getAll'
-        })
-      })
+          action: "getAll",
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer les événements pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvents(result.data)
+        result.data = helpers.transformEvents(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -39,29 +39,29 @@ class EventManager {
   async getById(eventId) {
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getById',
-          id: eventId
-        })
-      })
+          action: "getById",
+          id: eventId,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer l'événement pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvent(result.data)
+        result.data = helpers.transformEvent(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -70,36 +70,36 @@ class EventManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'create',
+          action: "create",
           token: token,
-          ...eventData
-        })
-      })
+          ...eventData,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer l'événement pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvent(result.data)
+        result.data = helpers.transformEvent(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -108,37 +108,37 @@ class EventManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'update',
+          action: "update",
           token: token,
           id: eventId,
-          ...eventData
-        })
-      })
+          ...eventData,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer l'événement pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvent(result.data)
+        result.data = helpers.transformEvent(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -147,29 +147,29 @@ class EventManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'delete',
+          action: "delete",
           token: token,
-          id: eventId
-        })
-      })
+          id: eventId,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -177,29 +177,29 @@ class EventManager {
   async getByCountry(country) {
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getByCountry',
-          country: country
-        })
-      })
+          action: "getByCountry",
+          country: country,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer les événements pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvents(result.data)
+        result.data = helpers.transformEvents(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -207,29 +207,29 @@ class EventManager {
   async getByCategory(category) {
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getByCategory',
-          category: category
-        })
-      })
+          action: "getByCategory",
+          category: category,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer les événements pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvents(result.data)
+        result.data = helpers.transformEvents(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -237,31 +237,68 @@ class EventManager {
   async search(searchTerm) {
     try {
       const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'search',
-          search: searchTerm
-        })
-      })
+          action: "search",
+          search: searchTerm,
+        }),
+      });
 
-      const result = await response.json()
-      
+      const result = await response.json();
+
       // Si succès, transformer les événements pour ajouter l'URL de l'image
       if (result.success && result.data) {
-        result.data = helpers.transformEvents(result.data)
+        result.data = helpers.transformEvents(result.data);
       }
-      
-      return result
+
+      return result;
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Récupérer les événements créés par l'utilisateur connecté
+  async getMyEvents(token) {
+    if (!token) {
+      return {
+        success: false,
+        message: "Non authentifié",
+      };
+    }
+
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "getMyEvents",
+          token: token,
+        }),
+      });
+
+      const result = await response.json();
+
+      // Si succès, transformer les événements pour ajouter l'URL de l'image
+      if (result.success && result.data) {
+        result.data = helpers.transformEvents(result.data);
       }
+
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 }
 
-export default new EventManager()
+export default new EventManager();
