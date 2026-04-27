@@ -79,3 +79,49 @@
     margin-top: 20px;
   }
 }
+
+/* ========== DASHBOARD BOXES ========== */
+
+/* Boîtes cliquables du dashboard */
+.clickable-box {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clickable-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== MODALES DE CONFIRMATION ========== */
+
+/* Style personnalisé pour les modales de confirmation */
+#confirmModal .modal-header {
+  border-bottom: 2px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+#confirmModal .modal-header .modal-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+#confirmModal .modal-header .modal-title i {
+  color: #ffc107;
+}
+
+#confirmModal .modal-body {
+  padding: 1.5rem;
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+#confirmModal .modal-footer {
+  border-top: 2px solid #dee2e6;
+  padding: 0.75rem 1rem;
+}
+
+#confirmModal .modal-footer .btn {
+  min-width: 100px;
+  font-weight: 500;
+}

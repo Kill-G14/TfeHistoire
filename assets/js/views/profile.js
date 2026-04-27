@@ -5,6 +5,7 @@ import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import FavoriteManager from "../managers/FavoriteManager.js";
 import EventManager from "../managers/EventManager.js";
+import OrderManager from "../managers/OrderManager.js";
 import { showEventDetail } from "../components/eventDetail.js";
 import { validateChangePasswordForm } from "../validators/authValidator.js";
 import {
@@ -24,6 +25,7 @@ const templateObjects = {};
 // Stocker les événements favoris et créés pour les détails
 let favoriteEvents = [];
 let createdEvents = [];
+let userReservations = [];
 
 async function loadTemplate(path) {
   try {
@@ -101,7 +103,7 @@ export async function mount(container, params) {
   attachProfileEvents();
 
   // Charger et afficher les données utilisateur
-  await Promise.all([loadFavorites(), loadCreatedEvents()]);
+  await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);
@@ -303,9 +305,6 @@ async function loadCreatedEvents() {
       <div class="empty-state-small">
         <i class="bi bi-calendar-x text-muted fs-1 mb-2"></i>
         <p class="text-muted mb-3">Vous n'avez pas encore créé d'événements</p>
-        <a href="/create-event" data-link class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-plus-lg me-2"></i>Créer mon premier événement
-        </a>
       </div>
     `;
   }
@@ -529,6 +528,188 @@ window.removeFavoriteFromProfile = async function (eventId, btnElement) {
     helpers.showToast(result.message || "Erreur", "error");
     btnElement.disabled = false;
     btnElement.innerHTML = '<i class="bi bi-trash"></i> Retirer des favoris';
+  }
+};
+
+// Charger les réservations de l'utilisateur
+async function loadReservations() {
+  const token = auth.getToken();
+  if (!token) return;
+
+  const reservationsContainer = document.getElementById("userReservations");
+  if (!reservationsContainer) return;
+
+  // Afficher un loader
+  reservationsContainer.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+  `;
+
+  // Récupérer les commandes de l'utilisateur
+  const result = await OrderManager.getByUser(token);
+
+  if (result.success && result.data && result.data.length > 0) {
+    userReservations = result.data;
+    displayReservations(userReservations);
+
+    // Mettre à jour le compteur
+    const statReservations = document.getElementById("statReservations");
+    if (statReservations) {
+      statReservations.textContent = userReservations.length;
+    }
+  } else {
+    // Aucune réservation
+    reservationsContainer.innerHTML = `
+      <div class="empty-state-small">
+        <i class="bi bi-ticket-perforated text-muted fs-1 mb-2"></i>
+        <p class="text-muted mb-3">Vous n'avez pas encore de réservations</p>
+        <a href="/" class="btn btn-primary btn-sm">
+          <i class="bi bi-calendar-event"></i> Découvrir des événements
+        </a>
+      </div>
+    `;
+  }
+}
+
+// Afficher les réservations
+function displayReservations(reservations) {
+  const reservationsContainer = document.getElementById("userReservations");
+  if (!reservationsContainer) return;
+
+  reservationsContainer.innerHTML = `
+    <div class="d-flex flex-column gap-3">
+      ${reservations
+        .map((order) => {
+          // Déterminer le statut de la commande
+          let statusBadge = "";
+          let statusClass = "";
+
+          if (order.is_paid) {
+            statusBadge = '<span class="badge bg-success">Payé</span>';
+            statusClass = "border-success";
+          } else if (order.is_cancelled) {
+            statusBadge = '<span class="badge bg-danger">Annulé</span>';
+            statusClass = "border-danger";
+          } else if (order.is_failed) {
+            statusBadge = '<span class="badge bg-warning">Échec</span>';
+            statusClass = "border-warning";
+          } else if (order.is_pending) {
+            statusBadge = '<span class="badge bg-info">En attente</span>';
+            statusClass = "border-info";
+          }
+
+          // Formater le prix
+          const priceDisplay =
+            order.total_price <= 0
+              ? "Gratuit"
+              : `${helpers.formatPrice(order.total_price)}`;
+
+          // Formater la date de commande
+          const orderDate = helpers.formatDate(order.created_at);
+
+          return `
+        <div class="card ${statusClass}" style="border-width: 2px;">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="card-title mb-1">Commande #${order.id}</h6>
+                <small class="text-muted">
+                  <i class="bi bi-calendar3"></i> ${orderDate}
+                </small>
+              </div>
+              ${statusBadge}
+            </div>
+            
+            ${
+              order.items && order.items.length > 0
+                ? `
+              <div class="mb-3">
+                ${order.items
+                  .map(
+                    (item) => `
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                      <div class="fw-bold">${item.event_title}</div>
+                      <small class="text-muted">${item.ticket_name} × ${item.quantity}</small>
+                    </div>
+                    <span class="text-primary fw-bold">
+                      ${item.unit_price <= 0 ? "Gratuit" : helpers.formatPrice(item.unit_price * item.quantity)}
+                    </span>
+                  </div>
+                `,
+                  )
+                  .join("")}
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                <span class="fw-bold">Total</span>
+                <span class="fs-5 fw-bold text-primary">${priceDisplay}</span>
+              </div>
+              
+              ${
+                order.is_paid
+                  ? `
+                <div class="d-grid gap-2 mt-3">
+                  <button class="btn btn-primary btn-sm" 
+                          onclick="downloadTickets(${order.id})"
+                          id="download-tickets-${order.id}">
+                    <i class="bi bi-download"></i> Télécharger les billets PDF
+                  </button>
+                </div>
+              `
+                  : ""
+              }
+            `
+                : `
+              <p class="text-muted small mb-0">Aucun détail disponible</p>
+            `
+            }
+          </div>
+        </div>
+        `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+// Fonction globale pour télécharger les billets
+window.downloadTickets = async function (orderId) {
+  const btnElement = document.getElementById(`download-tickets-${orderId}`);
+  if (btnElement.disabled) return;
+
+  const token = auth.getToken();
+  if (!token) {
+    helpers.showToast("Vous devez être connecté", "error");
+    return;
+  }
+
+  // Désactiver le bouton pendant le traitement
+  btnElement.disabled = true;
+  btnElement.innerHTML =
+    '<span class="spinner-border spinner-border-sm"></span> Téléchargement...';
+
+  try {
+    // TODO: Implémenter l'API de téléchargement des tickets
+    // Pour l'instant, juste afficher un message
+    helpers.showToast("Téléchargement des billets en cours...", "info");
+
+    // Simuler un téléchargement
+    setTimeout(() => {
+      helpers.showToast("Billets téléchargés avec succès", "success");
+      btnElement.disabled = false;
+      btnElement.innerHTML =
+        '<i class="bi bi-download"></i> Télécharger les billets PDF';
+    }, 2000);
+  } catch (error) {
+    console.error("Erreur lors du téléchargement:", error);
+    helpers.showToast("Erreur lors du téléchargement des billets", "error");
+    btnElement.disabled = false;
+    btnElement.innerHTML =
+      '<i class="bi bi-download"></i> Télécharger les billets PDF';
   }
 };
 

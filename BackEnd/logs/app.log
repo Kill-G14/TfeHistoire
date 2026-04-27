@@ -70,3 +70,8 @@
 [2026-04-27 12:54:23] [INFO] Event approved successfully | Context: {"event_id":14}
 [2026-04-27 13:28:57] [INFO] User logged in successfully | Context: {"user_id":1}
 [2026-04-27 14:00:22] [INFO] User logged out successfully
+[2026-04-27 14:14:19] [INFO] User registered successfully | Context: {"user_id":5}
+[2026-04-27 14:14:37] [INFO] User logged in successfully | Context: {"user_id":1}
+[2026-04-27 14:15:44] [INFO] Favorite added successfully | Context: {"user_id":5,"event_id":1}
+[2026-04-27 14:38:44] [INFO] Event created successfully | Context: {"event_id":14}
+[2026-04-27 14:43:39] [INFO] Event approved successfully | Context: {"event_id":14}

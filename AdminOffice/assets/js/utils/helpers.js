@@ -84,4 +84,78 @@ export const helpers = {
       $(this).remove();
     });
   },
+
+  // Afficher une modale de confirmation
+  showConfirm(
+    title,
+    message,
+    confirmText = "Confirmer",
+    cancelText = "Annuler",
+    type = "warning",
+  ) {
+    return new Promise((resolve) => {
+      // Supprimer les modales existantes
+      $("#confirmModal").remove();
+
+      const iconClass =
+        type === "danger"
+          ? "fa-exclamation-triangle"
+          : type === "warning"
+            ? "fa-exclamation-circle"
+            : "fa-question-circle";
+      const btnClass =
+        type === "danger"
+          ? "btn-danger"
+          : type === "warning"
+            ? "btn-warning"
+            : "btn-primary";
+
+      const modal = $(`
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <i class="fas ${iconClass} mr-2"></i>${title}
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p class="mb-0">${message}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">${cancelText}</button>
+                <button type="button" class="btn ${btnClass}" id="confirmBtn">${confirmText}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+
+      $("body").append(modal);
+
+      // Gérer la confirmation
+      modal.find("#confirmBtn").on("click", function () {
+        modal.modal("hide");
+        resolve(true);
+      });
+
+      // Gérer l'annulation
+      modal.on("hidden.bs.modal", function () {
+        const wasConfirmed = $(this).data("confirmed");
+        if (!wasConfirmed) {
+          resolve(false);
+        }
+        $(this).remove();
+      });
+
+      modal.find("#confirmBtn").on("click", function () {
+        modal.data("confirmed", true);
+      });
+
+      modal.modal("show");
+    });
+  },
 };

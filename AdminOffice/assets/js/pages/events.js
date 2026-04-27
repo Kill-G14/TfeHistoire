@@ -154,9 +154,15 @@ function renderAllEvents() {
 
 // Approuver un événement
 window.approveEvent = async function (eventId) {
-  if (!confirm("Êtes-vous sûr de vouloir approuver cet événement ?")) {
-    return;
-  }
+  const confirmed = await helpers.showConfirm(
+    "Approuver l'événement",
+    "Êtes-vous sûr de vouloir approuver cet événement ? Il sera visible publiquement.",
+    "Approuver",
+    "Annuler",
+    "warning",
+  );
+
+  if (!confirmed) return;
 
   const token = storage.getToken();
   const result = await EventManager.approve(eventId, token);
@@ -174,9 +180,15 @@ window.approveEvent = async function (eventId) {
 
 // Rejeter un événement
 window.rejectEvent = async function (eventId) {
-  if (!confirm("Êtes-vous sûr de vouloir rejeter cet événement ?")) {
-    return;
-  }
+  const confirmed = await helpers.showConfirm(
+    "Rejeter l'événement",
+    "Êtes-vous sûr de vouloir rejeter cet événement ? Cette action est définitive.",
+    "Rejeter",
+    "Annuler",
+    "warning",
+  );
+
+  if (!confirmed) return;
 
   const token = storage.getToken();
   const result = await EventManager.reject(eventId, token);
@@ -191,13 +203,15 @@ window.rejectEvent = async function (eventId) {
 
 // Supprimer un événement
 window.deleteEvent = async function (eventId) {
-  if (
-    !confirm(
-      "Êtes-vous sûr de vouloir supprimer définitivement cet événement ?",
-    )
-  ) {
-    return;
-  }
+  const confirmed = await helpers.showConfirm(
+    "Supprimer l'événement",
+    "⚠️ Attention ! Êtes-vous sûr de vouloir supprimer définitivement cet événement ? Cette action est irréversible.",
+    "Supprimer",
+    "Annuler",
+    "danger",
+  );
+
+  if (!confirmed) return;
 
   const token = storage.getToken();
   const result = await EventManager.adminDelete(eventId, token);

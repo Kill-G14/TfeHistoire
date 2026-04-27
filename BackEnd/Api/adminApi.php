@@ -76,7 +76,7 @@ switch ($resource) {
     switch ($action) {
 
       case 'getAll':
-        $response = $eventService->getAllEvents();
+        $response = $eventService->getAllEventsForAdmin();
         break;
 
       case 'getPending':

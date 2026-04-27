@@ -39,6 +39,17 @@ class EventRepository {
     return $stmt->fetchAll();
   }
 
+  // Récupérer tous les événements pour l'admin (tous les statuts)
+  public function getAllEventsForAdmin(): array {
+    $query = "SELECT * FROM events 
+              WHERE is_deleted = FALSE 
+              ORDER BY created_at DESC";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->execute();
+    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
+    return $stmt->fetchAll();
+  }
+
   // Récupérer les événements en attente de modération
   public function getPendingEvents(): array {
     $query = "SELECT * FROM events WHERE is_deleted = FALSE AND is_pending = TRUE ORDER BY created_at DESC";

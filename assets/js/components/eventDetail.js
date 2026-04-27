@@ -2,6 +2,8 @@
 
 import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
+import { appState } from "../store/appState.js";
+import OrderManager from "../managers/OrderManager.js";
 
 const templateObjects = {};
 let currentEvent = null;
@@ -44,6 +46,9 @@ export async function showEventDetail(event) {
   // Attacher les événements
   attachDetailEvents();
 
+  // Appliquer la logique conditionnelle pour le bouton Réserver
+  applyReserveButtonLogic(event);
+
   // Empêcher le scroll du body
   document.body.style.overflow = "hidden";
 }
@@ -72,11 +77,34 @@ function fillEventDetails(event) {
     detailLocation.textContent = `${event.city}, ${event.country}`;
   if (detailDate) detailDate.textContent = event.date;
   if (detailTime) detailTime.textContent = event.time;
-  if (detailTickets) detailTickets.textContent = event.availableTickets;
-  if (detailPrice) detailPrice.textContent = event.price;
+
+  // Afficher les tickets disponibles
+  if (detailTickets) {
+    if (event.ticket_quantity > 0) {
+      detailTickets.textContent = event.ticket_quantity;
+    } else {
+      detailTickets.textContent = "Illimité";
+    }
+  }
+
+  // Afficher le prix
+  if (detailPrice) {
+    if (event.is_free) {
+      detailPrice.textContent = "0.00";
+    } else if (event.ticket_price) {
+      detailPrice.textContent = parseFloat(event.ticket_price).toFixed(2);
+    } else {
+      detailPrice.textContent = "0.00";
+    }
+  }
+
   if (quantityEl) quantityEl.textContent = quantity;
-  if (totalPrice)
-    totalPrice.textContent = helpers.formatPrice(event.priceValue * quantity);
+
+  // Calculer le total
+  if (totalPrice) {
+    const priceValue = event.is_free ? 0 : event.ticket_price || 0;
+    totalPrice.textContent = (priceValue * quantity).toFixed(2);
+  }
 }
 
 function attachDetailEvents() {
@@ -109,7 +137,15 @@ function attachDetailEvents() {
 
   if (increaseBtn) {
     increaseBtn.addEventListener("click", () => {
-      if (currentEvent && quantity < currentEvent.availableTickets) {
+      if (
+        currentEvent &&
+        currentEvent.ticket_quantity > 0 &&
+        quantity < currentEvent.ticket_quantity
+      ) {
+        quantity++;
+        updateQuantityDisplay();
+      } else if (currentEvent && currentEvent.ticket_quantity === 0) {
+        // Pas de limite de tickets
         quantity++;
         updateQuantityDisplay();
       }
@@ -127,27 +163,87 @@ function updateQuantityDisplay() {
 
   if (quantityEl) quantityEl.textContent = quantity;
   if (totalPrice && currentEvent) {
-    totalPrice.textContent = helpers.formatPrice(
-      currentEvent.priceValue * quantity,
-    );
+    const priceValue = currentEvent.is_free
+      ? 0
+      : currentEvent.ticket_price || 0;
+    totalPrice.textContent = (priceValue * quantity).toFixed(2);
   }
 }
 
-function handleReservation() {
-  if (!auth.isLoggedIn()) {
+async function handleReservation() {
+  // Vérifier si l'utilisateur est connecté
+  const isAuthenticated = appState.get("isAuthenticated");
+
+  if (!isAuthenticated) {
+    // Afficher la modale de connexion
+    helpers.showToast(
+      "Vous devez être connecté pour réserver un événement",
+      "warning",
+    );
     closeEventDetail();
-    const event = new CustomEvent("openLoginModal");
-    window.dispatchEvent(event);
-    helpers.showToast("Veuillez vous connecter pour réserver", "error");
+    const loginModal = document.getElementById("loginModal");
+    if (loginModal) {
+      const modal = new bootstrap.Modal(loginModal);
+      modal.show();
+    }
     return;
   }
 
-  if (currentEvent) {
-    helpers.showToast(
-      `${quantity} ticket(s) réservé(s) pour ${currentEvent.title} !`,
-      "success",
-    );
-    closeEventDetail();
+  // Créer une commande pour cet événement
+  try {
+    helpers.showToast("Création de votre réservation...", "info");
+
+    const token = auth.getToken();
+    const orderData = {
+      items: [
+        {
+          event_id: currentEvent.id,
+          quantity: quantity,
+        },
+      ],
+    };
+
+    const result = await OrderManager.create(orderData, token);
+
+    if (result.success) {
+      // Stocker l'ID de commande et rediriger vers le checkout
+      appState.set("currentOrderId", result.data.order_id);
+      closeEventDetail();
+      window.router.navigate(`/checkout`);
+    } else {
+      helpers.showToast(
+        result.message || "Erreur lors de la création de la commande",
+        "error",
+      );
+    }
+  } catch (error) {
+    console.error("Erreur lors de la réservation:", error);
+    helpers.showToast("Erreur lors de la création de la réservation", "error");
+  }
+}
+
+/**
+ * Appliquer la logique conditionnelle pour le bouton Réserver
+ * - Événement payant (is_free=false, ticket_price>0) → Bouton visible
+ * - Événement gratuit avec tickets limités (is_free=true, ticket_quantity>0) → Bouton visible
+ * - Événement gratuit sans limite (is_free=true, ticket_quantity=0) → Section réservation complète cachée
+ */
+function applyReserveButtonLogic(event) {
+  const reservationSection = document.getElementById("reservationSection");
+
+  // Déterminer si la section de réservation doit être affichée
+  const shouldShowReservation =
+    (!event.is_free && event.ticket_price > 0) ||
+    (event.is_free && event.ticket_quantity > 0);
+
+  if (reservationSection) {
+    if (shouldShowReservation) {
+      // Afficher toute la section de réservation
+      reservationSection.style.display = "block";
+    } else {
+      // Cacher toute la section de réservation (titre + contenu)
+      reservationSection.style.display = "none";
+    }
   }
 }
 

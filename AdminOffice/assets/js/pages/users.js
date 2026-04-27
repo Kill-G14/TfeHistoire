@@ -107,9 +107,15 @@ async function saveRoles() {
 
 // Supprimer un utilisateur
 window.deleteUser = async function (userId) {
-  if (!confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-    return;
-  }
+  const confirmed = await helpers.showConfirm(
+    "Supprimer l'utilisateur",
+    "⚠️ Attention ! Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ? Cette action est irréversible.",
+    "Supprimer",
+    "Annuler",
+    "danger",
+  );
+
+  if (!confirmed) return;
 
   const token = storage.getToken();
   const result = await UserManager.delete(userId, token);

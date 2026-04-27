@@ -43,10 +43,24 @@ function logout() {
   window.location.href = "login.html";
 }
 
+// Gérer les clics sur les boîtes statistiques
+function attachBoxListeners() {
+  const clickableBoxes = document.querySelectorAll(".clickable-box");
+  clickableBoxes.forEach((box) => {
+    box.addEventListener("click", function () {
+      const link = this.getAttribute("data-link");
+      if (link) {
+        window.location.href = link;
+      }
+    });
+  });
+}
+
 // Initialisation
 async function init() {
   await checkAuth();
   await loadStats();
+  attachBoxListeners();
 
   // Event listener pour la déconnexion
   document.getElementById("logoutBtn").addEventListener("click", (e) => {

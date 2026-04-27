@@ -21,11 +21,11 @@ class OrderValidator {
       $errors['items'] = 'Au moins un article est requis pour créer une commande';
     } else {
       foreach ($data['items'] as $index => $item) {
-        // Ticket ID
-        if (!isset($item['ticket_id'])) {
-          $errors["items.$index.ticket_id"] = 'L\'ID du billet est requis';
-        } elseif (!is_numeric($item['ticket_id']) || $item['ticket_id'] <= 0) {
-          $errors["items.$index.ticket_id"] = 'L\'ID du billet doit être un nombre positif';
+        // Event ID
+        if (!isset($item['event_id'])) {
+          $errors["items.$index.event_id"] = 'L\'ID de l\'événement est requis';
+        } elseif (!is_numeric($item['event_id']) || $item['event_id'] <= 0) {
+          $errors["items.$index.event_id"] = 'L\'ID de l\'événement doit être un nombre positif';
         }
 
         // Quantity

@@ -206,9 +206,19 @@ async function handleCheckout() {
     orderItems,
   );
 
-  if (result.success && result.data && result.data.url) {
-    // Rediriger vers Stripe Checkout
-    window.location.href = result.data.url;
+  if (result.success && result.data) {
+    // Si c'est une réservation gratuite, rediriger vers la page de succès directement
+    if (result.data.is_free && result.data.redirect_url) {
+      window.location.href = result.data.redirect_url;
+    }
+    // Sinon, rediriger vers Stripe Checkout
+    else if (result.data.url) {
+      window.location.href = result.data.url;
+    } else {
+      showError("URL de paiement manquante");
+      btnCheckout.disabled = false;
+      checkoutLoading.classList.add("d-none");
+    }
   } else {
     showError(
       result.message || "Erreur lors de la création de la session de paiement",

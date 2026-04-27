@@ -31,6 +31,20 @@ class EventService {
     ];
   }
 
+  // Récupérer tous les événements pour l'admin (tous les statuts)
+  public function getAllEventsForAdmin(): array {
+    $events = $this->eventRepository->getAllEventsForAdmin();
+    
+    $eventDTOs = array_map(function($event) {
+      return (new EventDTO($event))->toArray();
+    }, $events);
+
+    return [
+      'success' => true,
+      'data' => $eventDTOs
+    ];
+  }
+
   // Récupérer un événement par ID
   public function getEventById(int $id): array {
     $event = $this->eventRepository->getEventById($id);

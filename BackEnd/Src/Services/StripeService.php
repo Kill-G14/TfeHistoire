@@ -4,22 +4,39 @@ namespace App\Services;
 
 use App\Models\Payment;
 use App\Models\Order;
+use App\Models\TicketGenerated;
 use App\Repositories\PaymentRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\PurchasedTicketRepository;
+use App\Repositories\OrderItemRepository;
+use App\Repositories\EventRepository;
 
 class StripeService {
     private PaymentRepository $paymentRepository;
     private OrderRepository $orderRepository;
+    private PurchasedTicketRepository $purchasedTicketRepository;
+    private OrderItemRepository $orderItemRepository;
+    private EventRepository $eventRepository;
+    private PdfService $pdfService;
     private string $secretKey;
     private string $webhookSecret;
     private string $currency;
 
     public function __construct(
         PaymentRepository $paymentRepository,
-        OrderRepository $orderRepository
+        OrderRepository $orderRepository,
+        ?PurchasedTicketRepository $purchasedTicketRepository = null,
+        ?OrderItemRepository $orderItemRepository = null,
+        ?EventRepository $eventRepository = null
     ) {
         $this->paymentRepository = $paymentRepository;
         $this->orderRepository = $orderRepository;
+        
+        // Initialiser les dépendances si non fournies (rétrocompatibilité)
+        $this->purchasedTicketRepository = $purchasedTicketRepository ?? new PurchasedTicketRepository();
+        $this->orderItemRepository = $orderItemRepository ?? new OrderItemRepository();
+        $this->eventRepository = $eventRepository ?? new EventRepository();
+        $this->pdfService = new PdfService($this->eventRepository, $this->orderItemRepository);
 
         // Charger la configuration
         $config = require __DIR__ . '/../../config.php';
@@ -44,6 +61,11 @@ class StripeService {
                     'success' => false,
                     'message' => 'Commande introuvable'
                 ];
+            }
+
+            // Si le montant est 0 (réservation gratuite), traiter différemment
+            if ($order->total_price <= 0) {
+                return $this->processFreeReservation($orderId);
             }
 
             $config = require __DIR__ . '/../../config.php';
@@ -224,6 +246,9 @@ class StripeService {
         // Mettre à jour le payment_id dans la commande
         $this->orderRepository->updatePaymentId($payment->order_id, $paymentIntent->id);
 
+        // Générer les tickets et PDFs
+        $this->generateTicketsAndPdfs($payment->order_id);
+
         return ['success' => true, 'message' => 'Paiement réussi'];
     }
 
@@ -375,5 +400,134 @@ class StripeService {
                 'message' => 'Erreur Stripe : ' . $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * Traiter une réservation gratuite (montant 0€)
+     * Pas besoin de passer par Stripe, on valide directement la commande
+     */
+    private function processFreeReservation(int $orderId): array {
+        try {
+            // Créer un "paiement" fictif avec statut succeeded
+            $payment = new Payment();
+            $payment->order_id = $orderId;
+            $payment->stripe_checkout_session_id = 'free_reservation_' . time();
+            $payment->stripe_payment_intent_id = 'free_' . $orderId . '_' . time();
+            $payment->amount = 0.00;
+            $payment->currency = $this->currency;
+            $payment->status = 'succeeded';
+            $payment->payment_method = 'free_reservation';
+            $payment->metadata = json_encode([
+                'order_id' => $orderId,
+                'type' => 'free_reservation',
+                'processed_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $paymentId = $this->paymentRepository->createPayment($payment);
+
+            if (!$paymentId) {
+                return [
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'enregistrement de la réservation'
+                ];
+            }
+
+            // Mettre à jour la commande comme payée
+            $this->orderRepository->updateOrderStatus(
+                $orderId,
+                false, // is_pending
+                true,  // is_paid
+                false, // is_failed
+                false  // is_cancelled
+            );
+
+            // Mettre à jour le payment_id dans la commande
+            $this->orderRepository->updatePaymentId($orderId, $payment->stripe_payment_intent_id);
+
+            // Générer les tickets et PDFs
+            $this->generateTicketsAndPdfs($orderId);
+
+            $config = require __DIR__ . '/../../config.php';
+
+            return [
+                'success' => true,
+                'message' => 'Réservation gratuite confirmée',
+                'data' => [
+                    'is_free' => true,
+                    'order_id' => $orderId,
+                    'payment_id' => $paymentId,
+                    'redirect_url' => $config['stripe']['success_url'] . '?order_id=' . $orderId . '&free=1'
+                ]
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Générer les tickets et PDFs pour une commande payée
+     */
+    private function generateTicketsAndPdfs(int $orderId): void {
+        try {
+            // Récupérer les items de la commande
+            $order = $this->orderRepository->getOrderById($orderId);
+            if (!$order) {
+                return;
+            }
+
+            // Récupérer tous les order items
+            $orderItems = $this->orderItemRepository->getOrderItemsByOrderId($orderId);
+            
+            foreach ($orderItems as $orderItem) {
+                // Pour chaque quantité, créer un ticket
+                for ($i = 0; $i < $orderItem->quantity; $i++) {
+                    // Générer un code unique pour le ticket
+                    $uniqueCode = $this->generateUniqueTicketCode();
+                    
+                    // Créer le ticket_generated
+                    $ticketGenerated = new TicketGenerated();
+                    $ticketGenerated->order_item_id = $orderItem->id;
+                    $ticketGenerated->unique_code = $uniqueCode;
+                    $ticketGenerated->qr_code = $this->generateQRCodePath($uniqueCode);
+                    $ticketGenerated->is_used = false;
+                    $ticketGenerated->is_deleted = false;
+                    
+                    $ticketId = $this->purchasedTicketRepository->createTicketGenerated($ticketGenerated);
+                    
+                    if ($ticketId) {
+                        // Récupérer le ticket créé
+                        $createdTicket = $this->purchasedTicketRepository->getTicketGeneratedById($ticketId);
+                        
+                        // Générer le PDF
+                        if ($createdTicket) {
+                            $this->pdfService->generateTicketPdf($createdTicket, $order->user_id);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Logger l'erreur mais ne pas faire échouer la transaction
+            error_log('Erreur génération tickets/PDFs : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Générer un code unique pour un ticket
+     */
+    private function generateUniqueTicketCode(): string {
+        return strtoupper(bin2hex(random_bytes(8)));
+    }
+
+    /**
+     * Générer le chemin du QR code
+     */
+    private function generateQRCodePath(string $uniqueCode): string {
+        // Pour l'instant, retourner un placeholder
+        // TODO: Implémenter la génération réelle de QR code
+        return 'qr_' . $uniqueCode . '.png';
     }
 }
