@@ -116,5 +116,64 @@ class UserRepository {
     $stmt->bindParam(':is_moderator', $isModerator, PDO::PARAM_INT);
     return $stmt->execute();
   }
+
+  // ========================================
+  // MÉTHODES STRIPE CONNECT
+  // ========================================
+
+  /**
+   * Mettre à jour les informations Stripe Connect d'un utilisateur
+   */
+  public function updateStripeAccount(
+    int $userId, 
+    string $stripeAccountId, 
+    string $status, 
+    bool $onboardingCompleted
+  ): bool {
+    $query = "UPDATE users 
+              SET stripe_account_id = :stripe_account_id,
+                  stripe_account_status = :status,
+                  stripe_onboarding_completed = :onboarding_completed,
+                  stripe_connected_at = IF(:onboarding_completed = 1, NOW(), stripe_connected_at),
+                  updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+    $stmt->bindParam(':stripe_account_id', $stripeAccountId);
+    $stmt->bindParam(':status', $status);
+    $stmt->bindParam(':onboarding_completed', $onboardingCompleted, PDO::PARAM_BOOL);
+    
+    return $stmt->execute();
+  }
+
+  /**
+   * Récupérer le statut Stripe Connect d'un utilisateur
+   */
+  public function getStripeAccountStatus(int $userId): ?array {
+    $query = "SELECT stripe_account_id, stripe_account_status, 
+              stripe_onboarding_completed, stripe_connected_at
+              FROM users 
+              WHERE id = :id AND is_deleted = FALSE";
+    
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ?: null;
+  }
+
+  /**
+   * Vérifier si un utilisateur a un compte Stripe connecté et actif
+   */
+  public function hasActiveStripeAccount(int $userId): bool {
+    $stripeData = $this->getStripeAccountStatus($userId);
+    
+    return $stripeData && 
+           !empty($stripeData['stripe_account_id']) && 
+           $stripeData['stripe_onboarding_completed'] && 
+           $stripeData['stripe_account_status'] === 'connected';
+  }
 }
 

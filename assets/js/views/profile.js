@@ -6,6 +6,7 @@ import { appState } from "../store/appState.js";
 import FavoriteManager from "../managers/FavoriteManager.js";
 import EventManager from "../managers/EventManager.js";
 import OrderManager from "../managers/OrderManager.js";
+import StripeConnectManager from "../managers/StripeConnectManager.js";
 import { showEventDetail } from "../components/eventDetail.js";
 import { validateChangePasswordForm } from "../validators/authValidator.js";
 import {
@@ -104,6 +105,12 @@ export async function mount(container, params) {
 
   // Charger et afficher les données utilisateur
   await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
+
+  // Charger et afficher le statut Stripe Connect
+  await loadStripeConnectStatus();
+
+  // Vérifier si retour depuis Stripe
+  checkStripeReturnStatus();
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);
@@ -712,6 +719,209 @@ window.downloadTickets = async function (orderId) {
       '<i class="bi bi-download"></i> Télécharger les billets PDF';
   }
 };
+
+// ========================================
+// FONCTIONS STRIPE CONNECT
+// ========================================
+
+// Charger et afficher le statut Stripe Connect
+async function loadStripeConnectStatus() {
+  const container = document.getElementById("stripeConnectSection");
+  if (!container) return;
+
+  const result = await StripeConnectManager.checkStripeAccount();
+
+  if (!result.success) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const status = result.data.status;
+  const hasAccount = result.data.has_stripe_account;
+
+  if (hasAccount && status === "connected") {
+    // Compte connecté
+    container.innerHTML = `
+      <div class="alert alert-success d-flex align-items-center gap-3">
+        <div>
+          <i class="bi bi-check-circle-fill fs-3"></i>
+        </div>
+        <div class="flex-grow-1">
+          <strong>Compte Stripe connecté</strong>
+          <p class="mb-0 small">Vous pouvez créer des événements payants et recevoir les paiements directement.</p>
+        </div>
+        <button class="btn btn-outline-success btn-sm" id="btnManageStripe">
+          <i class="bi bi-gear"></i> Gérer
+        </button>
+      </div>
+    `;
+
+    // Event listener pour gérer le compte
+    document
+      .getElementById("btnManageStripe")
+      ?.addEventListener("click", handleManageStripe);
+  } else if (status === "pending") {
+    // Onboarding en cours
+    container.innerHTML = `
+      <div class="alert alert-warning d-flex align-items-center gap-3">
+        <div>
+          <i class="bi bi-hourglass-split fs-3"></i>
+        </div>
+        <div class="flex-grow-1">
+          <strong>Configuration Stripe en cours</strong>
+          <p class="mb-0 small">Finalisez votre compte Stripe pour recevoir les paiements.</p>
+        </div>
+        <button class="btn btn-outline-warning btn-sm" id="btnContinueStripe">
+          <i class="bi bi-arrow-right"></i> Continuer
+        </button>
+      </div>
+    `;
+
+    // Event listener pour continuer l'onboarding
+    document
+      .getElementById("btnContinueStripe")
+      ?.addEventListener("click", handleContinueStripeOnboarding);
+  } else {
+    // Pas de compte Stripe
+    container.innerHTML = `
+      <div class="alert alert-info d-flex align-items-center gap-3">
+        <div>
+          <i class="bi bi-stripe fs-3"></i>
+        </div>
+        <div class="flex-grow-1">
+          <strong>Créez des événements payants</strong>
+          <p class="mb-0 small">Connectez votre compte Stripe pour recevoir les paiements de vos billets.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btnConnectStripe">
+          <i class="bi bi-plus-circle"></i> Connecter Stripe
+        </button>
+      </div>
+    `;
+
+    // Event listener pour connecter Stripe
+    document
+      .getElementById("btnConnectStripe")
+      ?.addEventListener("click", handleConnectStripe);
+  }
+}
+
+// Gérer la connexion Stripe
+async function handleConnectStripe() {
+  const btn = document.getElementById("btnConnectStripe");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Connexion...';
+  }
+
+  const result = await StripeConnectManager.createStripeConnectAccount();
+
+  if (result.success && result.data.onboarding_url) {
+    helpers.showToast("Redirection vers Stripe...", "info");
+    setTimeout(() => {
+      window.location.href = result.data.onboarding_url;
+    }, 500);
+  } else {
+    helpers.showToast(result.message || "Erreur lors de la connexion", "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-plus-circle"></i> Connecter Stripe';
+    }
+  }
+}
+
+// Continuer l'onboarding Stripe
+async function handleContinueStripeOnboarding() {
+  const btn = document.getElementById("btnContinueStripe");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Chargement...';
+  }
+
+  const result = await StripeConnectManager.createStripeConnectAccount();
+
+  if (result.success && result.data.onboarding_url) {
+    helpers.showToast("Redirection vers Stripe...", "info");
+    setTimeout(() => {
+      window.location.href = result.data.onboarding_url;
+    }, 500);
+  } else {
+    helpers.showToast(result.message || "Erreur lors du chargement", "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-arrow-right"></i> Continuer';
+    }
+  }
+}
+
+// Gérer le compte Stripe (ouvrir dashboard)
+async function handleManageStripe() {
+  const btn = document.getElementById("btnManageStripe");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Chargement...';
+  }
+
+  const result = await StripeConnectManager.getDashboardLink();
+
+  if (result.success && result.data.url) {
+    window.open(result.data.url, "_blank");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-gear"></i> Gérer';
+    }
+  } else {
+    helpers.showToast(
+      result.message || "Erreur lors de l'ouverture du dashboard",
+      "error",
+    );
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-gear"></i> Gérer';
+    }
+  }
+}
+
+// Vérifier si retour depuis Stripe et afficher message
+function checkStripeReturnStatus() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const stripeStatus = urlParams.get("stripe");
+
+  if (stripeStatus === "success") {
+    // Vérifier la complétion du compte
+    verifyStripeAccountCompletion();
+
+    // Nettoyer l'URL
+    window.history.replaceState({}, "", window.location.pathname);
+  } else if (stripeStatus === "refresh") {
+    helpers.showToast(
+      "Configuration Stripe non terminée. Vous pouvez la reprendre plus tard.",
+      "info",
+    );
+
+    // Nettoyer l'URL
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
+// Vérifier la complétion du compte Stripe
+async function verifyStripeAccountCompletion() {
+  const result = await StripeConnectManager.verifyAccountCompletion();
+
+  if (result.success && result.data.is_complete) {
+    helpers.showToast("Compte Stripe connecté avec succès ! 🎉", "success");
+
+    // Recharger le statut Stripe
+    await loadStripeConnectStatus();
+  } else {
+    helpers.showToast(
+      "Configuration Stripe en cours. Finalisez-la pour activer les paiements.",
+      "warning",
+    );
+
+    // Recharger le statut Stripe
+    await loadStripeConnectStatus();
+  }
+}
 
 // Export par défaut
 export default { mount, unmount, meta };

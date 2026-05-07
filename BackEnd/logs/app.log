@@ -82,3 +82,13 @@
 [2026-04-27 15:43:15] [INFO] Order created successfully | Context: {"order_id":16}
 [2026-04-27 15:43:23] [INFO] Order created successfully | Context: {"order_id":17}
 [2026-04-27 15:44:06] [INFO] Order created successfully | Context: {"order_id":18}
+[2026-04-27 16:36:09] [INFO] Order created successfully | Context: {"order_id":19}
+[2026-04-27 16:39:24] [INFO] User logged in successfully | Context: {"user_id":1}
+[2026-04-28 17:20:34] [INFO] Order created successfully | Context: {"order_id":20}
+[2026-05-07 12:27:19] [INFO] User logged out successfully
+[2026-05-07 12:30:03] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-05-07 12:30:11] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-05-07 12:30:19] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-05-07 12:30:25] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-05-07 12:31:23] [INFO] User logged in successfully | Context: {"user_id":5}
+[2026-05-07 12:32:11] [INFO] User deleted by admin | Context: {"user_id":4}

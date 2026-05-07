@@ -55,6 +55,15 @@ CREATE TABLE IF NOT EXISTS users (
     is_organizer BOOLEAN DEFAULT FALSE,
     is_moderator BOOLEAN DEFAULT FALSE,
     is_deleted BOOLEAN DEFAULT FALSE,
+    stripe_account_id VARCHAR(255) NULL COMMENT 'ID du compte Stripe Connect du créateur',
+    stripe_account_status ENUM(
+        'not_connected',
+        'pending',
+        'connected',
+        'rejected'
+    ) DEFAULT 'not_connected' COMMENT 'Statut de la connexion Stripe',
+    stripe_onboarding_completed BOOLEAN DEFAULT FALSE COMMENT 'Si le processus d onboarding Stripe est terminé',
+    stripe_connected_at DATETIME NULL COMMENT 'Date de connexion du compte Stripe',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
@@ -81,6 +90,8 @@ CREATE TABLE IF NOT EXISTS events (
     is_approved BOOLEAN DEFAULT FALSE,
     is_rejected BOOLEAN DEFAULT FALSE,
     is_deleted BOOLEAN DEFAULT FALSE,
+    requires_stripe_account BOOLEAN DEFAULT FALSE COMMENT 'Si true, le créateur doit avoir un compte Stripe connecté',
+    stripe_account_verified BOOLEAN DEFAULT FALSE COMMENT 'Si le compte Stripe du créateur était vérifié lors de la création',
     image_event VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -174,6 +185,50 @@ CREATE TABLE IF NOT EXISTS payments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Table des gains des créateurs (Stripe Connect)
+CREATE TABLE IF NOT EXISTS creator_earnings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL COMMENT 'Créateur de l événement',
+    event_id INT NOT NULL COMMENT 'Événement concerné',
+    order_id INT NOT NULL COMMENT 'Commande associée',
+    gross_amount DECIMAL(10, 2) NOT NULL COMMENT 'Montant brut (prix du billet)',
+    platform_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Commission de la plateforme',
+    stripe_fee DECIMAL(10, 2) DEFAULT 0 COMMENT 'Frais Stripe',
+    net_amount DECIMAL(10, 2) NOT NULL COMMENT 'Montant net pour le créateur',
+    status ENUM(
+        'pending',
+        'transferred',
+        'failed'
+    ) DEFAULT 'pending',
+    stripe_transfer_id VARCHAR(255) NULL COMMENT 'ID du transfert Stripe',
+    transferred_at DATETIME NULL COMMENT 'Date du transfert',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES orders (id) ON DELETE CASCADE,
+    INDEX idx_user_status (user_id, status),
+    INDEX idx_event (event_id),
+    INDEX idx_created (created_at)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Suivi des gains des créateurs d événements';
+
+-- Table de l'historique des connexions Stripe Connect
+CREATE TABLE IF NOT EXISTS stripe_connect_log (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    action ENUM(
+        'onboarding_started',
+        'onboarding_completed',
+        'account_updated',
+        'account_disconnected'
+    ) NOT NULL,
+    stripe_account_id VARCHAR(255) NULL,
+    details TEXT NULL COMMENT 'JSON avec détails supplémentaires',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_user (user_id),
+    INDEX idx_created (created_at)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Historique des actions Stripe Connect';
 
 -- ============================================
 -- INDEX POUR AMÉLIORER LES PERFORMANCES
