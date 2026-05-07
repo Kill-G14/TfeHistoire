@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use Stripe\Stripe;
+use Stripe\Account;
+use Stripe\AccountLink;
+use Stripe\Exception\ApiErrorException;
 
 /**
  * Service de gestion de Stripe Connect
@@ -18,7 +22,7 @@ class StripeConnectService {
         $config = require __DIR__ . '/../../config.php';
         $this->secretKey = $config['stripe']['secret_key'];
         
-        \Stripe\Stripe::setApiKey($this->secretKey);
+        Stripe::setApiKey($this->secretKey);
     }
     
     /**
@@ -34,7 +38,7 @@ class StripeConnectService {
             }
             
             // Créer un nouveau compte Stripe Express (recommandé pour marketplaces)
-            $account = \Stripe\Account::create([
+            $account = Account::create([
                 'type' => 'express',
                 'email' => $email,
                 'capabilities' => [
@@ -54,7 +58,7 @@ class StripeConnectService {
             // Créer le lien d'onboarding
             return $this->createAccountLink($account->id);
             
-        } catch (\Stripe\Exception\ApiErrorException $e) {
+        } catch (ApiErrorException $e) {
             return [
                 'success' => false,
                 'message' => 'Erreur Stripe : ' . $e->getMessage()
@@ -74,7 +78,7 @@ class StripeConnectService {
         try {
             $config = require __DIR__ . '/../../config.php';
             
-            $accountLink = \Stripe\AccountLink::create([
+            $accountLink = AccountLink::create([
                 'account' => $accountId,
                 'refresh_url' => $config['stripe']['refresh_url'] ?? 'http://localhost/tfeHistoire/#/profile?stripe=refresh',
                 'return_url' => $config['stripe']['return_url'] ?? 'http://localhost/tfeHistoire/#/profile?stripe=success',
@@ -90,7 +94,7 @@ class StripeConnectService {
                 ]
             ];
             
-        } catch (\Stripe\Exception\ApiErrorException $e) {
+        } catch (ApiErrorException $e) {
             return [
                 'success' => false,
                 'message' => 'Erreur lors de la création du lien : ' . $e->getMessage()
@@ -103,7 +107,7 @@ class StripeConnectService {
      */
     public function checkAccountStatus(string $stripeAccountId): array {
         try {
-            $account = \Stripe\Account::retrieve($stripeAccountId);
+            $account = Account::retrieve($stripeAccountId);
             
             $isComplete = $account->charges_enabled && $account->payouts_enabled;
             
@@ -117,7 +121,7 @@ class StripeConnectService {
                 ]
             ];
             
-        } catch (\Stripe\Exception\ApiErrorException $e) {
+        } catch (ApiErrorException $e) {
             return [
                 'success' => false,
                 'message' => 'Erreur lors de la vérification : ' . $e->getMessage()
@@ -130,7 +134,7 @@ class StripeConnectService {
      */
     public function createDashboardLink(string $stripeAccountId): array {
         try {
-            $loginLink = \Stripe\Account::createLoginLink($stripeAccountId);
+            $loginLink = Account::createLoginLink($stripeAccountId);
             
             return [
                 'success' => true,
@@ -139,7 +143,7 @@ class StripeConnectService {
                 ]
             ];
             
-        } catch (\Stripe\Exception\ApiErrorException $e) {
+        } catch (ApiErrorException $e) {
             return [
                 'success' => false,
                 'message' => 'Erreur lors de la création du lien : ' . $e->getMessage()
