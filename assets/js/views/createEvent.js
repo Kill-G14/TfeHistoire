@@ -299,11 +299,11 @@ async function handleSubmit(e) {
 
   // ⭐ NOUVEAU : Vérifier Stripe Connect si événement payant
   const isFree = document.getElementById("isFree")?.checked || false;
-  
+
   if (!isFree) {
     // L'événement est payant, vérifier le compte Stripe
     const hasStripe = await checkUserStripeAccount();
-    
+
     if (!hasStripe) {
       // Afficher modale pour connecter Stripe
       showStripeConnectModal();
@@ -403,8 +403,7 @@ async function handleSubmit(e) {
     );
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.innerHTML =
-        '<i class="bi bi-plus-lg"></i> Créer l\'événement';
+      submitBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Créer l\'événement';
     }
   }
 }
@@ -472,51 +471,58 @@ function showStripeConnectModal() {
       </div>
     </div>
   `;
-  
-  document.body.insertAdjacentHTML('beforeend', modal);
-  
+
+  document.body.insertAdjacentHTML("beforeend", modal);
+
   // Event listener pour le bouton
-  document.getElementById('btnConnectStripeModal').addEventListener('click', initiateStripeConnect);
+  document
+    .getElementById("btnConnectStripeModal")
+    .addEventListener("click", initiateStripeConnect);
 }
 
 // Fermer la modale Stripe
-window.closeStripeModal = function() {
-  const modal = document.getElementById('stripeConnectModal');
+window.closeStripeModal = function () {
+  const modal = document.getElementById("stripeConnectModal");
   if (modal) {
     modal.remove();
   }
-}
+};
 
 // Lancer le processus Stripe Connect
 async function initiateStripeConnect() {
-  const btn = document.getElementById('btnConnectStripeModal');
+  const btn = document.getElementById("btnConnectStripeModal");
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Connexion...';
   }
-  
+
   try {
     const result = await StripeConnectManager.createStripeConnectAccount();
-    
+
     if (result.success && result.data.onboarding_url) {
-      helpers.showToast('Redirection vers Stripe...', 'info');
+      helpers.showToast("Redirection vers Stripe...", "info");
       // Rediriger vers Stripe pour finaliser
       setTimeout(() => {
         window.location.href = result.data.onboarding_url;
       }, 500);
     } else {
-      helpers.showToast(result.message || 'Erreur lors de la connexion', 'error');
+      helpers.showToast(
+        result.message || "Erreur lors de la connexion",
+        "error",
+      );
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
+        btn.innerHTML =
+          '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
       }
     }
   } catch (error) {
-    console.error('Erreur:', error);
-    helpers.showToast('Erreur de connexion à Stripe', 'error');
+    console.error("Erreur:", error);
+    helpers.showToast("Erreur de connexion à Stripe", "error");
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
+      btn.innerHTML =
+        '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
     }
   }
 }
