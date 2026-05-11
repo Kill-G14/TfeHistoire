@@ -252,5 +252,88 @@ class EventRepository {
     $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
     return $stmt->execute();
   }
+
+  // Mettre à jour la date et l'heure d'un événement
+  public function updateEventDateTime(int $eventId, string $newDate, string $newTime): bool {
+    $query = "UPDATE events 
+              SET date = :new_date, time = :new_time, has_pending_modification = FALSE, updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
+    $stmt->bindParam(':new_date', $newDate);
+    $stmt->bindParam(':new_time', $newTime);
+    return $stmt->execute();
+  }
+
+  // Marquer qu'un événement a une modification en attente
+  public function setHasPendingModification(int $eventId, bool $hasPending): bool {
+    $query = "UPDATE events 
+              SET has_pending_modification = :has_pending, updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
+    $stmt->bindParam(':has_pending', $hasPending, PDO::PARAM_BOOL);
+    return $stmt->execute();
+  }
+
+  // Marquer qu'un événement a une demande de suppression
+  public function setDeletionRequested(int $eventId, bool $requested, ?string $message = null): bool {
+    $query = "UPDATE events 
+              SET deletion_requested = :requested, 
+                  deletion_message = :message, 
+                  deletion_requested_at = NOW(), 
+                  updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
+    $stmt->bindParam(':requested', $requested, PDO::PARAM_BOOL);
+    $stmt->bindParam(':message', $message);
+    return $stmt->execute();
+  }
+
+  // Récupérer les événements en attente de suppression
+  public function getEventsPendingDeletion(): array {
+    $query = "SELECT e.*, u.name as user_name, u.email as user_email
+              FROM events e
+              INNER JOIN users u ON e.user_id = u.id
+              WHERE e.deletion_requested = TRUE AND e.is_deleted = FALSE
+              ORDER BY e.deletion_requested_at DESC";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // Récupérer les utilisateurs ayant acheté des billets pour un événement
+  public function getUsersWhoBoughtTickets(int $eventId): array {
+    $query = "SELECT DISTINCT u.id, u.email, u.name, oi.quantity, o.created_at as purchase_date
+              FROM users u
+              INNER JOIN orders o ON u.id = o.user_id
+              INNER JOIN order_items oi ON o.id = oi.order_id
+              WHERE oi.event_id = :event_id 
+              AND o.is_paid = TRUE 
+              AND o.is_deleted = FALSE
+              AND oi.is_deleted = FALSE
+              ORDER BY o.created_at DESC";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // Vérifier si un événement a des billets vendus
+  public function hasTicketsSold(int $eventId): bool {
+    $query = "SELECT COUNT(*) as count
+              FROM order_items oi
+              INNER JOIN orders o ON oi.order_id = o.id
+              WHERE oi.event_id = :event_id 
+              AND o.is_paid = TRUE 
+              AND o.is_deleted = FALSE
+              AND oi.is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['count'] > 0;
+  }
 }
 

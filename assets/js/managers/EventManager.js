@@ -299,6 +299,71 @@ class EventManager {
       };
     }
   }
+
+  // Demander une modification de date/heure pour un événement
+  async requestModification(eventId, newDate, newTime, token) {
+    if (!token) {
+      return {
+        success: false,
+        message: "Non authentifié",
+      };
+    }
+
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "requestModification",
+          token: token,
+          event_id: eventId,
+          new_date: newDate,
+          new_time: newTime,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Demander la suppression d'un événement
+  async requestDeletion(eventId, deletionMessage, token) {
+    if (!token) {
+      return {
+        success: false,
+        message: "Non authentifié",
+      };
+    }
+
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "requestDeletion",
+          token: token,
+          event_id: eventId,
+          deletion_message: deletionMessage,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
 }
 
 export default new EventManager();

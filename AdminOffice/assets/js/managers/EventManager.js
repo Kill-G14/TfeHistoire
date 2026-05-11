@@ -134,6 +134,163 @@ class EventManager {
       };
     }
   }
+
+  // Récupérer les modifications en attente
+  async getPendingModifications(token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "getPendingModifications",
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors du chargement des modifications:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Approuver une modification
+  async approveModification(modificationId, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "approveModification",
+          modification_id: modificationId,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors de l'approbation de la modification:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Rejeter une modification
+  async rejectModification(modificationId, reason, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "rejectModification",
+          modification_id: modificationId,
+          reason: reason,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors du rejet de la modification:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Récupérer les suppressions en attente
+  async getPendingDeletions(token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "getPendingDeletions",
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors du chargement des suppressions:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Approuver une suppression
+  async approveDeletion(eventId, adminMessage, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "approveDeletion",
+          event_id: eventId,
+          admin_message: adminMessage || null,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors de l'approbation de la suppression:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
+  // Rejeter une suppression
+  async rejectDeletion(eventId, reason, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "events",
+          action: "rejectDeletion",
+          event_id: eventId,
+          reason: reason,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erreur lors du rejet de la suppression:", error);
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
 }
 
 // Export d'une instance singleton

@@ -25,6 +25,10 @@ class Event {
   public bool $is_approved;
   public bool $is_rejected;
   public bool $is_deleted;
+  public bool $has_pending_modification;
+  public bool $deletion_requested;
+  public ?string $deletion_message;
+  public ?string $deletion_requested_at;
   public ?string $image_event;
   public string $created_at;
   public string $updated_at;

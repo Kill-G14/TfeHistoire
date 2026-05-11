@@ -114,11 +114,216 @@ export async function mount(container, params) {
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);
+
+  // Rendre les fonctions globales pour les onclick
+  window.openModifyEventModal = openModifyEventModal;
+  window.openDeleteEventModal = openDeleteEventModal;
+}
+
+// Ouvrir la modal de modification d'événement
+function openModifyEventModal(eventId, currentDate, currentTime) {
+  const modalHtml = `
+    <div class="modal fade" id="modifyEventModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modifier la date et l'heure</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              Vous ne pouvez modifier que la date et l'heure de l'événement. La modification devra être validée par un administrateur.
+            </div>
+            <form id="modifyEventForm">
+              <input type="hidden" id="modifyEventId" value="${eventId}">
+              <div class="mb-3">
+                <label for="modifyDate" class="form-label">Nouvelle date</label>
+                <input type="date" class="form-control" id="modifyDate" value="${currentDate}" required>
+                <div class="invalid-feedback"></div>
+              </div>
+              <div class="mb-3">
+                <label for="modifyTime" class="form-label">Nouvelle heure</label>
+                <input type="time" class="form-control" id="modifyTime" value="${currentTime}" required>
+                <div class="invalid-feedback"></div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmModify">Envoyer la demande</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Supprimer l'ancienne modal si elle existe
+  const existingModal = document.getElementById("modifyEventModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Ajouter la modal au DOM
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+  // Afficher la modal
+  const modalEl = document.getElementById("modifyEventModal");
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  // Event listener pour le bouton de confirmation
+  document
+    .getElementById("btnConfirmModify")
+    .addEventListener("click", async () => {
+      await handleModifyEvent(modal);
+    });
+}
+
+// Gérer la modification d'événement
+async function handleModifyEvent(modal) {
+  const eventId = document.getElementById("modifyEventId").value;
+  const newDate = document.getElementById("modifyDate").value;
+  const newTime = document.getElementById("modifyTime").value;
+
+  // Validation basique
+  if (!newDate || !newTime) {
+    helpers.showToast("Veuillez remplir tous les champs", "error");
+    return;
+  }
+
+  // Vérifier que la date est dans le futur
+  const selectedDate = new Date(newDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (selectedDate < today) {
+    helpers.showToast("La date doit être dans le futur", "error");
+    return;
+  }
+
+  const token = auth.getToken();
+  const result = await EventManager.requestModification(
+    eventId,
+    newDate,
+    newTime,
+    token,
+  );
+
+  if (result.success) {
+    helpers.showToast("Demande de modification envoyée avec succès", "success");
+    modal.hide();
+    // Recharger les événements
+    await loadCreatedEvents();
+  } else {
+    helpers.showToast(result.message || "Erreur lors de la demande", "error");
+  }
+}
+
+// Ouvrir la modal de suppression d'événement
+function openDeleteEventModal(eventId, eventTitle) {
+  const modalHtml = `
+    <div class="modal fade" id="deleteEventModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Demander la suppression de l'événement</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              <strong>Attention !</strong> La suppression devra être validée par un administrateur.
+            </div>
+            <p><strong>Événement :</strong> ${eventTitle}</p>
+            <p class="text-muted small">
+              Veuillez expliquer la raison de l'annulation. Ce message sera envoyé par email à tous les participants ayant réservé ou acheté des billets.
+            </p>
+            <form id="deleteEventForm">
+              <input type="hidden" id="deleteEventId" value="${eventId}">
+              <div class="mb-3">
+                <label for="deletionMessage" class="form-label">Message d'excuse et d'explication <span class="text-danger">*</span></label>
+                <textarea 
+                  class="form-control" 
+                  id="deletionMessage" 
+                  rows="4" 
+                  required
+                  placeholder="Exemple : Nous sommes sincèrement désolés mais en raison de circonstances imprévues, nous devons annuler cet événement..."></textarea>
+                <div class="form-text">Minimum 20 caractères</div>
+                <div class="invalid-feedback"></div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmDelete">Demander la suppression</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Supprimer l'ancienne modal si elle existe
+  const existingModal = document.getElementById("deleteEventModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Ajouter la modal au DOM
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+  // Afficher la modal
+  const modalEl = document.getElementById("deleteEventModal");
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
+
+  // Event listener pour le bouton de confirmation
+  document
+    .getElementById("btnConfirmDelete")
+    .addEventListener("click", async () => {
+      await handleDeleteEvent(modal);
+    });
+}
+
+// Gérer la suppression d'événement
+async function handleDeleteEvent(modal) {
+  const eventId = document.getElementById("deleteEventId").value;
+  const deletionMessage = document
+    .getElementById("deletionMessage")
+    .value.trim();
+
+  // Validation
+  if (!deletionMessage || deletionMessage.length < 20) {
+    helpers.showToast(
+      "Le message doit contenir au moins 20 caractères",
+      "error",
+    );
+    return;
+  }
+
+  const token = auth.getToken();
+  const result = await EventManager.requestDeletion(
+    eventId,
+    deletionMessage,
+    token,
+  );
+
+  if (result.success) {
+    helpers.showToast("Demande de suppression envoyée avec succès", "success");
+    modal.hide();
+    // Recharger les événements
+    await loadCreatedEvents();
+  } else {
+    helpers.showToast(result.message || "Erreur lors de la demande", "error");
+  }
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
 export async function unmount() {
   // Pas de nettoyage nécessaire pour cette vue simple
+  // Nettoyer les fonctions globales
+  delete window.openModifyEventModal;
+  delete window.openDeleteEventModal;
 }
 
 // Attacher les événements de la page profil
@@ -328,7 +533,13 @@ function displayCreatedEvents(events) {
         .map((event) => {
           // Déterminer le statut de l'événement
           let statusBadge = "";
-          if (event.is_pending) {
+          if (event.deletion_requested) {
+            statusBadge =
+              '<span class="badge bg-dark">En attente de suppression</span>';
+          } else if (event.has_pending_modification) {
+            statusBadge =
+              '<span class="badge bg-info">Modification en attente</span>';
+          } else if (event.is_pending) {
             statusBadge = '<span class="badge bg-warning">En attente</span>';
           } else if (event.is_approved) {
             statusBadge = '<span class="badge bg-success">Approuvé</span>';
@@ -337,6 +548,36 @@ function displayCreatedEvents(events) {
           }
 
           const priceDisplay = event.is_free ? "Gratuit" : "Voir billets";
+
+          // Boutons d'action selon le statut
+          let actionButtons = `
+            <button class="btn btn-primary btn-sm flex-grow-1" 
+                    onclick="event.stopPropagation(); viewCreatedEventDetails(${event.id})">
+              <i class="bi bi-eye"></i> Voir détails
+            </button>
+          `;
+
+          // Si l'événement est approuvé et n'a pas de modification/suppression en attente
+          if (
+            event.is_approved &&
+            !event.has_pending_modification &&
+            !event.deletion_requested
+          ) {
+            actionButtons = `
+              <button class="btn btn-primary btn-sm" 
+                      onclick="event.stopPropagation(); viewCreatedEventDetails(${event.id})">
+                <i class="bi bi-eye"></i> Détails
+              </button>
+              <button class="btn btn-warning btn-sm" 
+                      onclick="event.stopPropagation(); openModifyEventModal(${event.id}, '${event.date}', '${event.time}')">
+                <i class="bi bi-pencil"></i> Modifier
+              </button>
+              <button class="btn btn-danger btn-sm" 
+                      onclick="event.stopPropagation(); openDeleteEventModal(${event.id}, '${event.title.replace(/'/g, "\\'")}')">
+                <i class="bi bi-trash"></i> Supprimer
+              </button>
+            `;
+          }
 
           return `
         <div class="favorite-card-wrapper" id="created-event-${event.id}">
@@ -365,10 +606,7 @@ function displayCreatedEvents(events) {
               </div>
               
               <div class="d-flex gap-2">
-                <button class="btn btn-primary btn-sm flex-grow-1" 
-                        onclick="event.stopPropagation(); viewCreatedEventDetails(${event.id})">
-                  <i class="bi bi-eye"></i> Voir détails
-                </button>
+                ${actionButtons}
               </div>
             </div>
           </div>

@@ -102,6 +102,14 @@ class OrderService {
         ];
       }
 
+      // Vérifier que l'événement n'est pas en attente de suppression
+      if ($event->deletion_requested) {
+        return [
+          'success' => false,
+          'message' => 'L\'événement "' . $event->title . '" est en cours d\'annulation et ne peut plus être réservé'
+        ];
+      }
+
       // Vérifier la disponibilité
       if ($event->ticket_quantity < $item['quantity']) {
         return [

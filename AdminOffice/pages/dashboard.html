@@ -70,11 +70,21 @@
                   <i class="nav-icon fas fa-calendar-alt"></i>
                   <p>
                     Événements
-                    <span
-                      class="badge badge-warning right"
-                      id="pendingEventsCount"
-                      >0</span
-                    >
+                    <span class="badges-group">
+                      <span class="badge badge-warning" id="pendingEventsCount"
+                        >0</span
+                      >
+                      <span
+                        class="badge badge-info"
+                        id="modificationsCountSidebar"
+                        >0</span
+                      >
+                      <span
+                        class="badge badge-danger"
+                        id="deletionsCountSidebar"
+                        >0</span
+                      >
+                    </span>
                   </p>
                 </a>
               </li>
@@ -108,14 +118,14 @@
               <div class="col-lg-3 col-6">
                 <div
                   class="small-box bg-info clickable-box"
-                  data-link="events.html"
+                  data-link="events.html#modifications"
                 >
                   <div class="inner">
-                    <h3 id="totalEvents">0</h3>
-                    <p>Événements Total</p>
+                    <h3 id="modificationsCount">0</h3>
+                    <p>Modifications</p>
                   </div>
                   <div class="icon">
-                    <i class="fas fa-calendar"></i>
+                    <i class="fas fa-edit"></i>
                   </div>
                 </div>
               </div>
@@ -152,15 +162,15 @@
 
               <div class="col-lg-3 col-6">
                 <div
-                  class="small-box bg-primary clickable-box"
-                  data-link="users.html"
+                  class="small-box bg-danger clickable-box"
+                  data-link="events.html#deletions"
                 >
                   <div class="inner">
-                    <h3 id="totalUsers">0</h3>
-                    <p>Utilisateurs</p>
+                    <h3 id="deletionsCount">0</h3>
+                    <p>Suppressions</p>
                   </div>
                   <div class="icon">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-trash"></i>
                   </div>
                 </div>
               </div>

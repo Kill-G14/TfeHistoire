@@ -1,5 +1,4 @@
 import EventManager from "../managers/EventManager.js";
-import UserManager from "../managers/UserManager.js";
 import { storage, helpers } from "../utils/helpers.js";
 
 // Vérifier l'authentification
@@ -19,21 +18,31 @@ async function loadStats() {
   const eventsResult = await EventManager.getAll(token);
   if (eventsResult.success) {
     const events = eventsResult.data;
-    const totalEvents = events.length;
     const pendingEvents = events.filter((e) => e.is_pending).length;
     const approvedEvents = events.filter((e) => e.is_approved).length;
 
-    document.getElementById("totalEvents").textContent = totalEvents;
     document.getElementById("pendingEvents").textContent = pendingEvents;
     document.getElementById("approvedEvents").textContent = approvedEvents;
     document.getElementById("pendingEventsCount").textContent = pendingEvents;
   }
 
-  // Charger les utilisateurs
-  const usersResult = await UserManager.getAll(token);
-  if (usersResult.success) {
-    const totalUsers = usersResult.data.length;
-    document.getElementById("totalUsers").textContent = totalUsers;
+  // Charger les modifications en attente
+  const modificationsResult = await EventManager.getPendingModifications(token);
+  if (modificationsResult.success) {
+    const modificationsCount = modificationsResult.data.length;
+    document.getElementById("modificationsCount").textContent =
+      modificationsCount;
+    document.getElementById("modificationsCountSidebar").textContent =
+      modificationsCount;
+  }
+
+  // Charger les suppressions en attente
+  const deletionsResult = await EventManager.getPendingDeletions(token);
+  if (deletionsResult.success) {
+    const deletionsCount = deletionsResult.data.length;
+    document.getElementById("deletionsCount").textContent = deletionsCount;
+    document.getElementById("deletionsCountSidebar").textContent =
+      deletionsCount;
   }
 }
 

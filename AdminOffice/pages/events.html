@@ -65,11 +65,67 @@
                   <p>Dashboard</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="events.html" class="nav-link active">
+              <li class="nav-item has-treeview menu-open">
+                <a href="#" class="nav-link active">
                   <i class="nav-icon fas fa-calendar-alt"></i>
-                  <p>Événements</p>
+                  <p>
+                    Événements
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="#all" class="nav-link active" data-toggle="tab">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Tous</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#approved" class="nav-link" data-toggle="tab">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Approuvés</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#pending" class="nav-link" data-toggle="tab">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>
+                        En Attente
+                        <span
+                          class="badge badge-warning"
+                          id="pendingCountSidebar"
+                          >0</span
+                        >
+                      </p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#modifications" class="nav-link" data-toggle="tab">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>
+                        Modifications
+                        <span
+                          class="badge badge-info"
+                          id="modificationsCountSidebar"
+                          >0</span
+                        >
+                      </p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#deletions" class="nav-link" data-toggle="tab">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>
+                        Suppressions
+                        <span
+                          class="badge badge-danger"
+                          id="deletionsCountSidebar"
+                          >0</span
+                        >
+                      </p>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="users.html" class="nav-link">
@@ -101,13 +157,12 @@
               <li class="nav-item">
                 <a
                   class="nav-link active"
-                  id="pending-tab"
+                  id="all-tab"
                   data-toggle="tab"
-                  href="#pending"
+                  href="#all"
                   role="tab"
                 >
-                  <i class="fas fa-clock"></i> En Attente
-                  <span class="badge badge-warning" id="pendingCount">0</span>
+                  <i class="fas fa-list"></i> Tous
                 </a>
               </li>
               <li class="nav-item">
@@ -124,27 +179,50 @@
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  id="all-tab"
+                  id="pending-tab"
                   data-toggle="tab"
-                  href="#all"
+                  href="#pending"
                   role="tab"
                 >
-                  <i class="fas fa-list"></i> Tous
+                  <i class="fas fa-clock"></i> En Attente
+                  <span class="badge badge-warning" id="pendingCount">0</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="modifications-tab"
+                  data-toggle="tab"
+                  href="#modifications"
+                  role="tab"
+                >
+                  <i class="fas fa-edit"></i> Modifications
+                  <span class="badge badge-info" id="modificationsCount"
+                    >0</span
+                  >
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="deletions-tab"
+                  data-toggle="tab"
+                  href="#deletions"
+                  role="tab"
+                >
+                  <i class="fas fa-trash"></i> Suppressions
+                  <span class="badge badge-danger" id="deletionsCount">0</span>
                 </a>
               </li>
             </ul>
 
             <!-- Tab Content -->
             <div class="tab-content" id="eventTabsContent">
-              <!-- Pending Events -->
-              <div
-                class="tab-pane fade show active"
-                id="pending"
-                role="tabpanel"
-              >
+              <!-- All Events -->
+              <div class="tab-pane fade show active" id="all" role="tabpanel">
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Événements en Attente</h3>
+                    <h3 class="card-title">Tous les Événements</h3>
                   </div>
                   <div class="card-body p-0">
                     <table class="table table-striped">
@@ -154,11 +232,11 @@
                           <th>Titre</th>
                           <th>Date</th>
                           <th>Ville</th>
-                          <th>Catégorie</th>
+                          <th>Statut</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
-                      <tbody id="pendingEventsList">
+                      <tbody id="allEventsList">
                         <tr>
                           <td colspan="6" class="text-center">Chargement...</td>
                         </tr>
@@ -196,11 +274,11 @@
                 </div>
               </div>
 
-              <!-- All Events -->
-              <div class="tab-pane fade" id="all" role="tabpanel">
+              <!-- Pending Events -->
+              <div class="tab-pane fade" id="pending" role="tabpanel">
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title">Tous les Événements</h3>
+                    <h3 class="card-title">Événements en Attente</h3>
                   </div>
                   <div class="card-body p-0">
                     <table class="table table-striped">
@@ -210,13 +288,74 @@
                           <th>Titre</th>
                           <th>Date</th>
                           <th>Ville</th>
-                          <th>Statut</th>
+                          <th>Catégorie</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
-                      <tbody id="allEventsList">
+                      <tbody id="pendingEventsList">
                         <tr>
                           <td colspan="6" class="text-center">Chargement...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pending Modifications -->
+              <div class="tab-pane fade" id="modifications" role="tabpanel">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Modifications en Attente</h3>
+                  </div>
+                  <div class="card-body p-0">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Événement</th>
+                          <th>Créateur</th>
+                          <th>Date Actuelle</th>
+                          <th>Heure Actuelle</th>
+                          <th>Nouvelle Date</th>
+                          <th>Nouvelle Heure</th>
+                          <th>Demandé le</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="modificationsList">
+                        <tr>
+                          <td colspan="9" class="text-center">Chargement...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pending Deletions -->
+              <div class="tab-pane fade" id="deletions" role="tabpanel">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Demandes de Suppression</h3>
+                  </div>
+                  <div class="card-body p-0">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Événement</th>
+                          <th>Créateur</th>
+                          <th>Date</th>
+                          <th>Message</th>
+                          <th>Billets Vendus</th>
+                          <th>Demandé le</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="deletionsList">
+                        <tr>
+                          <td colspan="8" class="text-center">Chargement...</td>
                         </tr>
                       </tbody>
                     </table>

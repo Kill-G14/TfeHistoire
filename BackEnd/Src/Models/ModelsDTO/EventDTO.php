@@ -22,6 +22,10 @@ class EventDTO {
   public bool $is_pending;
   public bool $is_approved;
   public bool $is_rejected;
+  public bool $has_pending_modification;
+  public bool $deletion_requested;
+  public ?string $deletion_message;
+  public ?string $deletion_requested_at;
   public ?string $image_event;
   public string $created_at;
   
@@ -48,6 +52,10 @@ class EventDTO {
     $this->is_pending = $event->is_pending;
     $this->is_approved = $event->is_approved;
     $this->is_rejected = $event->is_rejected;
+    $this->has_pending_modification = $event->has_pending_modification;
+    $this->deletion_requested = $event->deletion_requested;
+    $this->deletion_message = $event->deletion_message;
+    $this->deletion_requested_at = $event->deletion_requested_at;
     $this->image_event = $event->image_event;
     $this->created_at = $event->created_at;
     
@@ -76,6 +84,10 @@ class EventDTO {
       'is_pending' => $this->is_pending,
       'is_approved' => $this->is_approved,
       'is_rejected' => $this->is_rejected,
+      'has_pending_modification' => $this->has_pending_modification,
+      'deletion_requested' => $this->deletion_requested,
+      'deletion_message' => $this->deletion_message,
+      'deletion_requested_at' => $this->deletion_requested_at,
       'image_event' => $this->image_event,
       'created_at' => $this->created_at,
       // Informations de billetterie

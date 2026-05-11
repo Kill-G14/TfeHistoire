@@ -41,6 +41,8 @@ DROP TABLE IF EXISTS favorites;
 
 DROP TABLE IF EXISTS sessions;
 
+DROP TABLE IF EXISTS event_modifications;
+
 DROP TABLE IF EXISTS events;
 
 DROP TABLE IF EXISTS users;
@@ -92,11 +94,36 @@ CREATE TABLE IF NOT EXISTS events (
     is_deleted BOOLEAN DEFAULT FALSE,
     requires_stripe_account BOOLEAN DEFAULT FALSE COMMENT 'Si true, le créateur doit avoir un compte Stripe connecté',
     stripe_account_verified BOOLEAN DEFAULT FALSE COMMENT 'Si le compte Stripe du créateur était vérifié lors de la création',
+    has_pending_modification BOOLEAN DEFAULT FALSE COMMENT 'Si true, une modification de date/heure est en attente de validation',
+    deletion_requested BOOLEAN DEFAULT FALSE COMMENT 'Si true, une demande de suppression est en attente',
+    deletion_message TEXT NULL COMMENT 'Message de l organisateur expliquant la suppression',
+    deletion_requested_at TIMESTAMP NULL COMMENT 'Date de la demande de suppression',
     image_event VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Table des modifications d'événements (date/heure) en attente
+CREATE TABLE IF NOT EXISTS event_modifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    event_id INT NOT NULL,
+    new_date DATE NOT NULL COMMENT 'Nouvelle date proposée',
+    new_time TIME NOT NULL COMMENT 'Nouvelle heure proposée',
+    old_date DATE NOT NULL COMMENT 'Ancienne date (pour historique)',
+    old_time TIME NOT NULL COMMENT 'Ancienne heure (pour historique)',
+    status ENUM(
+        'pending',
+        'approved',
+        'rejected'
+    ) DEFAULT 'pending' COMMENT 'Statut de la modification',
+    rejection_reason TEXT NULL COMMENT 'Raison du rejet par l admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Date de la demande',
+    validated_at TIMESTAMP NULL COMMENT 'Date de validation/rejet par admin',
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE,
+    INDEX idx_status (status),
+    INDEX idx_event_id (event_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Modifications de date/heure d événements en attente de validation';
 
 -- Table des commandes
 CREATE TABLE IF NOT EXISTS orders (
@@ -252,6 +279,10 @@ CREATE INDEX idx_events_approved ON events (is_approved);
 CREATE INDEX idx_events_rejected ON events (is_rejected);
 
 CREATE INDEX idx_events_deleted ON events (is_deleted);
+
+CREATE INDEX idx_events_has_pending_modification ON events (has_pending_modification);
+
+CREATE INDEX idx_events_deletion_requested ON events (deletion_requested);
 
 CREATE INDEX idx_events_location ON events (latitude, longitude);
 -- Index composite pour recherche géographique

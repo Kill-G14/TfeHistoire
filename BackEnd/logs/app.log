@@ -92,3 +92,6 @@
 [2026-05-07 12:30:25] [INFO] User logged in successfully | Context: {"user_id":5}
 [2026-05-07 12:31:23] [INFO] User logged in successfully | Context: {"user_id":5}
 [2026-05-07 12:32:11] [INFO] User deleted by admin | Context: {"user_id":4}
+[2026-05-11 13:34:49] [INFO] User logged out successfully
+[2026-05-11 13:35:29] [INFO] User logged in successfully | Context: {"user_id":1}
+[2026-05-11 13:35:45] [INFO] User registered successfully | Context: {"user_id":5}

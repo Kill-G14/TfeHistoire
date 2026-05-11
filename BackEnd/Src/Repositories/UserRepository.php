@@ -175,5 +175,16 @@ class UserRepository {
            $stripeData['stripe_onboarding_completed'] && 
            $stripeData['stripe_account_status'] === 'connected';
   }
+
+  /**
+   * Récupérer tous les utilisateurs administrateurs
+   */
+  public function getAllAdmins(): array {
+    $query = "SELECT id, email, name FROM users 
+              WHERE is_admin = TRUE AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }
 

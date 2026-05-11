@@ -93,6 +93,38 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ========== SIDEBAR BADGES ========== */
+
+/* Groupe de badges côte à côte dans la sidebar */
+.badges-group {
+  display: inline-flex;
+  gap: 5px;
+  float: right;
+  margin-top: 2px;
+}
+
+.badges-group .badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  font-weight: 600;
+}
+
+/* Badges individuels dans la sidebar */
+.sidebar .nav-treeview .badge {
+  float: right;
+  margin-left: 5px;
+  font-size: 11px;
+  padding: 3px 8px;
+  font-weight: 600;
+}
+
+/* Badges dans les onglets du haut */
+.nav-tabs .badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  font-weight: 600;
+}
+
 /* ========== MODALES DE CONFIRMATION ========== */
 
 /* Style personnalisé pour les modales de confirmation */
