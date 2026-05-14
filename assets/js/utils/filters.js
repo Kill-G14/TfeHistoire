@@ -171,12 +171,6 @@ export const filters = {
 
     const finalConfig = { ...defaultConfig, ...config };
 
-    // Debug: Vérifier que europeanCountries est bien chargé
-    console.log(
-      "Nombre de pays européens disponibles:",
-      europeanCountries.length,
-    );
-
     // Populer le select des pays avec TOUS les pays européens
     if (document.getElementById(finalConfig.countrySelectId)) {
       this.populateSelect(

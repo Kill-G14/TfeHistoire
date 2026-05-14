@@ -157,7 +157,6 @@ async function uploadImage(file) {
 
     return await response.json();
   } catch (error) {
-    console.error("Erreur upload:", error);
     return {
       success: false,
       message: "Erreur de connexion au serveur",
@@ -201,7 +200,6 @@ async function geocodeAddress(address, city, postalCode, country) {
       };
     } else {
       // Pas de résultats trouvés, mais on continue sans erreur
-      console.warn("Géocodage : aucun résultat trouvé pour", fullAddress);
       return {
         success: false,
         latitude: null,
@@ -210,7 +208,6 @@ async function geocodeAddress(address, city, postalCode, country) {
     }
   } catch (error) {
     // En cas d'erreur, on continue sans coordonnées
-    console.error("Erreur lors du géocodage:", error);
     return {
       success: false,
       latitude: null,
@@ -517,7 +514,6 @@ async function initiateStripeConnect() {
       }
     }
   } catch (error) {
-    console.error("Erreur:", error);
     helpers.showToast("Erreur de connexion à Stripe", "error");
     if (btn) {
       btn.disabled = false;

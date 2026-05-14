@@ -21,7 +21,6 @@ class CheckoutManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la récupération de la clé Stripe:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -49,10 +48,6 @@ class CheckoutManager {
 
       return await response.json();
     } catch (error) {
-      console.error(
-        "Erreur lors de la création de la session de checkout:",
-        error,
-      );
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -79,10 +74,6 @@ class CheckoutManager {
 
       return await response.json();
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération du statut de paiement:",
-        error,
-      );
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -109,7 +100,6 @@ class CheckoutManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la récupération des paiements:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -142,7 +132,6 @@ class CheckoutManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la demande de remboursement:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",

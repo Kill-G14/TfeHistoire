@@ -217,7 +217,6 @@ async function handleReservation() {
       );
     }
   } catch (error) {
-    console.error("Erreur lors de la réservation:", error);
     helpers.showToast("Erreur lors de la création de la réservation", "error");
   }
 }

@@ -28,13 +28,7 @@
 - ✅ Table rate_limiter dans migration SQL
 - ✅ authApi.php intégré avec rate limiting
 
-### 4. Scripts utilitaires
-
-- ✅ cleanup_sessions.php pour cron
-- ✅ cleanup_ratelimiter.php pour cron
-- ✅ GUIDE_MIGRATION.md complet
-
-### 5. LocalStorage - Cohérence des clés
+### 4. LocalStorage - Cohérence des clés
 
 - ✅ Clés localStorage unifiées vers `memoriaeventia_*`
 - ✅ assets/js/utils/auth.js mis à jour
@@ -44,6 +38,16 @@
 ---
 
 ## 🔨 À FAIRE RAPIDEMENT
+
+### 5. Scripts utilitaires (cron jobs)
+
+**Priorité : MOYENNE**
+
+Créer les scripts de nettoyage automatique :
+
+- [ ] cleanup_sessions.php (supprimer sessions expirées)
+- [ ] cleanup_ratelimiter.php (nettoyer rate_limiter ancien)
+- [ ] GUIDE_MIGRATION.md (documentation migration)
 
 ### 6. Standardiser les réponses API
 

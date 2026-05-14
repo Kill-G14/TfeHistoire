@@ -21,7 +21,6 @@ class UserManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors du chargement des utilisateurs:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -50,7 +49,6 @@ class UserManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la mise à jour des droits:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -76,7 +74,6 @@ class UserManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la suppression de l'utilisateur:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",

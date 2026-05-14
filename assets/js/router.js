@@ -1,142 +1,144 @@
 // Routeur SPA avec History API
 export class Router {
   constructor(routes, appSelector) {
-    this.routes = routes
-    this.appElement = document.querySelector(appSelector)
-    this.currentView = null
-    this.params = {}
+    this.routes = routes;
+    this.appElement = document.querySelector(appSelector);
+    this.currentView = null;
+    this.params = {};
     // Détecter le base path depuis la balise <base>
-    const baseTag = document.querySelector('base')
-    this.basePath = baseTag ? new URL(baseTag.href).pathname : '/'
+    const baseTag = document.querySelector("base");
+    this.basePath = baseTag ? new URL(baseTag.href).pathname : "/";
     // Enlever le slash final du basePath
-    if (this.basePath.endsWith('/') && this.basePath.length > 1) {
-      this.basePath = this.basePath.slice(0, -1)
+    if (this.basePath.endsWith("/") && this.basePath.length > 1) {
+      this.basePath = this.basePath.slice(0, -1);
     }
   }
 
   init() {
     // Écouter les changements d'URL
-    window.addEventListener('popstate', () => this.handleRoute())
+    window.addEventListener("popstate", () => this.handleRoute());
 
     // Intercepter les clics sur les liens
-    document.addEventListener('click', (e) => {
-      if (e.target.matches('[data-link]') || e.target.closest('[data-link]')) {
-        e.preventDefault()
-        const link = e.target.matches('[data-link]') ? e.target : e.target.closest('[data-link]')
-        this.navigate(link.getAttribute('href'))
+    document.addEventListener("click", (e) => {
+      if (e.target.matches("[data-link]") || e.target.closest("[data-link]")) {
+        e.preventDefault();
+        const link = e.target.matches("[data-link]")
+          ? e.target
+          : e.target.closest("[data-link]");
+        this.navigate(link.getAttribute("href"));
       }
-    })
+    });
 
     // Charger la route initiale
-    this.handleRoute()
+    this.handleRoute();
   }
 
   async navigate(url) {
     // Ajouter le base path si l'URL ne commence pas déjà par celui-ci
-    let fullUrl = url
-    if (!url.startsWith(this.basePath) && url.startsWith('/')) {
-      fullUrl = this.basePath + url
+    let fullUrl = url;
+    if (!url.startsWith(this.basePath) && url.startsWith("/")) {
+      fullUrl = this.basePath + url;
     }
-    history.pushState(null, null, fullUrl)
-    await this.handleRoute()
+    history.pushState(null, null, fullUrl);
+    await this.handleRoute();
   }
 
   async handleRoute() {
-    const path = window.location.pathname
+    const path = window.location.pathname;
 
     // Trouver la route correspondante
-    const route = this.matchRoute(path)
+    const route = this.matchRoute(path);
 
     if (route) {
       // Démonter la vue précédente
       if (this.currentView && this.currentView.unmount) {
-        await this.currentView.unmount()
+        await this.currentView.unmount();
       }
 
       // Ajouter classe de chargement
-      this.appElement.classList.add('loading')
+      this.appElement.classList.add("loading");
 
       try {
         // Charger et monter la nouvelle vue
-        const viewModule = await route.handler()
-        this.currentView = viewModule.default || viewModule
+        const viewModule = await route.handler();
+        this.currentView = viewModule.default || viewModule;
 
         // Mettre à jour les métadonnées
-        this.updateMetadata(this.currentView.meta)
+        this.updateMetadata(this.currentView.meta);
 
         // Monter la vue
-        await this.currentView.mount(this.appElement, this.params)
+        await this.currentView.mount(this.appElement, this.params);
       } catch (error) {
-        console.error('Erreur lors du chargement de la vue:', error)
-        this.show404()
+        this.show404();
       } finally {
         // Retirer classe de chargement
-        this.appElement.classList.remove('loading')
+        this.appElement.classList.remove("loading");
       }
     } else {
       // Route 404
-      this.show404()
+      this.show404();
     }
   }
 
   matchRoute(path) {
     // Nettoyer le path en enlevant le base path
-    let cleanPath = path
-    
+    let cleanPath = path;
+
     if (cleanPath.startsWith(this.basePath)) {
-      cleanPath = cleanPath.slice(this.basePath.length)
+      cleanPath = cleanPath.slice(this.basePath.length);
     }
-    
+
     // S'assurer qu'on a au moins un /
-    if (!cleanPath.startsWith('/')) {
-      cleanPath = '/' + cleanPath
+    if (!cleanPath.startsWith("/")) {
+      cleanPath = "/" + cleanPath;
     }
-    
+
     // Enlever le / final si présent (sauf pour la racine)
-    if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
-      cleanPath = cleanPath.slice(0, -1)
+    if (cleanPath.length > 1 && cleanPath.endsWith("/")) {
+      cleanPath = cleanPath.slice(0, -1);
     }
 
     for (const [pattern, handler] of Object.entries(this.routes)) {
-      const match = this.match(pattern, cleanPath)
+      const match = this.match(pattern, cleanPath);
       if (match) {
-        this.params = match.params
-        return { handler, params: match.params }
+        this.params = match.params;
+        return { handler, params: match.params };
       }
     }
-    return null
+    return null;
   }
 
   match(pattern, path) {
     // Convertir le pattern en regex (ex: /event/:id -> /event/([^/]+))
-    const paramNames = []
+    const paramNames = [];
     const regexPattern = pattern
       .replace(/:[^/]+/g, (match) => {
-        paramNames.push(match.slice(1))
-        return '([^/]+)'
+        paramNames.push(match.slice(1));
+        return "([^/]+)";
       })
-      .replace(/\//g, '\\/')
+      .replace(/\//g, "\\/");
 
-    const regex = new RegExp(`^${regexPattern}$`)
-    const matches = path.match(regex)
+    const regex = new RegExp(`^${regexPattern}$`);
+    const matches = path.match(regex);
 
     if (matches) {
-      const params = {}
+      const params = {};
       paramNames.forEach((name, index) => {
-        params[name] = matches[index + 1]
-      })
-      return { params }
+        params[name] = matches[index + 1];
+      });
+      return { params };
     }
 
-    return null
+    return null;
   }
 
   updateMetadata(meta = {}) {
-    document.title = meta.title || 'MemoriaEventia'
+    document.title = meta.title || "MemoriaEventia";
 
-    const description = document.getElementById('pageDescription')
+    const description = document.getElementById("pageDescription");
     if (description) {
-      description.content = meta.description || 'Découvrez les événements historiques d\'Europe'
+      description.content =
+        meta.description || "Découvrez les événements historiques d'Europe";
     }
   }
 
@@ -147,6 +149,6 @@ export class Router {
         <p class="lead">Page non trouvée</p>
         <a href="/" data-link class="btn btn-primary">Retour à l'accueil</a>
       </div>
-    `
+    `;
   }
 }

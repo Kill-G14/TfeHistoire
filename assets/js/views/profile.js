@@ -950,7 +950,6 @@ window.downloadTickets = async function (orderId) {
         '<i class="bi bi-download"></i> Télécharger les billets PDF';
     }, 2000);
   } catch (error) {
-    console.error("Erreur lors du téléchargement:", error);
     helpers.showToast("Erreur lors du téléchargement des billets", "error");
     btnElement.disabled = false;
     btnElement.innerHTML =

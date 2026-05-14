@@ -135,7 +135,6 @@ function getUserLocation() {
       }
     },
     (error) => {
-      console.error("Erreur de géolocalisation:", error);
       if (statusElement) {
         statusElement.textContent = "Position non disponible";
         statusElement.className = "small text-warning";
@@ -510,7 +509,6 @@ async function showRoute(eventId) {
       );
     }
   } catch (error) {
-    console.error("Erreur lors du calcul de l'itinéraire:", error);
     helpers.showToast("Erreur lors du calcul de l'itinéraire", "error");
   }
 }

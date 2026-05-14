@@ -77,7 +77,6 @@ export const auth = {
 
       return true
     } catch (error) {
-      console.error('Erreur lors de la vérification du token:', error)
       return false
     }
   }

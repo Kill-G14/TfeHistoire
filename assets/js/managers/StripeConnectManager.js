@@ -25,7 +25,6 @@ class StripeConnectManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -53,7 +52,6 @@ class StripeConnectManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -81,7 +79,6 @@ class StripeConnectManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -109,7 +106,6 @@ class StripeConnectManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
