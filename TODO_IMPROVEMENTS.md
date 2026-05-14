@@ -72,6 +72,7 @@ Créer les scripts de nettoyage automatique :
 ```
 
 **Services uniformisés :**
+
 - ✅ EventService.php (8 méthodes)
 - ✅ FavoriteService.php (3 méthodes)
 - ✅ OrderService.php (2 méthodes)
