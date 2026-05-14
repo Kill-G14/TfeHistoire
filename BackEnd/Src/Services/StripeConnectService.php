@@ -113,6 +113,7 @@ class StripeConnectService {
             
             return [
                 'success' => true,
+                'message' => 'Statut du compte vérifié',
                 'data' => [
                     'is_complete' => $isComplete,
                     'charges_enabled' => $account->charges_enabled,
@@ -138,6 +139,7 @@ class StripeConnectService {
             
             return [
                 'success' => true,
+                'message' => 'Lien du tableau de bord créé',
                 'data' => [
                     'url' => $loginLink->url
                 ]

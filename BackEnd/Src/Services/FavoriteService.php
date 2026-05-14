@@ -26,6 +26,7 @@ class FavoriteService {
 
     return [
       'success' => true,
+      'message' => 'Favoris récupérés avec succès',
       'data' => $favoriteDTOs
     ];
   }
@@ -36,6 +37,7 @@ class FavoriteService {
 
     return [
       'success' => true,
+      'message' => 'Favoris récupérés avec succès',
       'data' => $favoriteEvents
     ];
   }
@@ -46,6 +48,7 @@ class FavoriteService {
 
     return [
       'success' => true,
+      'message' => 'Statut favori récupéré',
       'data' => ['is_favorite' => $isFavorite]
     ];
   }

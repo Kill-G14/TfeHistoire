@@ -24,6 +24,7 @@ class UserService {
 
     return [
       'success' => true,
+      'message' => 'Utilisateurs récupérés avec succès',
       'data' => $userDTOs
     ];
   }
@@ -41,6 +42,7 @@ class UserService {
 
     return [
       'success' => true,
+      'message' => 'Utilisateur récupéré avec succès',
       'data' => (new UserDTO($user))->toArray()
     ];
   }

@@ -44,6 +44,7 @@ class OrderService {
 
     return [
       'success' => true,
+      'message' => 'Commandes récupérées avec succès',
       'data' => $orderDTOs
     ];
   }
@@ -72,6 +73,7 @@ class OrderService {
 
     return [
       'success' => true,
+      'message' => 'Commande récupérée avec succès',
       'data' => (new OrderDTO($order, $items))->toArray()
     ];
   }

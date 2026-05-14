@@ -389,6 +389,7 @@ class StripeService {
 
             return [
                 'success' => true,
+                'message' => 'Détails du paiement récupérés',
                 'data' => [
                     'id' => $paymentIntent->id,
                     'amount' => $paymentIntent->amount / 100,

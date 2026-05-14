@@ -35,11 +35,18 @@
 - ✅ AdminOffice/assets/js/utils/auth.js mis à jour
 - ✅ AdminOffice/assets/js/utils/helpers.js mis à jour
 
+### 5. Nettoyage console.log/error
+
+- ✅ Suppression de tous les console.log() et console.error()
+- ✅ 15+ fichiers JavaScript nettoyés
+- ✅ Messages utilisateur préservés (showToast, retours API)
+- ✅ Migration scripts conservés (feedback intentionnel)
+
 ---
 
 ## 🔨 À FAIRE RAPIDEMENT
 
-### 5. Scripts utilitaires (cron jobs)
+### 6. Scripts utilitaires (cron jobs)
 
 **Priorité : MOYENNE**
 
@@ -49,11 +56,11 @@ Créer les scripts de nettoyage automatique :
 - [ ] cleanup_ratelimiter.php (nettoyer rate_limiter ancien)
 - [ ] GUIDE_MIGRATION.md (documentation migration)
 
-### 6. Standardiser les réponses API
+### 7. Standardiser les réponses API
 
 **Priorité : MOYENNE**
 
-Toutes les réponses doivent avoir la structure :
+**✅ TERMINÉ !** Toutes les réponses ont maintenant la structure standardisée :
 
 ```json
 {
@@ -64,21 +71,16 @@ Toutes les réponses doivent avoir la structure :
 }
 ```
 
-Vérifier et uniformiser dans tous les Services et API.
-
-### 7. Retirer les console.log/error
-
-**Priorité : BASSE**
-
-Nettoyer tous les `console.log()` et `console.error()` :
-
-- [ ] assets/js/managers/\*.js
-- [ ] assets/js/views/\*.js
-- [ ] assets/js/components/\*.js
-- [ ] assets/js/router.js
-- [ ] AdminOffice/assets/js/\*_/_.js
-
-**Alternative** : Créer un logger JS conditionnel (dev vs prod).
+**Services uniformisés :**
+- ✅ EventService.php (8 méthodes)
+- ✅ FavoriteService.php (3 méthodes)
+- ✅ OrderService.php (2 méthodes)
+- ✅ UserService.php (2 méthodes)
+- ✅ StripeService.php (1 méthode)
+- ✅ StripeConnectService.php (2 méthodes)
+- ✅ AuthService.php (déjà OK)
+- ✅ EventModificationService.php (déjà OK)
+- ✅ PdfService.php (déjà OK)
 
 ### 8. Page d'erreur générique
 
@@ -262,10 +264,11 @@ Ajouter dans AdminOffice :
 - [ ] Tester paiements Stripe (live keys)
 - [ ] Logs accessibles mais protégés
 - [ ] Changer les clés localStorage
-- [ ] Retirer tous les console.log
+- [x] Retirer tous les console.log
 
 ---
 
-**Estimation temps total** : 6-10h pour les tâches prioritaires (5-8).
+**Estimation temps total** : 6-10h pour les tâches prioritaires (6-8).
 
 **Date de création** : 11 mai 2026
+**Dernière mise à jour** : 14 mai 2026

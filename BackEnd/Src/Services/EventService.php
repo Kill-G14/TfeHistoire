@@ -27,6 +27,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
@@ -41,6 +42,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
@@ -58,6 +60,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événement récupéré avec succès',
       'data' => (new EventDTO($event))->toArray()
     ];
   }
@@ -72,6 +75,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
@@ -86,6 +90,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
@@ -100,6 +105,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
@@ -277,6 +283,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Résultats de recherche',
       'data' => $eventDTOs
     ];
   }
@@ -291,6 +298,7 @@ class EventService {
 
     return [
       'success' => true,
+      'message' => 'Événements en attente récupérés avec succès',
       'data' => $eventDTOs
     ];
   }
