@@ -3,8 +3,8 @@
 import { storage } from './storage.js'
 import AuthManager from '../managers/AuthManager.js'
 
-const AUTH_KEY = 'eurofetes_user'
-const TOKEN_KEY = 'eurofetes_token'
+const AUTH_KEY = 'memoriaeventia_user'
+const TOKEN_KEY = 'memoriaeventia_token'
 
 export const auth = {
   // Vérifier si l'utilisateur est connecté

@@ -1,9 +1,13 @@
 // Imports
 import AuthManager from "../managers/AuthManager.js";
 import { storage } from "../utils/helpers.js";
+import { migrateAdminLocalStorage } from "../utils/migrateLocalStorage.js";
 
 // Fonction init
 async function init() {
+  // Migrer les anciennes clés localStorage (une seule fois)
+  migrateAdminLocalStorage();
+
   // Vérifier si l'utilisateur est déjà connecté
   const token = storage.getToken();
   if (token) {

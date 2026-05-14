@@ -5,18 +5,18 @@ export const auth = {
   // Sauvegarder les données d'authentification
   saveAuthData(token, user, remember = false) {
     const storage = remember ? localStorage : sessionStorage
-    storage.setItem('admin_auth_token', token)
-    storage.setItem('admin_user', JSON.stringify(user))
+    storage.setItem('memoriaeventia_admin_token', token)
+    storage.setItem('memoriaeventia_admin_user', JSON.stringify(user))
   },
 
   // Récupérer le token
   getToken() {
-    return localStorage.getItem('admin_auth_token') || sessionStorage.getItem('admin_auth_token')
+    return localStorage.getItem('memoriaeventia_admin_token') || sessionStorage.getItem('memoriaeventia_admin_token')
   },
 
   // Récupérer l'utilisateur
   getUser() {
-    const userStr = localStorage.getItem('admin_user') || sessionStorage.getItem('admin_user')
+    const userStr = localStorage.getItem('memoriaeventia_admin_user') || sessionStorage.getItem('memoriaeventia_admin_user')
     return userStr ? JSON.parse(userStr) : null
   },
 
@@ -48,10 +48,10 @@ export const auth = {
     }
 
     // Supprimer les données locales
-    localStorage.removeItem('admin_auth_token')
-    localStorage.removeItem('admin_user')
-    sessionStorage.removeItem('admin_auth_token')
-    sessionStorage.removeItem('admin_user')
+    localStorage.removeItem('memoriaeventia_admin_token')
+    localStorage.removeItem('memoriaeventia_admin_user')
+    sessionStorage.removeItem('memoriaeventia_admin_token')
+    sessionStorage.removeItem('memoriaeventia_admin_user')
 
     // Rediriger vers la page de login
     window.location.href = 'login.html'

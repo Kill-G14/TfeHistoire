@@ -34,27 +34,16 @@
 - ✅ cleanup_ratelimiter.php pour cron
 - ✅ GUIDE_MIGRATION.md complet
 
+### 5. LocalStorage - Cohérence des clés
+
+- ✅ Clés localStorage unifiées vers `memoriaeventia_*`
+- ✅ assets/js/utils/auth.js mis à jour
+- ✅ AdminOffice/assets/js/utils/auth.js mis à jour
+- ✅ AdminOffice/assets/js/utils/helpers.js mis à jour
+
 ---
 
 ## 🔨 À FAIRE RAPIDEMENT
-
-### 5. LocalStorage - Cohérence des clés
-
-**Priorité : MOYENNE**
-
-Renommer toutes les clés localStorage pour uniformiser :
-
-- `eurofetes_token` → `memoriaeventia_token`
-- `eurofetes_user` → `memoriaeventia_user`
-- `admin_auth_token` → `memoriaeventia_admin_token`
-- `admin_user` → `memoriaeventia_admin_user`
-
-Fichiers concernés :
-
-- [ ] assets/js/utils/storage.js
-- [ ] assets/js/utils/auth.js
-- [ ] AdminOffice/assets/js/utils/auth.js
-- [ ] AdminOffice/assets/js/utils/helpers.js
 
 ### 6. Standardiser les réponses API
 

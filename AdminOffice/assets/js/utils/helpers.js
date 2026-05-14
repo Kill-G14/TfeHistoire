@@ -2,17 +2,17 @@
 export const storage = {
   // Récupérer le token admin
   getToken() {
-    return localStorage.getItem("adminToken");
+    return localStorage.getItem("memoriaeventia_admin_token");
   },
 
   // Sauvegarder le token admin
   setToken(token) {
-    localStorage.setItem("adminToken", token);
+    localStorage.setItem("memoriaeventia_admin_token", token);
   },
 
   // Supprimer le token admin
   removeToken() {
-    localStorage.removeItem("adminToken");
+    localStorage.removeItem("memoriaeventia_admin_token");
   },
 
   // Vérifier si un token existe

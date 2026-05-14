@@ -7,6 +7,7 @@ import { renderFooter } from "./components/footer.js";
 import { renderLoginModal } from "./components/loginModal.js";
 import { appState } from "./store/appState.js";
 import { auth } from "./utils/auth.js";
+import { migrateLocalStorage } from "./utils/migrateLocalStorage.js";
 import FavoriteManager from "./managers/FavoriteManager.js";
 
 // Définition des routes
@@ -29,6 +30,9 @@ window.router = router;
 
 // Fonction init
 async function init() {
+  // Migrer les anciennes clés localStorage (une seule fois)
+  migrateLocalStorage();
+
   // Vérifier l'authentification
   const isLoggedIn = auth.isLoggedIn();
   const user = auth.getUser();
