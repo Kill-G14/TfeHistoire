@@ -1,12 +1,13 @@
 # Configuration sensible
 /BackEnd/config.php
+/BackEnd/.env
 
 # Dépendances
 /BackEnd/vendor/
 /node_modules/
 
 # Logs
-/BackEnd/logs/*.log
+/BackEnd/vendor/logs/*.log
 *.log
 
 # Fichiers temporaires

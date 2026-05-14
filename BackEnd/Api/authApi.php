@@ -1,8 +1,15 @@
 <?php
 
+// Headers CORS
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit();
+}
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -15,6 +22,8 @@ use App\Validators\UserValidator;
 // services
 use App\Services\AuthService;
 use App\Services\SessionService;
+// Utils
+use App\Utils\RateLimiter;
 
 // Models
 // repositories 
@@ -37,11 +46,53 @@ if (!$request || !isset($request['action'])) {
 
 switch ($request['action']) {
   case 'register':
+    // RATE LIMITING : Limiter les tentatives d'inscription (protection contre spam/bots)
+    $email = $request['email'] ?? '';
+    $checkLimit = RateLimiter::check('register', $email);
+    
+    if (!$checkLimit['allowed']) {
+      $response = [
+        'success' => false, 
+        'message' => $checkLimit['message'] ?? 'Trop de tentatives'
+      ];
+      break;
+    }
+    
+    // Traiter l'inscription
     $response = $authService->register($request);
+    
+    // Si inscription échouée, enregistrer la tentative
+    if (!$response['success']) {
+      RateLimiter::recordAttempt('register', $email);
+    } else {
+      // Si inscription réussie, réinitialiser le compteur
+      RateLimiter::reset('register', $email);
+    }
     break;
 
   case 'login':
+    // RATE LIMITING : Protection contre brute force sur le login
+    $email = $request['email'] ?? '';
+    $checkLimit = RateLimiter::check('login', $email);
+    
+    if (!$checkLimit['allowed']) {
+      $response = [
+        'success' => false, 
+        'message' => $checkLimit['message'] ?? 'Trop de tentatives de connexion'
+      ];
+      break;
+    }
+    
+    // Traiter la connexion
     $response = $authService->login($request);
+    
+    // Si login échoué, enregistrer la tentative
+    if (!$response['success']) {
+      RateLimiter::recordAttempt('login', $email);
+    } else {
+      // Si login réussi, réinitialiser le compteur
+      RateLimiter::reset('login', $email);
+    }
     break;
 
   case 'getCurrentUser':
@@ -79,7 +130,22 @@ switch ($request['action']) {
     break;
 
   case 'requestPasswordReset':
+    // RATE LIMITING : Protection contre les abus de reset de mot de passe
+    $email = $request['email'] ?? '';
+    $checkLimit = RateLimiter::check('password_reset', $email);
+    
+    if (!$checkLimit['allowed']) {
+      $response = [
+        'success' => false, 
+        'message' => $checkLimit['message'] ?? 'Trop de tentatives'
+      ];
+      break;
+    }
+    
     $response = $authService->requestPasswordReset($request);
+    
+    // Enregistrer la tentative même en cas de succès (pour éviter l'énumération)
+    RateLimiter::recordAttempt('password_reset', $email);
     break;
 
   default:

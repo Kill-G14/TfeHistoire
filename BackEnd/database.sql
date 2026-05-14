@@ -31,6 +31,13 @@ CREATE DATABASE IF NOT EXISTS memoriaeventia CHARACTER SET utf8mb4 COLLATE utf8m
 USE memoriaeventia;
 
 -- Suppression des tables existantes pour recréation propre
+-- Ordre important : supprimer d'abord les tables avec foreign keys
+DROP TABLE IF EXISTS stripe_connect_log;
+
+DROP TABLE IF EXISTS creator_earnings;
+
+DROP TABLE IF EXISTS payments;
+
 DROP TABLE IF EXISTS tickets_generated;
 
 DROP TABLE IF EXISTS order_items;
@@ -38,6 +45,8 @@ DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 
 DROP TABLE IF EXISTS favorites;
+
+DROP TABLE IF EXISTS rate_limiter;
 
 DROP TABLE IF EXISTS sessions;
 
@@ -185,11 +194,29 @@ CREATE TABLE IF NOT EXISTS favorites (
 -- Table des sessions (tokens d'authentification)
 CREATE TABLE IF NOT EXISTS sessions (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    token VARCHAR(16) NOT NULL UNIQUE,
+    token VARCHAR(64) NOT NULL UNIQUE COMMENT 'Token de session (64 caractères)',
     user_id INT NOT NULL,
+    expires_at DATETIME NOT NULL COMMENT 'Date d expiration de la session',
+    last_activity DATETIME NULL COMMENT 'Date de la dernière activité',
     is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    INDEX idx_expires_at (expires_at),
+    INDEX idx_user_id (user_id),
+    INDEX idx_last_activity (last_activity)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- Table de rate limiting (protection contre brute force)
+CREATE TABLE IF NOT EXISTS rate_limiter (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    lookup_key VARCHAR(64) NOT NULL UNIQUE COMMENT 'Hash SHA256 de action:identifier:ip',
+    attempts_count INT NOT NULL DEFAULT 0 COMMENT 'Nombre de tentatives',
+    block_until INT NULL COMMENT 'Timestamp de fin de blocage',
+    created_at INT NOT NULL COMMENT 'Timestamp de création',
+    updated_at INT NOT NULL COMMENT 'Timestamp de dernière mise à jour',
+    INDEX idx_lookup (lookup_key),
+    INDEX idx_block (block_until),
+    INDEX idx_updated (updated_at)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- Table des paiements (Stripe)
@@ -702,3 +729,9 @@ VALUES (
         FALSE,
         'sofiia-vytrishko-iK6g0pI0FE8-unsplash.jpg'
     );
+
+-- ===============================================
+-- FIN DE L'INITIALISATION
+-- ===============================================
+
+);
