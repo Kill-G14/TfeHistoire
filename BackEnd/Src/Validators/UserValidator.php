@@ -11,23 +11,23 @@ class UserValidator {
 
     // Email
     if (Helpers::isEmpty($data['email'] ?? null)) {
-      $errors['email'] = 'L\'email est requis';
+      $errors['email'] = 'Veuillez saisir votre adresse email pour créer votre compte';
     } elseif (!Helpers::isValidEmail($data['email'])) {
-      $errors['email'] = 'L\'email n\'est pas valide';
+      $errors['email'] = 'Cette adresse email n\'est pas valide. Veuillez vérifier le format (exemple : nom@domaine.com)';
     }
 
     // Password
     if (Helpers::isEmpty($data['password'] ?? null)) {
-      $errors['password'] = 'Le mot de passe est requis';
+      $errors['password'] = 'Veuillez choisir un mot de passe pour sécuriser votre compte';
     } elseif (strlen($data['password']) < 6) {
-      $errors['password'] = 'Le mot de passe doit contenir au moins 6 caractères';
+      $errors['password'] = 'Votre mot de passe est trop court. Utilisez au moins 6 caractères pour plus de sécurité';
     }
 
     // Name
     if (Helpers::isEmpty($data['name'] ?? null)) {
-      $errors['name'] = 'Le nom est requis';
+      $errors['name'] = 'Veuillez indiquer votre nom pour personnaliser votre profil';
     } elseif (strlen($data['name']) < 2) {
-      $errors['name'] = 'Le nom doit contenir au moins 2 caractères';
+      $errors['name'] = 'Votre nom est trop court. Veuillez saisir au moins 2 caractères';
     }
 
     return $errors;
@@ -39,14 +39,14 @@ class UserValidator {
 
     // Email
     if (Helpers::isEmpty($data['email'] ?? null)) {
-      $errors['email'] = 'L\'email est requis';
+      $errors['email'] = 'Veuillez saisir votre adresse email pour vous connecter';
     } elseif (!Helpers::isValidEmail($data['email'])) {
-      $errors['email'] = 'L\'email n\'est pas valide';
+      $errors['email'] = 'L\'adresse email saisie n\'est pas valide. Veuillez vérifier le format';
     }
 
     // Password
     if (Helpers::isEmpty($data['password'] ?? null)) {
-      $errors['password'] = 'Le mot de passe est requis';
+      $errors['password'] = 'Veuillez saisir votre mot de passe pour accéder à votre compte';
     }
 
     return $errors;
@@ -59,7 +59,7 @@ class UserValidator {
     // Name
     if (isset($data['name']) && !Helpers::isEmpty($data['name'])) {
       if (strlen($data['name']) < 2) {
-        $errors['name'] = 'Le nom doit contenir au moins 2 caractères';
+        $errors['name'] = 'Le nom saisi est trop court. Veuillez entrer au moins 2 caractères';
       }
     }
 

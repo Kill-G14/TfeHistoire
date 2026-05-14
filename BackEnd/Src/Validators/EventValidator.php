@@ -11,60 +11,60 @@ class EventValidator {
 
     // Title
     if (Helpers::isEmpty($data['title'] ?? null)) {
-      $errors['title'] = 'Le titre est requis';
+      $errors['title'] = 'Veuillez donner un titre à votre événement pour attirer les visiteurs';
     } elseif (strlen($data['title']) < 3) {
-      $errors['title'] = 'Le titre doit contenir au moins 3 caractères';
+      $errors['title'] = 'Le titre est trop court. Veuillez saisir au moins 3 caractères pour décrire votre événement';
     }
 
     // Description
     if (Helpers::isEmpty($data['description'] ?? null)) {
-      $errors['description'] = 'La description est requise';
+      $errors['description'] = 'Veuillez décrire votre événement pour donner envie aux participants de venir';
     } elseif (strlen($data['description']) < 10) {
-      $errors['description'] = 'La description doit contenir au moins 10 caractères';
+      $errors['description'] = 'La description est trop courte. Décrivez votre événement avec au moins 10 caractères';
     }
 
     // Country
     if (Helpers::isEmpty($data['country'] ?? null)) {
-      $errors['country'] = 'Le pays est requis';
+      $errors['country'] = 'Veuillez sélectionner le pays où se déroule votre événement';
     }
 
     // City
     if (Helpers::isEmpty($data['city'] ?? null)) {
-      $errors['city'] = 'La ville est requise';
+      $errors['city'] = 'Veuillez indiquer la ville où aura lieu votre événement';
     }
 
     // Postal code
     if (Helpers::isEmpty($data['postal_code'] ?? null)) {
-      $errors['postal_code'] = 'Le code postal est requis';
+      $errors['postal_code'] = 'Le code postal est nécessaire pour localiser précisément votre événement';
     }
 
     // Address
     if (Helpers::isEmpty($data['address'] ?? null)) {
-      $errors['address'] = 'L\'adresse est requise';
+      $errors['address'] = 'Veuillez saisir l\'adresse complète du lieu de l\'événement';
     }
 
     // Date
     if (Helpers::isEmpty($data['date'] ?? null)) {
-      $errors['date'] = 'La date est requise';
+      $errors['date'] = 'Veuillez indiquer la date à laquelle aura lieu votre événement';
     } elseif (!Helpers::isValidDate($data['date'])) {
-      $errors['date'] = 'La date n\'est pas valide (format attendu: YYYY-MM-DD)';
+      $errors['date'] = 'Le format de la date n\'est pas valide. Utilisez le format AAAA-MM-JJ (exemple : 2026-12-25)';
     }
 
     // Time
     if (Helpers::isEmpty($data['time'] ?? null)) {
-      $errors['time'] = 'L\'heure est requise';
+      $errors['time'] = 'Veuillez préciser l\'heure de début de votre événement';
     } elseif (!Helpers::isValidTime($data['time'])) {
-      $errors['time'] = 'L\'heure n\'est pas valide (format attendu: HH:MM)';
+      $errors['time'] = 'Le format de l\'heure n\'est pas valide. Utilisez le format HH:MM (exemple : 14:30)';
     }
 
     // Category
     if (Helpers::isEmpty($data['category'] ?? null)) {
-      $errors['category'] = 'La catégorie est requise';
+      $errors['category'] = 'Veuillez choisir une catégorie pour aider les visiteurs à trouver votre événement';
     }
 
     // Is Free
     if (!isset($data['is_free'])) {
-      $errors['is_free'] = 'Le statut gratuit/payant est requis';
+      $errors['is_free'] = 'Veuillez indiquer si votre événement est gratuit ou payant';
     } elseif (!is_bool($data['is_free']) && $data['is_free'] !== 0 && $data['is_free'] !== 1) {
       $errors['is_free'] = 'Le statut gratuit/payant doit être un booléen';
     }
@@ -72,14 +72,14 @@ class EventValidator {
     // Latitude (optionnel)
     if (isset($data['latitude']) && !Helpers::isEmpty($data['latitude'])) {
       if (!is_numeric($data['latitude']) || $data['latitude'] < -90 || $data['latitude'] > 90) {
-        $errors['latitude'] = 'La latitude doit être comprise entre -90 et 90';
+        $errors['latitude'] = 'La latitude doit être un nombre compris entre -90 et 90 degrés';
       }
     }
 
     // Longitude (optionnel)
     if (isset($data['longitude']) && !Helpers::isEmpty($data['longitude'])) {
       if (!is_numeric($data['longitude']) || $data['longitude'] < -180 || $data['longitude'] > 180) {
-        $errors['longitude'] = 'La longitude doit être comprise entre -180 et 180';
+        $errors['longitude'] = 'La longitude doit être un nombre compris entre -180 et 180 degrés';
       }
     }
 
@@ -90,7 +90,7 @@ class EventValidator {
       $extension = strtolower(pathinfo($data['image_event'], PATHINFO_EXTENSION));
       
       if (!in_array($extension, $allowedExtensions)) {
-        $errors['image_event'] = 'Le fichier image doit être au format jpg, jpeg, png, gif ou webp';
+        $errors['image_event'] = 'Le format de l\'image n\'est pas supporté. Utilisez JPG, JPEG, PNG, GIF ou WEBP uniquement';
       }
     }
 
