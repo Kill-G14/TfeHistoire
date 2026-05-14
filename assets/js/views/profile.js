@@ -74,7 +74,7 @@ export async function mount(container, params) {
       "error",
     );
     setTimeout(() => {
-      window.router.navigate("/");
+      window.router.navigate("./");
     }, 1500);
     return;
   }
@@ -811,7 +811,7 @@ async function loadReservations() {
       <div class="empty-state-small">
         <i class="bi bi-ticket-perforated text-muted fs-1 mb-2"></i>
         <p class="text-muted mb-3">Vous n'avez pas encore de réservations</p>
-        <a href="/" class="btn btn-primary btn-sm">
+        <a href="./" class="btn btn-primary btn-sm">
           <i class="bi bi-calendar-event"></i> Découvrir des événements
         </a>
       </div>

@@ -25,7 +25,8 @@ export class Router {
         const link = e.target.matches("[data-link]")
           ? e.target
           : e.target.closest("[data-link]");
-        this.navigate(link.getAttribute("href"));
+        const href = link.getAttribute("href");
+        this.navigate(href);
       }
     });
 
@@ -34,11 +35,26 @@ export class Router {
   }
 
   async navigate(url) {
-    // Ajouter le base path si l'URL ne commence pas déjà par celui-ci
+    // Normaliser l'URL pour qu'elle soit toujours absolue avec le basePath
     let fullUrl = url;
-    if (!url.startsWith(this.basePath) && url.startsWith("/")) {
+
+    // Si l'URL est "./", c'est la racine
+    if (url === "./") {
+      fullUrl = this.basePath || "/";
+    }
+    // Si l'URL ne commence pas par "/" ni par le basePath, c'est une URL relative
+    else if (!url.startsWith("/") && !url.startsWith(this.basePath)) {
+      // Ajouter le basePath et un slash
+      fullUrl = this.basePath + "/" + url;
+    }
+    // Si l'URL commence par "/" mais pas par le basePath
+    else if (url.startsWith("/") && !url.startsWith(this.basePath)) {
       fullUrl = this.basePath + url;
     }
+
+    // Nettoyer les doubles slashes (sauf après http://)
+    fullUrl = fullUrl.replace(/([^:]\/)\/+/g, "$1");
+
     history.pushState(null, null, fullUrl);
     await this.handleRoute();
   }
@@ -147,7 +163,7 @@ export class Router {
       <div class="container text-center py-5">
         <h1 class="display-1">404</h1>
         <p class="lead">Page non trouvée</p>
-        <a href="/" data-link class="btn btn-primary">Retour à l'accueil</a>
+        <a href="./" data-link class="btn btn-primary">Retour à l'accueil</a>
       </div>
     `;
   }

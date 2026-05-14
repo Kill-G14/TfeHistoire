@@ -284,7 +284,7 @@ function createEventPopup(event) {
       </p>
       <p class="mb-3 small">${event.description ? event.description.substring(0, 100) + "..." : ""}</p>
       <div class="d-grid gap-2">
-        <a href="/event/${event.id}" data-link class="btn btn-sm btn-outline-primary">
+        <a href="event/${event.id}" data-link class="btn btn-sm btn-outline-primary">
           <i class="bi bi-info-circle me-1"></i>Détails
         </a>
         ${routeButton}

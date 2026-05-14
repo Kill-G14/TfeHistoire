@@ -23,10 +23,10 @@ const template = `
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-              <a href="/account/orders" data-link class="btn btn-primary btn-lg">
+              <a href="account/orders" data-link class="btn btn-primary btn-lg">
                 <i class="bi bi-receipt"></i> Voir mes commandes
               </a>
-              <a href="/" data-link class="btn btn-outline-secondary btn-lg">
+              <a href="./" data-link class="btn btn-outline-secondary btn-lg">
                 <i class="bi bi-house"></i> Retour à l'accueil
               </a>
             </div>

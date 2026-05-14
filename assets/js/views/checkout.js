@@ -56,7 +56,7 @@ const template = `
         </div>
 
         <div class="text-center mt-4">
-          <a href="/cart" data-link class="btn btn-outline-secondary">
+          <a href="cart" data-link class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Retour au panier
           </a>
         </div>

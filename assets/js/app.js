@@ -20,6 +20,10 @@ const routes = {
   "/checkout": () => import("./views/checkout.js"),
   "/payment/success": () => import("./views/paymentSuccess.js"),
   "/payment/cancel": () => import("./views/paymentCancel.js"),
+  "/about": () => import("./views/about.js"),
+  "/terms": () => import("./views/terms.js"),
+  "/privacy": () => import("./views/privacy.js"),
+  "/faq": () => import("./views/faq.js"),
 };
 
 // Instance du routeur

@@ -63,7 +63,7 @@ export async function mount(container, params) {
       "error",
     );
     setTimeout(() => {
-      window.router.navigate("/");
+      window.router.navigate("./");
     }, 1500);
     return;
   }
@@ -240,7 +240,7 @@ function handleRemoveImage() {
 
 // Gérer l'annulation
 function handleCancel() {
-  window.router.navigate("/");
+  window.router.navigate("./");
 }
 
 // Gérer la sélection d'image
@@ -391,7 +391,7 @@ async function handleSubmit(e) {
   if (result.success) {
     helpers.showToast("Événement créé avec succès !", "success");
     setTimeout(() => {
-      window.router.navigate("/");
+      window.router.navigate("./");
     }, 1000);
   } else {
     helpers.showToast(

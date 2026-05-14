@@ -71,7 +71,7 @@ function renderHeaderActions() {
 
     if (btnProfile) {
       btnProfile.addEventListener("click", () => {
-        window.router.navigate("/profile");
+        window.router.navigate("profile");
       });
     }
 
@@ -80,7 +80,7 @@ function renderHeaderActions() {
         await auth.logout();
         appState.set("user", null);
         appState.set("isAuthenticated", false);
-        window.router.navigate("/");
+        window.router.navigate("./");
       });
     }
   } else {

@@ -1,0 +1,816 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- En-tête -->
+      <div class="text-center mb-5">
+        <i
+          class="bi bi-question-circle-fill text-primary"
+          style="font-size: 4rem"
+        ></i>
+        <h1 class="display-5 fw-bold text-primary mt-3">
+          Foire aux questions (FAQ)
+        </h1>
+        <p class="lead text-muted">
+          Toutes les réponses à vos questions sur MemoriaEventia
+        </p>
+      </div>
+
+      <!-- Recherche -->
+      <div class="card shadow-sm mb-5">
+        <div class="card-body p-4">
+          <div class="input-group input-group-lg">
+            <span class="input-group-text border-0 bg-white">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control border-0"
+              id="faqSearch"
+              placeholder="Rechercher une question..."
+              aria-label="Rechercher une question"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation catégories -->
+      <div class="mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+          <button
+            class="btn btn-outline-primary btn-sm active"
+            data-category="all"
+          >
+            <i class="bi bi-grid-fill me-2"></i>Toutes
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            data-category="general"
+          >
+            <i class="bi bi-info-circle-fill me-2"></i>Général
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            data-category="account"
+          >
+            <i class="bi bi-person-fill me-2"></i>Compte
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            data-category="booking"
+          >
+            <i class="bi bi-ticket-perforated-fill me-2"></i>Réservation
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            data-category="organizer"
+          >
+            <i class="bi bi-megaphone-fill me-2"></i>Organisateurs
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            data-category="payment"
+          >
+            <i class="bi bi-credit-card-fill me-2"></i>Paiement
+          </button>
+        </div>
+      </div>
+
+      <!-- Accordéon FAQ -->
+      <div class="accordion" id="faqAccordion">
+        <!-- Général -->
+        <div class="faq-item" data-category="general">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq1"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Qu'est-ce que MemoriaEventia ?
+              </button>
+            </h3>
+            <div
+              id="faq1"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  <strong>MemoriaEventia</strong> est une plateforme de
+                  réservation en ligne dédiée aux
+                  <strong>événements historiques et culturels européens</strong
+                  >. Nous mettons en relation les organisateurs d'événements
+                  (reconstitutions historiques, festivals patrimoniaux,
+                  célébrations) avec des milliers de passionnés d'histoire à
+                  travers toute l'Europe.
+                </p>
+                <p class="mb-0">
+                  Notre plateforme permet de
+                  <strong>découvrir, réserver et participer</strong> facilement
+                  à ces événements uniques grâce à une carte interactive, un
+                  calendrier et des filtres avancés.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="general">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq2"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                MemoriaEventia est-elle gratuite ?
+              </button>
+            </h3>
+            <div
+              id="faq2"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  <strong
+                    >Oui, l'utilisation de la plateforme est gratuite</strong
+                  >
+                  pour les visiteurs. Vous pouvez créer un compte, parcourir les
+                  événements et réserver des billets sans frais d'inscription.
+                </p>
+                <p class="mb-0">
+                  Pour les organisateurs, MemoriaEventia prélève une
+                  <strong>commission de 5%</strong> sur chaque vente de billet
+                  pour couvrir les frais de plateforme et de paiement sécurisé.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="general">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq3"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Quels types d'événements trouve-t-on sur MemoriaEventia ?
+              </button>
+            </h3>
+            <div
+              id="faq3"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Nous proposons une grande variété d'événements historiques :
+                </p>
+                <ul>
+                  <li>
+                    <strong>Reconstitutions historiques</strong> (batailles, vie
+                    quotidienne)
+                  </li>
+                  <li><strong>Festivals médiévaux et renaissance</strong></li>
+                  <li>
+                    <strong>Expositions et musées</strong> (événements spéciaux)
+                  </li>
+                  <li><strong>Commémorations</strong> historiques</li>
+                  <li>
+                    <strong>Spectacles</strong> (théâtre historique, concerts)
+                  </li>
+                  <li>
+                    <strong>Conférences</strong> et séminaires historiques
+                  </li>
+                </ul>
+                <p class="mb-0">
+                  Tous ces événements sont liés à l'<strong
+                    >histoire et au patrimoine européen</strong
+                  >.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compte -->
+        <div class="faq-item" data-category="account">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq4"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Comment créer un compte ?
+              </button>
+            </h3>
+            <div
+              id="faq4"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <ol>
+                  <li>
+                    Cliquez sur le bouton <strong>"Connexion"</strong> dans le
+                    header
+                  </li>
+                  <li>
+                    Sélectionnez <strong>"S'inscrire"</strong> dans la modal
+                  </li>
+                  <li>
+                    Renseignez votre
+                    <strong>nom, email et mot de passe</strong> (min. 6
+                    caractères)
+                  </li>
+                  <li>Cliquez sur <strong>"Créer mon compte"</strong></li>
+                  <li>
+                    Vous êtes automatiquement connecté et redirigé vers la page
+                    d'accueil
+                  </li>
+                </ol>
+                <p class="mb-0">
+                  <i class="bi bi-shield-check-fill text-success me-2"></i>
+                  Votre mot de passe est
+                  <strong>chiffré et sécurisé</strong> (hashage bcrypt).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="account">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq5"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                J'ai oublié mon mot de passe, que faire ?
+              </button>
+            </h3>
+            <div
+              id="faq5"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>Pour réinitialiser votre mot de passe :</p>
+                <ol>
+                  <li>
+                    Cliquez sur <strong>"Mot de passe oublié ?"</strong> dans la
+                    modal de connexion
+                  </li>
+                  <li>Saisissez votre <strong>adresse email</strong></li>
+                  <li>
+                    Vous recevrez un
+                    <strong>email avec un lien de réinitialisation</strong>
+                  </li>
+                  <li>Cliquez sur le lien et créez un nouveau mot de passe</li>
+                </ol>
+                <p class="mb-0">
+                  <i class="bi bi-info-circle-fill text-info me-2"></i>
+                  Le lien de réinitialisation est valide
+                  <strong>24 heures</strong>. Si vous ne recevez pas l'email,
+                  vérifiez vos spams ou contactez le support.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="account">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq6"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Comment supprimer mon compte ?
+              </button>
+            </h3>
+            <div
+              id="faq6"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>Pour supprimer votre compte :</p>
+                <ol>
+                  <li>
+                    Accédez à votre <strong>profil</strong> (icône utilisateur
+                    en haut à droite)
+                  </li>
+                  <li>Cliquez sur <strong>"Paramètres du compte"</strong></li>
+                  <li>Descendez jusqu'à <strong>"Zone dangereuse"</strong></li>
+                  <li>Cliquez sur <strong>"Supprimer mon compte"</strong></li>
+                  <li>Confirmez la suppression</li>
+                </ol>
+                <p class="text-danger mb-0">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <strong>Attention :</strong> Cette action est
+                  <strong>irréversible</strong>. Toutes vos données seront
+                  supprimées (sauf l'historique de commandes pour obligations
+                  légales).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Réservation -->
+        <div class="faq-item" data-category="booking">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq7"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Comment réserver des billets ?
+              </button>
+            </h3>
+            <div
+              id="faq7"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <ol>
+                  <li>
+                    Parcourez les événements via la
+                    <strong>carte, le calendrier ou les filtres</strong>
+                  </li>
+                  <li>Cliquez sur un événement pour voir les détails</li>
+                  <li>
+                    Sélectionnez la
+                    <strong>quantité de billets</strong> souhaitée
+                  </li>
+                  <li>Cliquez sur <strong>"Réserver maintenant"</strong></li>
+                  <li>
+                    Vous êtes redirigé vers <strong>Stripe</strong> pour le
+                    paiement sécurisé
+                  </li>
+                  <li>
+                    Après paiement, vous recevez vos
+                    <strong>billets PDF par email</strong>
+                  </li>
+                </ol>
+                <p class="mb-0">
+                  <i class="bi bi-envelope-check-fill text-success me-2"></i>
+                  Les billets sont envoyés <strong>instantanément</strong> après
+                  confirmation du paiement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="booking">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq8"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Où trouver mes billets après réservation ?
+              </button>
+            </h3>
+            <div
+              id="faq8"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Vos billets sont accessibles de <strong>3 manières</strong> :
+                </p>
+                <ul>
+                  <li>
+                    <strong>Par email</strong> : vous recevez un PDF avec le QR
+                    code à l'adresse indiquée lors de la réservation
+                  </li>
+                  <li>
+                    <strong>Dans votre profil</strong> : accédez à "Mon profil"
+                    → "Mes réservations" pour télécharger tous vos billets
+                  </li>
+                  <li>
+                    <strong>Dans l'email de confirmation</strong> : un lien
+                    direct vers le PDF est inclus
+                  </li>
+                </ul>
+                <p class="mb-0">
+                  <i class="bi bi-printer-fill text-primary me-2"></i>
+                  Vous pouvez
+                  <strong
+                    >imprimer ou présenter le QR code sur smartphone</strong
+                  >
+                  le jour de l'événement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="booking">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq9"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Puis-je annuler ma réservation ?
+              </button>
+            </h3>
+            <div
+              id="faq9"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Les conditions d'annulation sont
+                  <strong>définies par l'organisateur</strong> de chaque
+                  événement. MemoriaEventia agit uniquement comme intermédiaire.
+                </p>
+                <p><strong>Procédure d'annulation :</strong></p>
+                <ol>
+                  <li>
+                    Contactez <strong>directement l'organisateur</strong> via
+                    l'email indiqué dans votre billet
+                  </li>
+                  <li>Expliquez votre demande d'annulation</li>
+                  <li>
+                    L'organisateur décide selon sa politique de remboursement
+                  </li>
+                  <li>
+                    Si accepté, le remboursement est effectué via
+                    <strong>Stripe</strong> (délai 5-10 jours)
+                  </li>
+                </ol>
+                <p class="mb-0">
+                  <i class="bi bi-info-circle-fill text-info me-2"></i>
+                  En cas d'<strong
+                    >annulation de l'événement par l'organisateur</strong
+                  >, vous êtes automatiquement remboursé intégralement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Organisateurs -->
+        <div class="faq-item" data-category="organizer">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq10"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Comment publier un événement sur MemoriaEventia ?
+              </button>
+            </h3>
+            <div
+              id="faq10"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p><strong>Étape 1 : Créer un compte Stripe Connect</strong></p>
+                <ol>
+                  <li>Connectez-vous à votre compte MemoriaEventia</li>
+                  <li>Accédez à votre <strong>profil</strong></li>
+                  <li>Cliquez sur <strong>"Devenir organisateur"</strong></li>
+                  <li>
+                    Remplissez le formulaire
+                    <strong>Stripe Connect</strong> (IBAN, informations légales)
+                  </li>
+                  <li>Validez votre identité</li>
+                </ol>
+                <p><strong>Étape 2 : Créer votre événement</strong></p>
+                <ol>
+                  <li>
+                    Cliquez sur <strong>"Créer un événement"</strong> dans le
+                    menu
+                  </li>
+                  <li>
+                    Remplissez tous les champs (titre, description, lieu, date,
+                    prix, image)
+                  </li>
+                  <li>Soumettez votre événement</li>
+                </ol>
+                <p class="mb-0">
+                  <i class="bi bi-clock-fill text-warning me-2"></i>
+                  Votre événement sera
+                  <strong>validé par notre équipe sous 48-72h</strong> avant
+                  publication.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="organizer">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq11"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Quelle commission prend MemoriaEventia ?
+              </button>
+            </h3>
+            <div
+              id="faq11"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  MemoriaEventia prélève une
+                  <strong>commission de 5%</strong> sur le montant total de
+                  chaque vente de billet.
+                </p>
+                <p><strong>Exemple :</strong></p>
+                <ul>
+                  <li>Prix du billet : <strong>50 €</strong></li>
+                  <li>
+                    Commission MemoriaEventia (5%) : <strong>2,50 €</strong>
+                  </li>
+                  <li>
+                    Frais Stripe (~2,9% + 0,25€) : <strong>~1,70 €</strong>
+                  </li>
+                  <li>Vous recevez : <strong>~45,80 €</strong></li>
+                </ul>
+                <p class="mb-0">
+                  <i class="bi bi-bank2 text-primary me-2"></i>
+                  Les paiements sont transférés sur votre compte bancaire
+                  <strong>sous 7 jours ouvrés</strong> après l'événement.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="organizer">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq12"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Comment scanner les billets le jour de l'événement ?
+              </button>
+            </h3>
+            <div
+              id="faq12"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p><strong>Via l'application mobile (recommandé) :</strong></p>
+                <ol>
+                  <li>
+                    Téléchargez l'app
+                    <strong>MemoriaEventia Scanner</strong> (iOS/Android)
+                  </li>
+                  <li>Connectez-vous avec vos identifiants</li>
+                  <li>Sélectionnez votre événement</li>
+                  <li>
+                    Scannez le <strong>QR code</strong> sur le billet du
+                    participant
+                  </li>
+                  <li>
+                    Le système valide automatiquement (vert = OK, rouge =
+                    invalide/déjà utilisé)
+                  </li>
+                </ol>
+                <p><strong>Via l'interface web :</strong></p>
+                <p class="mb-0">
+                  Accédez à "Mon profil" → "Mes événements" → "Scanner les
+                  billets" et utilisez la webcam de votre ordinateur.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paiement -->
+        <div class="faq-item" data-category="payment">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq13"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Les paiements sont-ils sécurisés ?
+              </button>
+            </h3>
+            <div
+              id="faq13"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  <strong>Oui, les paiements sont 100% sécurisés</strong> grâce
+                  à <strong>Stripe</strong>, l'un des leaders mondiaux du
+                  paiement en ligne.
+                </p>
+                <p><strong>Garanties de sécurité :</strong></p>
+                <ul>
+                  <li>
+                    <i class="bi bi-shield-fill-check text-success me-2"></i
+                    >Chiffrement <strong>SSL/TLS 256 bits</strong>
+                  </li>
+                  <li>
+                    <i class="bi bi-shield-fill-check text-success me-2"></i
+                    >Conformité <strong>PCI-DSS Level 1</strong>
+                  </li>
+                  <li>
+                    <i class="bi bi-shield-fill-check text-success me-2"></i
+                    >Authentification <strong>3D Secure</strong> (selon banque)
+                  </li>
+                  <li>
+                    <i class="bi bi-shield-fill-check text-success me-2"></i
+                    >Données bancaires <strong>jamais stockées</strong> sur nos
+                    serveurs
+                  </li>
+                </ul>
+                <p class="mb-0">
+                  MemoriaEventia ne voit
+                  <strong>jamais vos coordonnées bancaires</strong>. Tout est
+                  géré directement par Stripe.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="payment">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq14"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Quels moyens de paiement sont acceptés ?
+              </button>
+            </h3>
+            <div
+              id="faq14"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>Via Stripe, nous acceptons :</p>
+                <ul>
+                  <li>
+                    <i class="bi bi-credit-card-fill text-primary me-2"></i
+                    ><strong>Cartes bancaires</strong> : Visa, Mastercard,
+                    American Express
+                  </li>
+                  <li>
+                    <i class="bi bi-wallet2 text-primary me-2"></i
+                    ><strong>Portefeuilles digitaux</strong> : Apple Pay, Google
+                    Pay
+                  </li>
+                  <li>
+                    <i class="bi bi-bank text-primary me-2"></i
+                    ><strong>Virements SEPA</strong> (selon pays)
+                  </li>
+                </ul>
+                <p class="mb-0">
+                  <i class="bi bi-info-circle-fill text-info me-2"></i>
+                  Les <strong>cryptomonnaies</strong> ne sont pas encore
+                  acceptées.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item" data-category="payment">
+          <div class="accordion-item border-0 shadow-sm mb-3">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq15"
+              >
+                <i class="bi bi-question-circle text-primary me-2"></i>
+                Mon paiement a échoué, que faire ?
+              </button>
+            </h3>
+            <div
+              id="faq15"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Si votre paiement a échoué, vérifiez les points suivants :
+                </p>
+                <ul>
+                  <li><strong>Solde insuffisant</strong> sur votre carte</li>
+                  <li><strong>Plafond de paiement</strong> dépassé</li>
+                  <li><strong>Carte expirée</strong> ou bloquée</li>
+                  <li>
+                    <strong>Informations incorrectes</strong> (numéro, CVV, date
+                    d'expiration)
+                  </li>
+                  <li>
+                    <strong>Authentification 3D Secure</strong> non validée
+                  </li>
+                </ul>
+                <p><strong>Solutions :</strong></p>
+                <ol>
+                  <li>
+                    Contactez votre <strong>banque</strong> pour débloquer le
+                    paiement
+                  </li>
+                  <li>Essayez avec une <strong>autre carte</strong></li>
+                  <li>
+                    Utilisez <strong>Apple Pay ou Google Pay</strong> si
+                    disponible
+                  </li>
+                  <li>
+                    Contactez notre support à
+                    <a href="mailto:support@memoriaeventia.com"
+                      >support@memoriaeventia.com</a
+                    >
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pas trouvé la réponse -->
+      <div class="card border-primary shadow-sm mt-5">
+        <div class="card-body p-4 p-md-5 text-center">
+          <i class="bi bi-headset text-primary fs-1 mb-3"></i>
+          <h3 class="h4 mb-3">Vous n'avez pas trouvé la réponse ?</h3>
+          <p class="text-muted mb-4">
+            Notre équipe support est là pour vous aider. Nous répondons sous
+            <strong>24-48h maximum</strong>.
+          </p>
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="mailto:support@memoriaeventia.com" class="btn btn-primary">
+              <i class="bi bi-envelope-fill me-2"></i>Contacter le support
+            </a>
+            <a
+              href="mailto:contact@memoriaeventia.com"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-chat-dots-fill me-2"></i>Discussion générale
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

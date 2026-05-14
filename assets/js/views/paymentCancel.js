@@ -23,10 +23,10 @@ const template = `
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-              <a href="/cart" data-link class="btn btn-primary btn-lg">
-                <i class="bi bi-cart"></i> Retour au panier
+              <a href="cart" data-link class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-left"></i> Retour au panier
               </a>
-              <a href="/" data-link class="btn btn-outline-secondary btn-lg">
+              <a href="./" data-link class="btn btn-outline-secondary btn-lg">
                 <i class="bi bi-house"></i> Retour à l'accueil
               </a>
             </div>
@@ -62,7 +62,7 @@ const template = `
                       <p class="card-text small text-muted">
                         Votre panier est toujours disponible. Vous pouvez réessayer le paiement quand vous le souhaitez.
                       </p>
-                      <a href="/cart" data-link class="btn btn-sm btn-primary">
+                      <a href="cart" data-link class="btn btn-sm btn-primary">
                         Accéder au panier
                       </a>
                     </div>
@@ -78,7 +78,7 @@ const template = `
                       <p class="card-text small text-muted">
                         Vous rencontrez un problème ? Notre équipe est là pour vous aider.
                       </p>
-                      <a href="/contact" data-link class="btn btn-sm btn-outline-secondary">
+                      <a href="contact" data-link class="btn btn-sm btn-outline-secondary">
                         Nous contacter
                       </a>
                     </div>
