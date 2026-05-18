@@ -28,11 +28,11 @@ class RateLimiter {
    * @return array ['allowed' => bool, 'remaining' => int, 'reset_at' => ?int]
    */
   public static function check(string $action, string $identifier): array {
-    // Récupérer la configuration
-    $config = require __DIR__ . '/../../config.php';
+    // Charger les variables d'environnement
+    \App\Utils\EnvLoader::load();
     
     // Récupérer les limites selon l'action
-    $limits = self::getLimitsForAction($action, $config);
+    $limits = self::getLimitsForAction($action);
     
     // Clé unique pour stocker les tentatives
     $key = self::generateKey($action, $identifier);
@@ -143,13 +143,12 @@ class RateLimiter {
    * Récupérer les limites selon le type d'action
    * 
    * @param string $action
-   * @param array $config
    * @return array
    */
-  private static function getLimitsForAction(string $action, array $config): array {
+  private static function getLimitsForAction(string $action): array {
     $defaults = [
-      'max_attempts' => $config['security']['max_login_attempts'] ?? 5,
-      'block_duration_minutes' => $config['security']['login_block_duration_minutes'] ?? 15
+      'max_attempts' => (int)\App\Utils\EnvLoader::get('MAX_LOGIN_ATTEMPTS', 5),
+      'block_duration_minutes' => (int)\App\Utils\EnvLoader::get('LOGIN_BLOCK_DURATION_MINUTES', 15)
     ];
     
     // Limites spécifiques par action

@@ -43,11 +43,11 @@ class StripeService {
         $this->eventRepository = $eventRepository ?? new EventRepository();
         $this->pdfService = new PdfService($this->eventRepository, $this->orderItemRepository);
 
-        // Charger la configuration
-        $config = require __DIR__ . '/../../config.php';
-        $this->secretKey = $config['stripe']['secret_key'];
-        $this->webhookSecret = $config['stripe']['webhook_secret'];
-        $this->currency = $config['stripe']['currency'];
+        // Charger les variables d'environnement
+        \App\Utils\EnvLoader::load();
+        $this->secretKey = \App\Utils\EnvLoader::get('STRIPE_SECRET_KEY');
+        $this->webhookSecret = \App\Utils\EnvLoader::get('STRIPE_WEBHOOK_SECRET');
+        $this->currency = \App\Utils\EnvLoader::get('STRIPE_CURRENCY', 'eur');
 
         // Initialiser Stripe
         \Stripe\Stripe::setApiKey($this->secretKey);
@@ -72,7 +72,7 @@ class StripeService {
                 return $this->processFreeReservation($orderId);
             }
 
-            $config = require __DIR__ . '/../../config.php';
+            \App\Utils\EnvLoader::load();
 
             // Préparer les line items pour Stripe
             $lineItems = [];
@@ -95,8 +95,8 @@ class StripeService {
                 'payment_method_types' => ['card'],
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-                'success_url' => $config['stripe']['success_url'] . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => $config['stripe']['cancel_url'],
+                'success_url' => \App\Utils\EnvLoader::get('STRIPE_SUCCESS_URL') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => \App\Utils\EnvLoader::get('STRIPE_CANCEL_URL'),
                 'metadata' => [
                     'order_id' => $orderId,
                 ],
@@ -452,7 +452,7 @@ class StripeService {
             // Générer les tickets et PDFs
             $this->generateTicketsAndPdfs($orderId);
 
-            $config = require __DIR__ . '/../../config.php';
+            \App\Utils\EnvLoader::load();
 
             return [
                 'success' => true,
@@ -461,7 +461,7 @@ class StripeService {
                     'is_free' => true,
                     'order_id' => $orderId,
                     'payment_id' => $paymentId,
-                    'redirect_url' => $config['stripe']['success_url'] . '?order_id=' . $orderId . '&free=1'
+                    'redirect_url' => \App\Utils\EnvLoader::get('STRIPE_SUCCESS_URL') . '?order_id=' . $orderId . '&free=1'
                 ]
             ];
 

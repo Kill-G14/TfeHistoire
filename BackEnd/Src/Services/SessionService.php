@@ -24,8 +24,8 @@ class SessionService {
     $token = bin2hex(random_bytes(32));
 
     // Calculer la date d'expiration (14 jours par défaut)
-    $config = require __DIR__ . '/../../config.php';
-    $lifetimeDays = $config['security']['session_lifetime_days'] ?? 14;
+    \App\Utils\EnvLoader::load();
+    $lifetimeDays = \App\Utils\EnvLoader::get('SESSION_LIFETIME_DAYS', 14);
     $expiresAt = time() + ($lifetimeDays * 86400); // 86400 = secondes dans un jour
 
     $created = $this->sessionRepository->createSession($token, $userId, $expiresAt);
@@ -59,8 +59,8 @@ class SessionService {
    * @return bool
    */
   public function renewSession(string $token): bool {
-    $config = require __DIR__ . '/../../config.php';
-    $lifetimeDays = $config['security']['session_lifetime_days'] ?? 14;
+    \App\Utils\EnvLoader::load();
+    $lifetimeDays = \App\Utils\EnvLoader::get('SESSION_LIFETIME_DAYS', 14);
     $newExpiresAt = time() + ($lifetimeDays * 86400);
     
     return $this->sessionRepository->updateSessionExpiration($token, $newExpiresAt);

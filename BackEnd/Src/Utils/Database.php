@@ -15,20 +15,20 @@ class Database {
   public static function getConnection(): PDO {
     if (self::$connection === null) {
       try {
-        // Charger la configuration
-        $config = require __DIR__ . '/../../config.php';
+        // Charger les variables d'environnement
+        \App\Utils\EnvLoader::load();
         
         $dsn = sprintf(
           'mysql:host=%s;dbname=%s;charset=%s',
-          $config['database']['host'],
-          $config['database']['name'],
-          $config['database']['charset']
+          \App\Utils\EnvLoader::get('DB_HOST', 'localhost'),
+          \App\Utils\EnvLoader::get('DB_NAME'),
+          \App\Utils\EnvLoader::get('DB_CHARSET', 'utf8mb4')
         );
 
         self::$connection = new PDO(
           $dsn, 
-          $config['database']['user'], 
-          $config['database']['password'], 
+          \App\Utils\EnvLoader::get('DB_USER'),
+          \App\Utils\EnvLoader::get('DB_PASSWORD', ''), 
           [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

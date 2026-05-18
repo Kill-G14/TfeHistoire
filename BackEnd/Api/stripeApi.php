@@ -68,11 +68,11 @@ if (!in_array($request['action'], $publicActions)) {
 switch ($request['action']) {
     case 'getPublishableKey':
         // Retourner la clé publique Stripe
-        $config = require __DIR__ . '/../config.php';
+        \App\Utils\EnvLoader::load();
         $response = [
             'success' => true,
             'data' => [
-                'publishable_key' => $config['stripe']['publishable_key']
+                'publishable_key' => \App\Utils\EnvLoader::get('STRIPE_PUBLISHABLE_KEY')
             ]
         ];
         break;

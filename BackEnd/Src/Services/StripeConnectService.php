@@ -19,8 +19,8 @@ class StripeConnectService {
     public function __construct(UserRepository $userRepository) {
         $this->userRepository = $userRepository;
         
-        $config = require __DIR__ . '/../../config.php';
-        $this->secretKey = $config['stripe']['secret_key'];
+        \App\Utils\EnvLoader::load();
+        $this->secretKey = \App\Utils\EnvLoader::get('STRIPE_SECRET_KEY');
         
         Stripe::setApiKey($this->secretKey);
     }
@@ -76,12 +76,12 @@ class StripeConnectService {
      */
     private function createAccountLink(string $accountId): array {
         try {
-            $config = require __DIR__ . '/../../config.php';
+            \App\Utils\EnvLoader::load();
             
             $accountLink = AccountLink::create([
                 'account' => $accountId,
-                'refresh_url' => $config['stripe']['refresh_url'] ?? 'http://localhost/tfeHistoire/#/profile?stripe=refresh',
-                'return_url' => $config['stripe']['return_url'] ?? 'http://localhost/tfeHistoire/#/profile?stripe=success',
+                'refresh_url' => \App\Utils\EnvLoader::get('STRIPE_REFRESH_URL', 'http://localhost/tfeHistoire/#/profile?stripe=refresh'),
+                'return_url' => \App\Utils\EnvLoader::get('STRIPE_RETURN_URL', 'http://localhost/tfeHistoire/#/profile?stripe=success'),
                 'type' => 'account_onboarding',
             ]);
             

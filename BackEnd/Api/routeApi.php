@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 header("Content-Type: application/json");
 
-// Charger la configuration
-$config = require __DIR__ . '/../config.php';
+// Charger les variables d'environnement
+\App\Utils\EnvLoader::load();
 
 $request = json_decode(file_get_contents("php://input"), true);
 
@@ -53,7 +53,7 @@ switch ($request['action']) {
     }
 
     // Construire l'URL de l'API OpenRouteService
-    $url = $config['openroute']['base_url'] . '/directions/driving-car/geojson';
+    $url = \App\Utils\EnvLoader::get('OPENROUTE_BASE_URL') . '/directions/driving-car/geojson';
 
     // Préparer le body JSON avec les coordonnées
     $bodyData = [
@@ -75,7 +75,7 @@ switch ($request['action']) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
       'Accept: application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
       'Content-Type: application/json; charset=utf-8',
-      'Authorization: ' . $config['openroute']['api_key']
+      'Authorization: ' . \App\Utils\EnvLoader::get('OPENROUTE_API_KEY')
     ]);
 
     // Exécuter la requête
