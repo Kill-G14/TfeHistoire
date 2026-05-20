@@ -87,23 +87,16 @@ function fillEventDetails(event) {
     }
   }
 
-  // Afficher le prix
+  // Tous les événements sont gratuits
   if (detailPrice) {
-    if (event.is_free) {
-      detailPrice.textContent = "0.00";
-    } else if (event.ticket_price) {
-      detailPrice.textContent = parseFloat(event.ticket_price).toFixed(2);
-    } else {
-      detailPrice.textContent = "0.00";
-    }
+    detailPrice.textContent = "0.00";
   }
 
   if (quantityEl) quantityEl.textContent = quantity;
 
-  // Calculer le total
+  // Le total est toujours 0 (gratuit)
   if (totalPrice) {
-    const priceValue = event.is_free ? 0 : event.ticket_price || 0;
-    totalPrice.textContent = (priceValue * quantity).toFixed(2);
+    totalPrice.textContent = "0.00";
   }
 }
 
@@ -162,11 +155,9 @@ function updateQuantityDisplay() {
   const totalPrice = document.getElementById("totalPrice");
 
   if (quantityEl) quantityEl.textContent = quantity;
-  if (totalPrice && currentEvent) {
-    const priceValue = currentEvent.is_free
-      ? 0
-      : currentEvent.ticket_price || 0;
-    totalPrice.textContent = (priceValue * quantity).toFixed(2);
+  // Tous les événements sont gratuits, total toujours à 0
+  if (totalPrice) {
+    totalPrice.textContent = "0.00";
   }
 }
 
@@ -197,27 +188,14 @@ async function handleReservation() {
 }
 
 /**
- * Appliquer la logique conditionnelle pour le bouton Réserver
- * - Événement payant (is_free=false, ticket_price>0) → Bouton visible
- * - Événement gratuit avec tickets limités (is_free=true, ticket_quantity>0) → Bouton visible
- * - Événement gratuit sans limite (is_free=true, ticket_quantity=0) → Section réservation complète cachée
+ * Tous les événements sont gratuits → Section réservation toujours visible
  */
 function applyReserveButtonLogic(event) {
   const reservationSection = document.getElementById("reservationSection");
 
-  // Déterminer si la section de réservation doit être affichée
-  const shouldShowReservation =
-    (!event.is_free && event.ticket_price > 0) ||
-    (event.is_free && event.ticket_quantity > 0);
-
+  // Tous les événements sont gratuits, toujours afficher la section
   if (reservationSection) {
-    if (shouldShowReservation) {
-      // Afficher toute la section de réservation
-      reservationSection.style.display = "block";
-    } else {
-      // Cacher toute la section de réservation (titre + contenu)
-      reservationSection.style.display = "none";
-    }
+    reservationSection.style.display = "block";
   }
 }
 

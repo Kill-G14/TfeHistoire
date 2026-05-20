@@ -71,7 +71,7 @@ function renderHeaderActions() {
 
     if (btnProfile) {
       btnProfile.addEventListener("click", () => {
-        window.router.navigate("profile");
+        window.router.navigate("/profile");
       });
     }
 

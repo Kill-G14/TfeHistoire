@@ -67,15 +67,9 @@ export async function renderEventCards(events, containerId, onEventClick) {
     if (date) date.textContent = event.date;
     if (time) time.textContent = event.time;
 
-    // Afficher le prix
+    // Tous les événements sont gratuits
     if (price) {
-      if (event.is_free) {
-        price.textContent = "Gratuit";
-      } else if (event.ticket_price) {
-        price.textContent = `${parseFloat(event.ticket_price).toFixed(2)} €`;
-      } else {
-        price.textContent = "Gratuit";
-      }
+      price.textContent = "Gratuit";
     }
 
     // Configurer le bouton favoris

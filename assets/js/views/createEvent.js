@@ -4,7 +4,6 @@ import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import EventManager from "../managers/EventManager.js";
-import StripeConnectManager from "../managers/StripeConnectManager.js";
 import { populateCountrySelect } from "../utils/countries.js";
 import {
   validateImageFile,
@@ -294,20 +293,6 @@ async function handleSubmit(e) {
     return;
   }
 
-  // ⭐ NOUVEAU : Vérifier Stripe Connect si événement payant
-  const isFree = document.getElementById("isFree")?.checked || false;
-
-  if (!isFree) {
-    // L'événement est payant, vérifier le compte Stripe
-    const hasStripe = await checkUserStripeAccount();
-
-    if (!hasStripe) {
-      // Afficher modale pour connecter Stripe
-      showStripeConnectModal();
-      return; // Arrêter la soumission
-    }
-  }
-
   // Désactiver le bouton de soumission
   const submitBtn = createEventForm.querySelector('button[type="submit"]');
   if (submitBtn) {
@@ -360,11 +345,7 @@ async function handleSubmit(e) {
       '<i class="bi bi-hourglass-split"></i> Création de l\'événement...';
   }
 
-  // Récupérer les données de billetterie (isFree déjà déclaré plus haut)
-  const price = document.getElementById("price")?.value || 0;
-  const availableTickets =
-    document.getElementById("availableTickets")?.value || null;
-
+  // Tous les événements sont gratuits (système de réservations sans paiement)
   const eventData = {
     title: document.getElementById("title").value,
     description: document.getElementById("description").value,
@@ -377,11 +358,10 @@ async function handleSubmit(e) {
     date: document.getElementById("date").value,
     time: document.getElementById("time").value,
     category: document.getElementById("category").value,
-    is_free: isFree,
+    is_free: true,
     image_event: uploadedImageFilename,
-    // Données de billetterie
-    ticket_price: parseFloat(price),
-    ticket_quantity: availableTickets ? parseInt(availableTickets) : null,
+    ticket_price: 0,
+    ticket_quantity: 0,
   };
 
   // Appel API pour créer l'événement
@@ -401,124 +381,6 @@ async function handleSubmit(e) {
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Créer l\'événement';
-    }
-  }
-}
-
-// ========================================
-// FONCTIONS STRIPE CONNECT
-// ========================================
-
-// Vérifier si l'utilisateur a un compte Stripe
-async function checkUserStripeAccount() {
-  const result = await StripeConnectManager.checkStripeAccount();
-  return result.success && result.data.has_stripe_account;
-}
-
-// Afficher modale de connexion Stripe
-function showStripeConnectModal() {
-  const modal = `
-    <div class="modal fade show d-block" id="stripeConnectModal" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              <i class="bi bi-credit-card text-primary"></i>
-              Connecter votre compte Stripe
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeStripeModal()"></button>
-          </div>
-          <div class="modal-body">
-            <div class="text-center mb-4">
-              <i class="bi bi-stripe text-primary" style="font-size: 4rem;"></i>
-            </div>
-            
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle"></i>
-              <strong>Événement payant détecté</strong>
-            </div>
-            
-            <p class="mb-3">
-              Pour créer un événement payant, vous devez connecter votre compte Stripe 
-              afin de recevoir les paiements directement.
-            </p>
-            
-            <h6 class="mb-2">✅ Pourquoi Stripe ?</h6>
-            <ul class="list-unstyled ms-3 mb-3">
-              <li><i class="bi bi-check-circle text-success"></i> Recevez vos paiements automatiquement</li>
-              <li><i class="bi bi-check-circle text-success"></i> Gestion sécurisée par Stripe</li>
-              <li><i class="bi bi-check-circle text-success"></i> Frais de 2,9% + 0,25€ par transaction</li>
-              <li><i class="bi bi-check-circle text-success"></i> Configuration en 2 minutes</li>
-            </ul>
-            
-            <div class="alert alert-warning">
-              <i class="bi bi-exclamation-triangle"></i>
-              Sans compte Stripe, vous ne pourrez créer que des événements gratuits.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeStripeModal()">
-              Annuler
-            </button>
-            <button type="button" class="btn btn-primary" id="btnConnectStripeModal">
-              <i class="bi bi-stripe"></i> Connecter mon compte Stripe
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.insertAdjacentHTML("beforeend", modal);
-
-  // Event listener pour le bouton
-  document
-    .getElementById("btnConnectStripeModal")
-    .addEventListener("click", initiateStripeConnect);
-}
-
-// Fermer la modale Stripe
-window.closeStripeModal = function () {
-  const modal = document.getElementById("stripeConnectModal");
-  if (modal) {
-    modal.remove();
-  }
-};
-
-// Lancer le processus Stripe Connect
-async function initiateStripeConnect() {
-  const btn = document.getElementById("btnConnectStripeModal");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Connexion...';
-  }
-
-  try {
-    const result = await StripeConnectManager.createStripeConnectAccount();
-
-    if (result.success && result.data.onboarding_url) {
-      helpers.showToast("Redirection vers Stripe...", "info");
-      // Rediriger vers Stripe pour finaliser
-      setTimeout(() => {
-        window.location.href = result.data.onboarding_url;
-      }, 500);
-    } else {
-      helpers.showToast(
-        result.message || "Erreur lors de la connexion",
-        "error",
-      );
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML =
-          '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
-      }
-    }
-  } catch (error) {
-    helpers.showToast("Erreur de connexion à Stripe", "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML =
-        '<i class="bi bi-stripe"></i> Connecter mon compte Stripe';
     }
   }
 }

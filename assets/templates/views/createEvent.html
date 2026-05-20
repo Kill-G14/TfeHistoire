@@ -184,53 +184,11 @@
         </div>
       </div>
 
-      <!-- Billetterie -->
-      <div class="form-section">
-        <div class="form-section-title">
-          <i class="bi bi-currency-euro text-accent"></i>
-          Billetterie
-        </div>
-
-        <div class="mb-3">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="isFree" />
-            <label class="form-check-label" for="isFree">
-              Événement gratuit
-            </label>
-          </div>
-        </div>
-
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="price" class="form-label">Prix du ticket (€)</label>
-            <input
-              type="number"
-              class="form-control"
-              id="price"
-              placeholder="25.00"
-              step="0.01"
-              min="0"
-              value="0"
-            />
-            <small class="text-muted">Laisser à 0 si gratuit</small>
-          </div>
-
-          <div class="col-md-6">
-            <label for="availableTickets" class="form-label"
-              >Nombre de tickets disponibles</label
-            >
-            <input
-              type="number"
-              class="form-control"
-              id="availableTickets"
-              placeholder="500"
-              min="1"
-            />
-            <small class="text-muted"
-              >Optionnel pour les événements libres</small
-            >
-          </div>
-        </div>
+      <!-- Information : Événements gratuits -->
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Tous les événements sont gratuits.</strong> Les participants
+        peuvent réserver leur place sans paiement.
       </div>
 
       <!-- Buttons -->

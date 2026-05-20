@@ -61,9 +61,7 @@ async function init() {
   await renderLoginModal();
 
   // Précharger la modal de réservation
-  await loadReservationModalTemplate(
-    "/assets/components/reservationModal.html",
-  );
+  await loadReservationModalTemplate("assets/components/reservationModal.html");
 
   // Initialiser le routeur
   router.init();

@@ -62,12 +62,9 @@ class EventValidator {
       $errors['category'] = 'Veuillez choisir une catégorie pour aider les visiteurs à trouver votre événement';
     }
 
-    // Is Free
-    if (!isset($data['is_free'])) {
-      $errors['is_free'] = 'Veuillez indiquer si votre événement est gratuit ou payant';
-    } elseif (!is_bool($data['is_free']) && $data['is_free'] !== 0 && $data['is_free'] !== 1) {
-      $errors['is_free'] = 'Le statut gratuit/payant doit être un booléen';
-    }
+    // Is Free - TOUS LES ÉVÉNEMENTS SONT GRATUITS (système de réservations)
+    // On force toujours is_free = TRUE, les champs ticket_price et ticket_quantity sont ignorés
+    // Pas de validation car la valeur est forcée côté backend
 
     // Latitude (optionnel)
     if (isset($data['latitude']) && !Helpers::isEmpty($data['latitude'])) {

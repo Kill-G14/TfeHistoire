@@ -41,7 +41,7 @@ export async function showReservationModal(event) {
 
   // Charger le template si ce n'est pas déjà fait
   if (!templateObjects["reservationModalTemplate"]) {
-    await loadTemplate("/assets/components/reservationModal.html");
+    await loadTemplate("assets/components/reservationModal.html");
   }
 
   // Vérifier si la modal existe déjà dans le DOM
@@ -79,15 +79,9 @@ export async function showReservationModal(event) {
       <p class="mb-1">
         <i class="bi bi-geo-alt"></i> ${event.city}, ${event.country}
       </p>
-      ${
-        !event.is_free
-          ? `<p class="mb-0 text-primary fw-bold">
-               <i class="bi bi-tag"></i> ${event.ticket_price} €
-             </p>`
-          : `<p class="mb-0 text-success fw-bold">
-               <i class="bi bi-gift"></i> Gratuit
-             </p>`
-      }
+      <p class="mb-0 text-success fw-bold">
+        <i class="bi bi-gift"></i> Gratuit
+      </p>
     `;
   }
 
