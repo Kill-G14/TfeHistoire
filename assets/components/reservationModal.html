@@ -1,0 +1,55 @@
+<template id="reservationModalTemplate">
+  <div
+    class="modal fade"
+    id="reservationModal"
+    tabindex="-1"
+    aria-labelledby="reservationModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reservationModalLabel">
+            Confirmer la réservation
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-3">
+            <i
+              class="bi bi-calendar-check text-primary"
+              style="font-size: 3rem"
+            ></i>
+          </div>
+          <p class="text-center fs-5">
+            Êtes-vous sûr de vouloir réserver une place pour cet événement ?
+          </p>
+          <div id="eventInfoReservation" class="mt-3 p-3 bg-light rounded">
+            <!-- Les informations de l'événement seront affichées ici -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bi bi-x-circle"></i> Non, annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="confirmReservationBtn"
+          >
+            <i class="bi bi-check-circle"></i> Oui, réserver
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

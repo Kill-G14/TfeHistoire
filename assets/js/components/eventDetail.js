@@ -3,7 +3,7 @@
 import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
-import OrderManager from "../managers/OrderManager.js";
+import { showReservationModal } from "./reservationModal.js";
 
 const templateObjects = {};
 let currentEvent = null;
@@ -189,36 +189,11 @@ async function handleReservation() {
     return;
   }
 
-  // Créer une commande pour cet événement
-  try {
-    helpers.showToast("Création de votre réservation...", "info");
+  // Fermer la modal de détails
+  closeEventDetail();
 
-    const token = auth.getToken();
-    const orderData = {
-      items: [
-        {
-          event_id: currentEvent.id,
-          quantity: quantity,
-        },
-      ],
-    };
-
-    const result = await OrderManager.create(orderData, token);
-
-    if (result.success) {
-      // Stocker l'ID de commande et rediriger vers le checkout
-      appState.set("currentOrderId", result.data.id);
-      closeEventDetail();
-      window.router.navigate(`/checkout`);
-    } else {
-      helpers.showToast(
-        result.message || "Erreur lors de la création de la commande",
-        "error",
-      );
-    }
-  } catch (error) {
-    helpers.showToast("Erreur lors de la création de la réservation", "error");
-  }
+  // Afficher la modal de confirmation de réservation
+  await showReservationModal(currentEvent);
 }
 
 /**

@@ -5,6 +5,7 @@ import { Router } from "./router.js";
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
 import { renderLoginModal } from "./components/loginModal.js";
+import { loadTemplate as loadReservationModalTemplate } from "./components/reservationModal.js";
 import { appState } from "./store/appState.js";
 import { auth } from "./utils/auth.js";
 import { migrateLocalStorage } from "./utils/migrateLocalStorage.js";
@@ -17,9 +18,10 @@ const routes = {
   "/create-event": () => import("./views/createEvent.js"),
   "/profile": () => import("./views/profile.js"),
   "/map": () => import("./views/map.js"),
-  "/checkout": () => import("./views/checkout.js"),
-  "/payment/success": () => import("./views/paymentSuccess.js"),
-  "/payment/cancel": () => import("./views/paymentCancel.js"),
+  // Routes Stripe désactivées
+  // "/checkout": () => import("./views/checkout.js"),
+  // "/payment/success": () => import("./views/paymentSuccess.js"),
+  // "/payment/cancel": () => import("./views/paymentCancel.js"),
   "/about": () => import("./views/about.js"),
   "/terms": () => import("./views/terms.js"),
   "/privacy": () => import("./views/privacy.js"),
@@ -57,6 +59,11 @@ async function init() {
   await renderHeader();
   await renderFooter();
   await renderLoginModal();
+
+  // Précharger la modal de réservation
+  await loadReservationModalTemplate(
+    "/assets/components/reservationModal.html",
+  );
 
   // Initialiser le routeur
   router.init();

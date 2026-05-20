@@ -5,8 +5,8 @@ import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import FavoriteManager from "../managers/FavoriteManager.js";
 import EventManager from "../managers/EventManager.js";
-import OrderManager from "../managers/OrderManager.js";
-import StripeConnectManager from "../managers/StripeConnectManager.js";
+import ReservationManager from "../managers/ReservationManager.js";
+// import StripeConnectManager from "../managers/StripeConnectManager.js"; // Désactivé
 import { showEventDetail } from "../components/eventDetail.js";
 import { validateChangePasswordForm } from "../validators/authValidator.js";
 import {
@@ -106,11 +106,11 @@ export async function mount(container, params) {
   // Charger et afficher les données utilisateur
   await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
 
-  // Charger et afficher le statut Stripe Connect
-  await loadStripeConnectStatus();
+  // Stripe Connect désactivé
+  // await loadStripeConnectStatus();
 
-  // Vérifier si retour depuis Stripe
-  checkStripeReturnStatus();
+  // Vérifier si retour depuis Stripe (désactivé)
+  // checkStripeReturnStatus();
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);
@@ -793,8 +793,8 @@ async function loadReservations() {
     </div>
   `;
 
-  // Récupérer les commandes de l'utilisateur
-  const result = await OrderManager.getByUser(token);
+  // Récupérer les réservations de l'utilisateur
+  const result = await ReservationManager.getMyReservations(token);
 
   if (result.success && result.data && result.data.length > 0) {
     userReservations = result.data;
@@ -827,90 +827,76 @@ function displayReservations(reservations) {
   reservationsContainer.innerHTML = `
     <div class="d-flex flex-column gap-3">
       ${reservations
-        .map((order) => {
-          // Déterminer le statut de la commande
+        .map((reservation) => {
+          // Déterminer le statut de la réservation
           let statusBadge = "";
           let statusClass = "";
 
-          if (order.is_paid) {
-            statusBadge = '<span class="badge bg-success">Payé</span>';
+          if (reservation.status === 'confirmed') {
+            statusBadge = '<span class="badge bg-success">Confirmée</span>';
             statusClass = "border-success";
-          } else if (order.is_cancelled) {
-            statusBadge = '<span class="badge bg-danger">Annulé</span>';
+          } else if (reservation.status === 'cancelled') {
+            statusBadge = '<span class="badge bg-danger">Annulée</span>';
             statusClass = "border-danger";
-          } else if (order.is_failed) {
-            statusBadge = '<span class="badge bg-warning">Échec</span>';
-            statusClass = "border-warning";
-          } else if (order.is_pending) {
-            statusBadge = '<span class="badge bg-info">En attente</span>';
-            statusClass = "border-info";
           }
 
           // Formater le prix
           const priceDisplay =
-            order.total_price <= 0
+            reservation.event_is_free || reservation.event_ticket_price <= 0
               ? "Gratuit"
-              : `${helpers.formatPrice(order.total_price)}`;
+              : `${helpers.formatPrice(reservation.event_ticket_price * reservation.quantity)}`;
 
-          // Formater la date de commande
-          const orderDate = helpers.formatDate(order.created_at);
+          // Formater la date de réservation
+          const reservationDate = helpers.formatDate(reservation.created_at);
+
+          // Formater la date de l'événement
+          const eventDate = helpers.formatDate(reservation.event_date);
 
           return `
         <div class="card ${statusClass}" style="border-width: 2px;">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <div>
-                <h6 class="card-title mb-1">Commande #${order.id}</h6>
+                <h6 class="card-title mb-1">${reservation.event_title}</h6>
                 <small class="text-muted">
-                  <i class="bi bi-calendar3"></i> ${orderDate}
+                  <i class="bi bi-calendar3"></i> Réservé le ${reservationDate}
                 </small>
               </div>
               ${statusBadge}
             </div>
             
+            <div class="mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-calendar-event me-2 text-primary"></i>
+                <span>${eventDate} à ${reservation.event_time}</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-geo-alt me-2 text-primary"></i>
+                <span>${reservation.event_city} - ${reservation.event_address}</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-ticket-perforated me-2 text-primary"></i>
+                <span>${reservation.quantity} place${reservation.quantity > 1 ? 's' : ''}</span>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+              <span class="fw-bold">Prix</span>
+              <span class="fs-5 fw-bold text-primary">${priceDisplay}</span>
+            </div>
+            
             ${
-              order.items && order.items.length > 0
+              reservation.status === 'confirmed'
                 ? `
-              <div class="mb-3">
-                ${order.items
-                  .map(
-                    (item) => `
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                      <div class="fw-bold">${item.event_title}</div>
-                      <small class="text-muted">${item.ticket_name} × ${item.quantity}</small>
-                    </div>
-                    <span class="text-primary fw-bold">
-                      ${item.unit_price <= 0 ? "Gratuit" : helpers.formatPrice(item.unit_price * item.quantity)}
-                    </span>
-                  </div>
-                `,
-                  )
-                  .join("")}
+              <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-outline-danger btn-sm" 
+                        onclick="cancelReservation(${reservation.id})"
+                        id="cancel-reservation-${reservation.id}">
+                  <i class="bi bi-x-circle"></i> Annuler la réservation
+                </button>
               </div>
-              
-              <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                <span class="fw-bold">Total</span>
-                <span class="fs-5 fw-bold text-primary">${priceDisplay}</span>
-              </div>
-              
-              ${
-                order.is_paid
-                  ? `
-                <div class="d-grid gap-2 mt-3">
-                  <button class="btn btn-primary btn-sm" 
-                          onclick="downloadTickets(${order.id})"
-                          id="download-tickets-${order.id}">
-                    <i class="bi bi-download"></i> Télécharger les billets PDF
-                  </button>
-                </div>
-              `
-                  : ""
-              }
             `
-                : `
-              <p class="text-muted small mb-0">Aucun détail disponible</p>
-            `
+                : ''
             }
           </div>
         </div>
@@ -935,33 +921,38 @@ window.downloadTickets = async function (orderId) {
   // Désactiver le bouton pendant le traitement
   btnElement.disabled = true;
   btnElement.innerHTML =
-    '<span class="spinner-border spinner-border-sm"></span> Téléchargement...';
-
-  try {
-    // TODO: Implémenter l'API de téléchargement des tickets
-    // Pour l'instant, juste afficher un message
-    helpers.showToast("Téléchargement des billets en cours...", "info");
-
-    // Simuler un téléchargement
-    setTimeout(() => {
-      helpers.showToast("Billets téléchargés avec succès", "success");
-      btnElement.disabled = false;
-      btnElement.innerHTML =
-        '<i class="bi bi-download"></i> Télécharger les billets PDF';
-    }, 2000);
-  } catch (error) {
-    helpers.showToast("Erreur lors du téléchargement des billets", "error");
-    btnElement.disabled = false;
-    btnElement.innerHTML =
-      '<i class="bi bi-download"></i> Télécharger les billets PDF';
+    '<span class="spinnerannuler une réservation
+window.cancelReservation = async function (reservationId) {
+  if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) {
+    return;
   }
-};
 
-// ========================================
-// FONCTIONS STRIPE CONNECT
-// ========================================
+  const btnElement = document.getElementById(`cancel-reservation-${reservationId}`);
+  if (!btnElement || btnElement.disabled) return;
 
-// Charger et afficher le statut Stripe Connect
+  const token = auth.getToken();
+  if (!token) {
+    helpers.showToast("Vous devez être connecté", "error");
+    return;
+  }
+
+  // Désactiver le bouton pendant le traitement
+  btnElement.disabled = true;
+  btnElement.innerHTML =
+    '<span class="spinner-border spinner-border-sm"></span> Annulation...';
+
+  const result = await ReservationManager.cancel(reservationId, token);
+
+  if (result.success) {
+    helpers.showToast(result.message, "success");
+    // Recharger les réservations
+    await loadReservations();
+  } else {
+    helpers.showToast(result.message, "error");
+    btnElement.disabled = false;
+    btnElement.innerHTML = '<i class="bi bi-x-circle"></i> Annuler la réservation';
+  }
+}
 async function loadStripeConnectStatus() {
   const container = document.getElementById("stripeConnectSection");
   if (!container) return;
