@@ -5,10 +5,10 @@
 Tout est maintenant dans **un seul fichier SQL** qui contient :
 
 - ✅ Création de la base `memoriaeventia`
-- ✅ Toutes les 14 tables (users, events, orders, sessions, rate_limiter, etc.)
+- ✅ Toutes les tables (users, events, reservations, sessions, rate_limiter, etc.)
 - ✅ Tous les index d'optimisation
 - ✅ Données de test (4 utilisateurs + 13 événements)
-- ✅ Configuration Stripe Connect
+- ✅ Système de réservations simples
 - ✅ Système de sessions avec expiration
 - ✅ Rate Limiter (protection brute force)
 
@@ -59,25 +59,14 @@ Puis importer `database.sql` dans la base `memoriaeventia`.
 
 ## 📊 Contenu de la Base
 
-### Tables principales (9)
+### Tables principales
 
-- `users` - Utilisateurs (avec Stripe Connect)
+- `users` - Utilisateurs
 - `events` - Événements historiques
-- `orders` - Commandes
-- `order_items` - Articles de commandes
-- `tickets_generated` - Billets individuels avec QR codes
+- `reservations` - Réservations simples
 - `favorites` - Favoris des utilisateurs
 - `sessions` - Sessions d'authentification avec expiration
-- `payments` - Paiements Stripe
 - `event_modifications` - Modifications d'événements en attente
-
-### Tables Stripe Connect (2)
-
-- `creator_earnings` - Gains des créateurs
-- `stripe_connect_log` - Historique des connexions Stripe
-
-### Tables système (1)
-
 - `rate_limiter` - Protection contre brute force
 
 ---

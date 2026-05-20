@@ -19,8 +19,6 @@ class Event {
   public bool $is_free;
   public float $ticket_price;
   public int $ticket_quantity;
-  public bool $requires_stripe_account;
-  public bool $stripe_account_verified;
   public bool $is_pending;
   public bool $is_approved;
   public bool $is_rejected;

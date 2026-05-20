@@ -18,10 +18,6 @@ const routes = {
   "/create-event": () => import("./views/createEvent.js"),
   "/profile": () => import("./views/profile.js"),
   "/map": () => import("./views/map.js"),
-  // Routes Stripe désactivées
-  // "/checkout": () => import("./views/checkout.js"),
-  // "/payment/success": () => import("./views/paymentSuccess.js"),
-  // "/payment/cancel": () => import("./views/paymentCancel.js"),
   "/about": () => import("./views/about.js"),
   "/terms": () => import("./views/terms.js"),
   "/privacy": () => import("./views/privacy.js"),

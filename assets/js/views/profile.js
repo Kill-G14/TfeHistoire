@@ -6,7 +6,6 @@ import { appState } from "../store/appState.js";
 import FavoriteManager from "../managers/FavoriteManager.js";
 import EventManager from "../managers/EventManager.js";
 import ReservationManager from "../managers/ReservationManager.js";
-// import StripeConnectManager from "../managers/StripeConnectManager.js"; // Désactivé
 import { showEventDetail } from "../components/eventDetail.js";
 import { validateChangePasswordForm } from "../validators/authValidator.js";
 import {
@@ -71,12 +70,6 @@ export async function mount(container, params) {
 
   // Charger et afficher les données utilisateur
   await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
-
-  // Stripe Connect désactivé
-  // await loadStripeConnectStatus();
-
-  // Vérifier si retour depuis Stripe (désactivé)
-  // checkStripeReturnStatus();
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);

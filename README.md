@@ -7,7 +7,7 @@ Application web Single Page Application (SPA) de réservation d'événements his
 - **SPA Navigation** : Navigation fluide sans rechargement de page
 - **Liste d'événements** : Affichage de tous les événements historiques d'Europe
 - **Filtres avancés** : Recherche par nom, filtrage par pays et catégorie
-- **Détails d'événement** : Vue détaillée avec réservation de tickets
+- **Détails d'événement** : Vue détaillée avec réservation de places
 - **Création d'événement** : Formulaire complet pour créer de nouveaux événements
 - **Authentification** : Système de connexion/inscription
 - **Profil utilisateur** : Gestion des réservations et événements créés
@@ -51,8 +51,7 @@ assets/
   │   │   ├── EventManager.js  # Appels API événements
   │   │   ├── AuthManager.js   # Appels API auth
   │   │   ├── FavoriteManager.js
-  │   │   ├── TicketManager.js
-  │   │   └── CheckoutManager.js
+  │   │   └── ReservationManager.js  # Appels API réservations
   │   ├── validators/
   │   │   ├── authValidator.js     # Validation auth frontend
   │   │   ├── formValidator.js     # Validation formulaires
@@ -122,9 +121,6 @@ Accéder à : `http://localhost/tfeHistoire/`
 - `/create-event` : Création d'événement (authentification requise)
 - `/profile` : Profil utilisateur (authentification requise)
 - `/map` : Carte interactive des événements
-- `/checkout` : Page de paiement (authentification requise)
-- `/payment/success` : Confirmation de paiement réussi
-- `/payment/cancel` : Paiement annulé
 
 ### Fonctionnalités principales
 
@@ -137,9 +133,10 @@ Accéder à : `http://localhost/tfeHistoire/`
 #### Réserver un événement
 
 1. Cliquer sur "Voir détails" d'un événement
-2. Ajuster la quantité de tickets
+2. Ajuster la quantité de places
 3. Cliquer sur "Réserver maintenant"
 4. Se connecter si nécessaire
+5. Confirmer la réservation (gratuit)
 
 #### Créer un événement
 

@@ -1,13 +1,13 @@
-# ✅ État du Projet - 14 Mai 2026
+# ✅ État du Projet - Mai 2026
 
 ## 🎯 Dernières modifications
 
-### ✅ Stripe Connect - Implémentation complète
+### ✅ Migration vers réservations simples
 
-- **Backend** : Service, API, Repository créés
-- **Frontend** : Manager, vues intégrées (createEvent, profile)
-- **Base de données** : Tables ajoutées dans database.sql
-- **Configuration** : URLs de retour configurées dans config.php
+- **Stripe supprimé** : Système de paiement retiré pour simplification
+- **Backend** : ReservationService, API, Repository créés
+- **Frontend** : ReservationManager, composants mis à jour
+- **Base de données** : Table reservations ajoutée, tables Stripe supprimées
 
 ### ✅ Sessions avec expiration
 
@@ -20,7 +20,7 @@ Toute la documentation est maintenant dans le dossier **Documentation/** :
 
 1. **README_CONFIG.md** - Configuration backend
 2. **DATABASE_OPTIMIZATION.md** - Structure base de données
-3. **STRIPE.md** - Guide complet Stripe Connect
+3. **MIGRATION_STRIPE_REMOVED.md** - Documentation de la migration
 4. **INSTALLATION_DATABASE.md** - Installation de la base de données
 
 ## 🚧 À faire
@@ -31,5 +31,5 @@ Voir **TODO_IMPROVEMENTS.md** pour les améliorations futures.
 
 - **Sessions** : Gestion avec expiration automatique (30 jours)
 - **RateLimiter** : Protection contre brute force et spam
-- **Stripe Connect** : Express accounts pour marketplace
+- **Réservations** : Système simple sans paiement en ligne
 - **Environnement** : Configuration via .env + config.php

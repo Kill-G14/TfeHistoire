@@ -2,7 +2,7 @@
 
 ## ✅ Terminé
 
-- [x] Intégrer Stripe Connect
+- [x] Système de réservations simples (sans paiement)
 - [x] Limiter le nombre de tentatives de connexion (RateLimiter)
 - [x] Intégrer page de modification d'événement (AdminOffice)
 - [x] Intégrer page de suppression d'événement (AdminOffice)
@@ -15,10 +15,9 @@ Aucune tâche en cours.
 
 ### Fonctionnalités
 
-- [ ] Gestion de multi-tickets (différents types de billets pour un même événement)
-- [ ] Transferts automatiques Stripe Connect lors des paiements
-- [ ] Dashboard créateur (statistiques de ventes)
-- [ ] Emails de notification (compte Stripe connecté, paiement reçu)
+- [ ] Gestion de multi-réservations (différents types de places)
+- [ ] Dashboard créateur (statistiques de réservations)
+- [ ] Emails de notification (réservation confirmée, événement annulé)
 
 ### Technique
 
@@ -29,7 +28,6 @@ Aucune tâche en cours.
 
 ### Sécurité
 
-- [ ] Configurer webhooks Stripe en production
 - [ ] Mettre en place HTTPS
 - [ ] Audit de sécurité complet
 

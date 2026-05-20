@@ -18,9 +18,9 @@ Ce dossier contient toute la documentation technique du projet.
 - **[README_CONFIG.md](README_CONFIG.md)** - Configuration du backend (.env, config.php)
 - **[DATABASE_OPTIMIZATION.md](DATABASE_OPTIMIZATION.md)** - Optimisations et structure de la base de données
 
-### Stripe Connect (Paiements)
+### Migration
 
-- **[STRIPE.md](STRIPE.md)** - Guide complet Stripe Connect (configuration, tests, API, webhooks)
+- **[MIGRATION_STRIPE_REMOVED.md](MIGRATION_STRIPE_REMOVED.md)** - Documentation de la suppression de Stripe (système de réservation simple)
 
 ## 📁 Autres documentations du projet
 
@@ -40,7 +40,7 @@ Ce dossier contient toute la documentation technique du projet.
 
 1. Consultez **README_CONFIG.md** pour la configuration
 2. Importez le fichier **database.sql** dans MySQL/phpMyAdmin
-3. Consultez **STRIPE_CONNECT_READY.md** pour tester les paiements
+3. Le projet utilise maintenant un système de réservation simple (sans paiement en ligne)
 
 ---
 

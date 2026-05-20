@@ -10,10 +10,6 @@ class User {
   public bool $is_admin;
   public bool $is_organizer;
   public bool $is_moderator;
-  public ?string $stripe_account_id;
-  public string $stripe_account_status;
-  public bool $stripe_onboarding_completed;
-  public ?string $stripe_connected_at;
   public bool $is_deleted;
   public string $created_at;
   public string $updated_at;

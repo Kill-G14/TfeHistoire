@@ -75,13 +75,10 @@ Créer les scripts de nettoyage automatique :
 
 - ✅ EventService.php (8 méthodes)
 - ✅ FavoriteService.php (3 méthodes)
-- ✅ OrderService.php (2 méthodes)
+- ✅ ReservationService.php (3 méthodes)
 - ✅ UserService.php (2 méthodes)
-- ✅ StripeService.php (1 méthode)
-- ✅ StripeConnectService.php (2 méthodes)
 - ✅ AuthService.php (déjà OK)
 - ✅ EventModificationService.php (déjà OK)
-- ✅ PdfService.php (déjà OK)
 
 ### 8. Page d'erreur générique
 
@@ -189,11 +186,11 @@ Ajouter une protection CSRF pour les formulaires sensibles :
 
 **✅ PARTIELLEMENT FAIT** : `/Documentation/` existe avec :
 
-- ✅ STRIPE.md (guide complet Stripe)
 - ✅ README_CONFIG.md (configuration backend)
 - ✅ INSTALLATION_DATABASE.md (installation BDD)
 - ✅ DATABASE_OPTIMIZATION.md (optimisation SQL)
 - ✅ ETAT_PROJET.md (état du projet)
+- ✅ MIGRATION_STRIPE_REMOVED.md (documentation migration)
 
 **À créer** (manquants) :
 
@@ -234,8 +231,8 @@ Créer `/BackEnd/Tests/` avec :
 
 - [ ] Nouveau compte créé
 - [ ] Nouvel événement publié
-- [ ] Nouveau paiement reçu
-- [ ] Ticket scanné
+- [ ] Nouvelle réservation confirmée
+- [ ] Réservation scannée
 
 **Framework** : Actuellement utilise `mail()` PHP natif. Possibilité d'upgrade vers Mailjet/Brevo.
 
@@ -477,7 +474,7 @@ Si hébergement via Git :
 - [ ] Statistiques sessions actives (requête sur table `sessions`)
 - [ ] Tentatives de connexion bloquées (requête sur table `rate_limiter`)
 - [ ] Événements créés par période (graphique)
-- [ ] CA Stripe par mois (intégration Stripe API)
+- [ ] Statistiques réservations par mois
 
 ---
 
@@ -489,9 +486,7 @@ Si hébergement via Git :
 - [ ] Vérifier HTTPS actif
 - [ ] Configurer cronjobs
 - [ ] Backup base de données
-- [ ] Tester paiements Stripe (live keys)
 - [ ] Logs accessibles mais protégés
-- [ ] Changer les clés localStorage
 - [x] Retirer tous les console.log
 
 ---

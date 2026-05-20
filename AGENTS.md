@@ -1072,7 +1072,7 @@ async function loadEvents() {
 
 - **Managers** : tous les appels `fetch()` sont centralisés dans les managers
 - **Vues** : utilisent les managers, ne font jamais de `fetch()` directement
-- Un manager par domaine (Auth, Event, Favorite, Order, Ticket)
+- Un manager par domaine (Auth, Event, Favorite, Reservation)
 - Méthodes avec paramètres clairs
 - Retour standardisé : `{ success: boolean, message: string, data?: any }`
 - Gestion des erreurs dans les managers

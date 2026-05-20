@@ -13,19 +13,10 @@
 - ✓ `database.sql`
 - ✓ `Src/Utils/Database.php`
 - ✓ `README.md`
-- ✓ `README_STRIPE_TEST.md`
 
 ---
 
-### 2. **Intégration de la table Stripe**
-
-- **Table `payments`** maintenant incluse dans `database.sql`
-- **Fichier obsolète** : `database_stripe.sql` → renommé en `.deprecated`
-- **Avantage** : Un seul fichier SQL à exécuter pour créer toute la base
-
----
-
-### 3. **Optimisation des index**
+### 2. **Optimisation des index**
 
 #### ❌ Index redondants SUPPRIMÉS (11 index)
 
@@ -44,8 +35,6 @@ Ces index étaient créés automatiquement par MySQL et étaient donc inutiles :
 -- Supprimés (UNIQUE les crée automatiquement) :
 -- CREATE INDEX idx_tickets_generated_unique_code ON tickets_generated (unique_code);
 -- CREATE INDEX idx_sessions_token ON sessions (token);
--- CREATE INDEX idx_payments_stripe_pi ON payments (stripe_payment_intent_id);
--- CREATE INDEX idx_payments_stripe_cs ON payments (stripe_checkout_session_id);
 ```
 
 #### ✅ Index conservés (9 index explicites)
@@ -86,7 +75,7 @@ CREATE INDEX idx_tickets_deleted ON tickets (is_deleted);
 ### Avant
 
 - **Total index** : 20 index explicites (dont 11 redondants)
-- **Fichiers SQL** : 2 fichiers (`database.sql` + `database_stripe.sql`)
+- **Fichiers SQL** : 1 seul fichier (`database.sql`)
 - **Nom de base** : Incohérent (`eurofetes_db` vs `memoriaeventia`)
 
 ### Après
@@ -119,8 +108,6 @@ Toutes les colonnes `id` des tables ont automatiquement un index unique.
 - `tickets_generated.unique_code`
 - `sessions.token`
 - `favorites.unique_favorite` (composite: user_id + event_id)
-- `payments.stripe_payment_intent_id`
-- `payments.stripe_checkout_session_id`
 
 ### FOREIGN KEY (InnoDB uniquement)
 
