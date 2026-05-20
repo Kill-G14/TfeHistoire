@@ -69,19 +69,29 @@ export async function showReservationModal(event) {
     });
 
     eventInfo.innerHTML = `
-      <h6 class="fw-bold mb-2">${event.title}</h6>
-      <p class="mb-1">
-        <i class="bi bi-calendar-event"></i> ${formattedDate}
-      </p>
-      <p class="mb-1">
-        <i class="bi bi-clock"></i> ${event.time}
-      </p>
-      <p class="mb-1">
-        <i class="bi bi-geo-alt"></i> ${event.city}, ${event.country}
-      </p>
-      <p class="mb-0 text-success fw-bold">
-        <i class="bi bi-gift"></i> Gratuit
-      </p>
+      <div class="card-body">
+        <h5 class="card-title text-primary mb-3">
+          <i class="bi bi-star-fill me-2"></i>${event.title}
+        </h5>
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-calendar3 text-muted me-2" style="width: 20px;"></i>
+            <span class="text-muted">${formattedDate}</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-clock text-muted me-2" style="width: 20px;"></i>
+            <span class="text-muted">${event.time}</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-geo-alt-fill text-muted me-2" style="width: 20px;"></i>
+            <span class="text-muted">${event.city}, ${event.country}</span>
+          </div>
+          <div class="d-flex align-items-center mt-2">
+            <i class="bi bi-tag-fill text-success me-2" style="width: 20px;"></i>
+            <span class="badge bg-success">Événement gratuit</span>
+          </div>
+        </div>
+      </div>
     `;
   }
 

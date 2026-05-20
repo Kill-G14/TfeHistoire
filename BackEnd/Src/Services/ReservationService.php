@@ -62,14 +62,17 @@ class ReservationService
         }
 
         // Vérifier qu'il reste des places disponibles
-        $reservedCount = $this->reservationRepository->getReservedCount($eventId);
-        $availableTickets = $event->ticket_quantity - $reservedCount;
+        // Si ticket_quantity = 0, cela signifie "illimité" (événement gratuit sans limite)
+        if ($event->ticket_quantity > 0) {
+            $reservedCount = $this->reservationRepository->getReservedCount($eventId);
+            $availableTickets = $event->ticket_quantity - $reservedCount;
 
-        if ($availableTickets < $quantity) {
-            return [
-                'success' => false,
-                'message' => 'Plus assez de places disponibles'
-            ];
+            if ($availableTickets < $quantity) {
+                return [
+                    'success' => false,
+                    'message' => 'Plus assez de places disponibles'
+                ];
+            }
         }
 
         // Créer la réservation
@@ -175,6 +178,20 @@ class ReservationService
         }
 
         $reservedCount = $this->reservationRepository->getReservedCount($eventId);
+        
+        // Si ticket_quantity = 0, cela signifie "illimité" (événement gratuit sans limite)
+        if ($event->ticket_quantity === 0) {
+            return [
+                'success' => true,
+                'data' => [
+                    'total' => 0,
+                    'reserved' => $reservedCount,
+                    'available' => -1, // -1 signifie "illimité"
+                    'unlimited' => true
+                ]
+            ];
+        }
+
         $available = $event->ticket_quantity - $reservedCount;
 
         return [
@@ -182,7 +199,8 @@ class ReservationService
             'data' => [
                 'total' => $event->ticket_quantity,
                 'reserved' => $reservedCount,
-                'available' => max(0, $available)
+                'available' => max(0, $available),
+                'unlimited' => false
             ]
         ];
     }
