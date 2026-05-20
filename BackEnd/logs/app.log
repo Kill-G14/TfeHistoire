@@ -105,3 +105,6 @@
 [2026-05-20 13:23:11] [INFO] User logged out successfully
 [2026-05-20 13:25:10] [INFO] User logged in successfully | Context: {"user_id":1}
 [2026-05-20 13:25:20] [INFO] User registered successfully | Context: {"user_id":5}
+[2026-05-20 15:21:58] [INFO] User logged out successfully
+[2026-05-20 15:22:19] [INFO] User registered successfully | Context: {"user_id":6}
+[2026-05-20 15:22:40] [INFO] Email simulation (SendGrid désactivé) | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Festival de la Bi\u00e8re Tch\u00e8que"}

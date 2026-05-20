@@ -12,15 +12,18 @@ class ReservationService
     private ReservationRepository $reservationRepository;
     private EventRepository $eventRepository;
     private UserRepository $userRepository;
+    private EmailService $emailService;
 
     public function __construct(
         ReservationRepository $reservationRepository,
         EventRepository $eventRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        EmailService $emailService
     ) {
         $this->reservationRepository = $reservationRepository;
         $this->eventRepository = $eventRepository;
         $this->userRepository = $userRepository;
+        $this->emailService = $emailService;
     }
 
     /**
@@ -91,6 +94,23 @@ class ReservationService
             ];
         }
 
+        // Envoyer un email de confirmation
+        $eventData = [
+            'title' => $event->title,
+            'date' => $event->date,
+            'time' => $event->time,
+            'address' => $event->address,
+            'city' => $event->city,
+            'country' => $event->country
+        ];
+
+        $this->emailService->sendReservationConfirmation(
+            $user->email,
+            $user->name,
+            $eventData,
+            $quantity
+        );
+
         return [
             'success' => true,
             'message' => 'Réservation effectuée avec succès',
@@ -148,6 +168,10 @@ class ReservationService
             ];
         }
 
+        // Récupérer les informations de l'utilisateur et de l'événement pour l'email
+        $user = $this->userRepository->getUserById($userId);
+        $event = $this->eventRepository->getEventById($reservation->event_id);
+
         $cancelled = $this->reservationRepository->cancel($reservationId);
 
         if (!$cancelled) {
@@ -155,6 +179,24 @@ class ReservationService
                 'success' => false,
                 'message' => 'Erreur lors de l\'annulation de la réservation'
             ];
+        }
+
+        // Envoyer un email de confirmation d'annulation
+        if ($user && $event) {
+            $eventData = [
+                'title' => $event->title,
+                'date' => $event->date,
+                'time' => $event->time,
+                'address' => $event->address,
+                'city' => $event->city,
+                'country' => $event->country
+            ];
+
+            $this->emailService->sendReservationCancellation(
+                $user->email,
+                $user->name,
+                $eventData
+            );
         }
 
         return [

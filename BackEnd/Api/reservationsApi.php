@@ -22,6 +22,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 use App\Services\ReservationService;
 use App\Services\SessionService;
+use App\Services\EmailService;
 
 // Instances
 $reservationRepository = new ReservationRepository();
@@ -29,10 +30,12 @@ $eventRepository = new EventRepository();
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
 $sessionService = new SessionService($sessionRepository);
+$emailService = new EmailService($userRepository);
 $reservationService = new ReservationService(
     $reservationRepository,
     $eventRepository,
-    $userRepository
+    $userRepository,
+    $emailService
 );
 
 // Récupération des données

@@ -17,6 +17,8 @@ Ce dossier contient toute la documentation technique du projet.
 
 - **[README_CONFIG.md](README_CONFIG.md)** - Configuration du backend (.env, config.php)
 - **[DATABASE_OPTIMIZATION.md](DATABASE_OPTIMIZATION.md)** - Optimisations et structure de la base de données
+- **[SENDGRID_CONFIGURATION.md](SENDGRID_CONFIGURATION.md)** - Configuration SendGrid pour l'envoi d'emails
+- **[EMAILS_ARCHITECTURE.md](EMAILS_ARCHITECTURE.md)** - Architecture technique du système d'emails
 
 ### Migration
 
