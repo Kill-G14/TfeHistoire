@@ -7,28 +7,28 @@
 
 // Détection de l'environnement
 const hostname = window.location.hostname;
-const isProduction =
+const _isProduction =
   hostname === "memoriaeventia.com" || hostname === "www.memoriaeventia.com";
-const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+const _isLocal = hostname === "localhost" || hostname === "127.0.0.1";
 
 // Configuration selon l'environnement
 export const config = {
   // Environnement actuel
-  ENVIRONMENT: isProduction ? "production" : "development",
+  ENVIRONMENT: _isProduction ? "production" : "development",
 
   // Debug mode (activé uniquement en développement)
-  DEBUG: !isProduction,
+  DEBUG: !_isProduction,
 
   // URLs de l'API
-  API_URL: isProduction
+  API_URL: _isProduction
     ? "https://memoriaeventia.com/BackEnd/Api"
     : "http://localhost/tfeHistoire/BackEnd/Api",
 
   // Base path pour le routing
-  BASE_PATH: isProduction ? "/" : "/tfeHistoire/",
+  BASE_PATH: _isProduction ? "/" : "/tfeHistoire/",
 
   // URL du frontend
-  FRONTEND_URL: isProduction
+  FRONTEND_URL: _isProduction
     ? "https://memoriaeventia.com"
     : "http://localhost/tfeHistoire",
 
