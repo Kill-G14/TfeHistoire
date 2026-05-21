@@ -46,11 +46,8 @@ class PasswordResetService
             // Générer un code à 6 chiffres
             $code = $this->generateCode();
 
-            // Calculer l'expiration (10 minutes)
-            $expiresAt = date('Y-m-d H:i:s', time() + (10 * 60));
-
-            // Créer la demande
-            $created = $this->passwordResetRepository->create($user->id, $code, $expiresAt);
+            // Créer la demande (expiration gérée par MySQL avec DATE_ADD)
+            $created = $this->passwordResetRepository->create($user->id, $code);
 
             if (!$created) {
                 Logger::error("Failed to create password reset for user ID: {$user->id}");
@@ -61,7 +58,6 @@ class PasswordResetService
             }
 
             // Envoyer l'email
-            Logger::info("Sending password reset email", ['email' => $user->email, 'code' => $code]);
             $emailSent = $this->emailService->sendPasswordResetEmail($user, $code);
 
             if (!$emailSent) {
@@ -94,14 +90,6 @@ class PasswordResetService
     public function resetPassword(string $email, string $code, string $newPassword): array
     {
         try {
-            // DEBUG: Log des paramètres reçus
-            Logger::info("resetPassword called", [
-                'email' => $email,
-                'code' => $code,
-                'code_length' => strlen($code),
-                'password_length' => strlen($newPassword)
-            ]);
-            
             // Vérifier si l'utilisateur existe
             $user = $this->userRepository->getUserByEmail($email);
             
