@@ -6,6 +6,7 @@ credentials.txt
 
 # Fichiers de développement (ne pas déployer)
 Archive_Dev/
+GUIDE_DEPLOIEMENT.md
 
 # Dépendances
 /BackEnd/vendor/
