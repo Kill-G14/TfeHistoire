@@ -1,30 +1,30 @@
 // Manager pour la gestion de l'authentification
 class AuthManager {
   constructor() {
-    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
   }
 
   // Connexion
   async login(email, password) {
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'login',
+          action: "login",
           email: email,
-          password: password
-        })
-      })
+          password: password,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -32,24 +32,24 @@ class AuthManager {
   async register(email, password, name) {
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'register',
+          action: "register",
           email: email,
           password: password,
-          name: name
-        })
-      })
+          name: name,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -58,28 +58,28 @@ class AuthManager {
     if (!token) {
       return {
         success: false,
-        message: 'Token manquant'
-      }
+        message: "Token manquant",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'logout',
-          token: token
-        })
-      })
+          action: "logout",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -88,28 +88,28 @@ class AuthManager {
     if (!token) {
       return {
         success: false,
-        message: 'Token manquant'
-      }
+        message: "Token manquant",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getCurrentUser',
-          token: token
-        })
-      })
+          action: "getCurrentUser",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -118,30 +118,30 @@ class AuthManager {
     if (!token) {
       return {
         success: false,
-        message: 'Token manquant'
-      }
+        message: "Token manquant",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'changePassword',
+          action: "changePassword",
           token: token,
           currentPassword: currentPassword,
-          newPassword: newPassword
-        })
-      })
+          newPassword: newPassword,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -149,24 +149,24 @@ class AuthManager {
   async requestPasswordReset(email) {
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'requestPasswordReset',
-          email: email
-        })
-      })
+          action: "requestPasswordReset",
+          email: email,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 }
 
-export default new AuthManager()
+export default new AuthManager();

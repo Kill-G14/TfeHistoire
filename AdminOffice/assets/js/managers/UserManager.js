@@ -1,7 +1,7 @@
 // Manager pour la gestion des utilisateurs côté admin
 class UserManager {
   constructor() {
-    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api/adminApi.php";
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api/adminApi.php";
   }
 
   // Récupérer tous les utilisateurs

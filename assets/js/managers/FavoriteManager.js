@@ -1,7 +1,7 @@
 // Manager pour la gestion des favoris
 class FavoriteManager {
   constructor() {
-    this.apiUrl = 'http://localhost/tfeHistoire/BackEnd/Api'
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
   }
 
   // Récupérer les favoris d'un utilisateur
@@ -9,28 +9,28 @@ class FavoriteManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getMyFavorites',
-          token: token
-        })
-      })
+          action: "getMyFavorites",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -39,28 +39,28 @@ class FavoriteManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'getMyFavoritesWithDetails',
-          token: token
-        })
-      })
+          action: "getMyFavoritesWithDetails",
+          token: token,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -69,29 +69,29 @@ class FavoriteManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'add',
+          action: "add",
           token: token,
-          event_id: eventId
-        })
-      })
+          event_id: eventId,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -100,29 +100,29 @@ class FavoriteManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'remove',
+          action: "remove",
           token: token,
-          event_id: eventId
-        })
-      })
+          event_id: eventId,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 
@@ -131,31 +131,31 @@ class FavoriteManager {
     if (!token) {
       return {
         success: false,
-        message: 'Non authentifié'
-      }
+        message: "Non authentifié",
+      };
     }
 
     try {
       const response = await fetch(`${this.apiUrl}/favoritesApi.php`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'isFavorite',
+          action: "isFavorite",
           token: token,
-          event_id: eventId
-        })
-      })
+          event_id: eventId,
+        }),
+      });
 
-      return await response.json()
+      return await response.json();
     } catch (error) {
       return {
         success: false,
-        message: 'Erreur de connexion au serveur'
-      }
+        message: "Erreur de connexion au serveur",
+      };
     }
   }
 }
 
-export default new FavoriteManager()
+export default new FavoriteManager();

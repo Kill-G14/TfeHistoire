@@ -84,7 +84,7 @@ export const helpers = {
   // Construire l'URL de l'image à partir du nom de fichier
   getImageUrl(imageName) {
     if (!imageName) return "/assets/images/default-event.jpg"; // Image par défaut
-    return `http://localhost/tfeHistoire/BackEnd/Api/imageApi.php?name=${encodeURIComponent(imageName)}`;
+    return `https://memoriaeventia.com/BackEnd/Api/imageApi.php?name=${encodeURIComponent(imageName)}`;
   },
 
   // Transformer un événement pour ajouter l'URL de l'image et les infos de billetterie

@@ -4,7 +4,7 @@ RewriteEngine On
 
 # Définir la base pour l'application
 
-RewriteBase /
+RewriteBase /tfeHistoire/
 
 # Si la requête n'est pas un fichier existant
 

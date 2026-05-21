@@ -3,7 +3,7 @@ import { helpers } from "../utils/helpers.js";
 
 class EventManager {
   constructor() {
-    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
   }
 
   // Récupérer tous les événements

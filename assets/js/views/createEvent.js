@@ -147,7 +147,7 @@ async function uploadImage(file) {
     formData.append("image", file);
 
     const response = await fetch(
-      "http://localhost/tfeHistoire/BackEnd/Api/uploadImageApi.php",
+      "https://memoriaeventia.com/BackEnd/Api/uploadImageApi.php",
       {
         method: "POST",
         body: formData,

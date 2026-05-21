@@ -36,7 +36,7 @@ export async function renderHeader() {
 }
 
 function updateActiveNav() {
-  const currentPath = window.location.pathname.replace(/^\/tfeHistoire/, "");
+  const currentPath = window.location.pathname;
   const navHome = document.getElementById("navHome");
   const navMap = document.getElementById("navMap");
 

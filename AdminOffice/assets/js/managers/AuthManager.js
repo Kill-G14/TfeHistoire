@@ -1,7 +1,7 @@
 // Manager pour la gestion de l'authentification admin
 class AuthManager {
   constructor() {
-    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
   }
 
   // Connexion admin/moderator

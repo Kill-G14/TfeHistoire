@@ -1,7 +1,7 @@
 // Manager pour la gestion des événements côté admin
 class EventManager {
   constructor() {
-    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api/adminApi.php";
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api/adminApi.php";
   }
 
   // Récupérer tous les événements

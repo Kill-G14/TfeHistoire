@@ -145,7 +145,7 @@ async function handleResetPassword() {
 
   try {
     const response = await fetch(
-      "http://localhost/tfeHistoire/BackEnd/Api/authApi.php",
+      "https://memoriaeventia.com/BackEnd/Api/authApi.php",
       {
         method: "POST",
         headers: {

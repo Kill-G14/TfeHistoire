@@ -441,7 +441,7 @@ async function showRoute(eventId) {
   try {
     // Appeler le backend qui gérera l'appel à OpenRouteService
     const response = await fetch(
-      "http://localhost/tfeHistoire/BackEnd/Api/routeApi.php",
+      "https://memoriaeventia.com/BackEnd/Api/routeApi.php",
       {
         method: "POST",
         headers: {

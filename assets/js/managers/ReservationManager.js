@@ -1,7 +1,7 @@
 // Manager pour la gestion des réservations
 class ReservationManager {
   constructor() {
-    this.apiUrl = "http://localhost/tfeHistoire/BackEnd/Api";
+    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
   }
 
   /**
