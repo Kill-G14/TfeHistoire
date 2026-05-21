@@ -44,12 +44,12 @@ export class Router {
     }
     // Si l'URL ne commence pas par "/" ni par le basePath, c'est une URL relative
     else if (!url.startsWith("/") && !url.startsWith(this.basePath)) {
-      // Ajouter le basePath et un slash
-      fullUrl = this.basePath + "/" + url;
+      // Ajouter le basePath (qui se termine déjà par / ou est vide)
+      fullUrl = this.basePath === "/" ? "/" + url : this.basePath + "/" + url;
     }
     // Si l'URL commence par "/" mais pas par le basePath
     else if (url.startsWith("/") && !url.startsWith(this.basePath)) {
-      fullUrl = this.basePath + url;
+      fullUrl = this.basePath === "/" ? url : this.basePath + url;
     }
 
     // Nettoyer les doubles slashes (sauf après http://)
