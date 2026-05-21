@@ -108,3 +108,19 @@
 [2026-05-20 15:21:58] [INFO] User logged out successfully
 [2026-05-20 15:22:19] [INFO] User registered successfully | Context: {"user_id":6}
 [2026-05-20 15:22:40] [INFO] Email simulation (SendGrid désactivé) | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Festival de la Bi\u00e8re Tch\u00e8que"}
+[2026-05-20 15:53:08] [INFO] Reservation created successfully | Context: {"reservation_id":8,"user_id":6,"event_id":13,"quantity":1}
+[2026-05-20 15:53:08] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival de la Bi\u00e8re Tch\u00e8que"}
+[2026-05-20 15:57:59] [INFO] Reservation created successfully | Context: {"reservation_id":9,"user_id":6,"event_id":3,"quantity":1}
+[2026-05-20 15:57:59] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival M\u00e9di\u00e9val de Carcassonne"}
+[2026-05-20 16:13:28] [INFO] Reservation created successfully | Context: {"reservation_id":10,"user_id":6,"event_id":10,"quantity":1}
+[2026-05-20 16:13:28] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival Viking de Bergen"}
+[2026-05-20 16:13:28] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Festival Viking de Bergen","status":202}
+[2026-05-20 16:14:30] [INFO] Reservation created successfully | Context: {"reservation_id":11,"user_id":6,"event_id":2,"quantity":1}
+[2026-05-20 16:14:30] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Oktoberfest"}
+[2026-05-20 16:14:31] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Oktoberfest","status":202}
+[2026-05-20 17:14:24] [INFO] Reservation cancelled successfully | Context: {"reservation_id":11,"user_id":6,"event_id":2}
+[2026-05-20 17:14:24] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"Oktoberfest"}
+[2026-05-20 17:14:25] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : Oktoberfest","status":202}
+[2026-05-20 17:14:34] [INFO] Reservation created successfully | Context: {"reservation_id":12,"user_id":6,"event_id":12,"quantity":1}
+[2026-05-20 17:14:34] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Carnaval de B\u00e2le"}
+[2026-05-20 17:14:35] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Carnaval de B\u00e2le","status":202}

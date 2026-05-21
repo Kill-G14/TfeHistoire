@@ -15,6 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Autoload Composer
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Charger les variables d'environnement
+\App\Utils\EnvLoader::load();
+
 // Imports
 use App\Repositories\ReservationRepository;
 use App\Repositories\EventRepository;

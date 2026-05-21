@@ -6,6 +6,9 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 require __DIR__ . '/../vendor/autoload.php';
 
+// Charger les variables d'environnement
+\App\Utils\EnvLoader::load();
+
 // repositories 
 use App\Repositories\UserRepository;
 use App\Repositories\EventRepository;

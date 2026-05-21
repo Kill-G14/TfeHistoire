@@ -24,7 +24,15 @@ class EmailService {
     
     // Initialiser SendGrid si activé et clé API disponible
     if ($this->enabled && !empty($_ENV['SENDGRID_API_KEY'])) {
-      $this->sendgrid = new SendGrid($_ENV['SENDGRID_API_KEY']);
+      // Options pour résoudre les problèmes SSL en développement
+      $options = [
+        'curl' => [
+          CURLOPT_SSL_VERIFYPEER => false, // Désactiver la vérification SSL en dev
+          CURLOPT_SSL_VERIFYHOST => false
+        ]
+      ];
+      
+      $this->sendgrid = new SendGrid($_ENV['SENDGRID_API_KEY'], $options);
     } else {
       $this->sendgrid = null;
       if ($this->enabled) {

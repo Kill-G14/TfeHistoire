@@ -137,6 +137,10 @@ async function handleConfirmReservation() {
   if (result.success) {
     helpers.showToast(result.message, "success");
 
+    // Réactiver le bouton
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '<i class="bi bi-check-circle"></i> Oui, réserver';
+
     // Fermer la modal
     const modalElement = document.getElementById("reservationModal");
     const modal = bootstrap.Modal.getInstance(modalElement);

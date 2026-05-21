@@ -1,0 +1,68 @@
+<template id="cancelReservationModalTemplate">
+  <div
+    class="modal fade"
+    id="cancelReservationModal"
+    tabindex="-1"
+    aria-labelledby="cancelReservationModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-danger text-white border-0">
+          <h5
+            class="modal-title d-flex align-items-center gap-2"
+            id="cancelReservationModalLabel"
+          >
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Annuler la réservation
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="text-center mb-4">
+            <div class="mb-3">
+              <i
+                class="bi bi-x-circle text-danger"
+                style="font-size: 4rem; opacity: 0.8"
+              ></i>
+            </div>
+            <h6 class="text-dark mb-3">
+              Êtes-vous sûr de vouloir annuler cette réservation ?
+            </h6>
+            <p class="text-muted small mb-0">
+              Cette action est définitive et ne peut pas être annulée.
+            </p>
+          </div>
+
+          <div
+            id="eventInfoCancelReservation"
+            class="card border-0 bg-light shadow-sm"
+          >
+            <!-- Les informations de l'événement seront affichées ici -->
+          </div>
+        </div>
+        <div class="modal-footer border-0 bg-light">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bi bi-arrow-left"></i> Non, garder
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="confirmCancelReservation"
+          >
+            <i class="bi bi-x-circle"></i> Oui, annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

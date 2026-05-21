@@ -7,6 +7,9 @@ header("Content-Type: application/json; charset=UTF-8");
 
 require __DIR__ . '/../vendor/autoload.php';
 
+// Charger les variables d'environnement
+\App\Utils\EnvLoader::load();
+
 // Models
 // repositories 
 use App\Repositories\FavoriteRepository;

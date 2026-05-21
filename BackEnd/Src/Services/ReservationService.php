@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\Reservation;
+use App\Models\ModelsDTO\ReservationDTO;
 use App\Repositories\ReservationRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
+use App\Utils\Logger;
 
 class ReservationService
 {
@@ -88,11 +90,22 @@ class ReservationService
         $createdReservation = $this->reservationRepository->create($reservation);
 
         if (!$createdReservation) {
+            Logger::error('Failed to create reservation', [
+                'user_id' => $userId,
+                'event_id' => $eventId
+            ]);
             return [
                 'success' => false,
                 'message' => 'Erreur lors de la création de la réservation'
             ];
         }
+
+        Logger::info('Reservation created successfully', [
+            'reservation_id' => $createdReservation->id,
+            'user_id' => $userId,
+            'event_id' => $eventId,
+            'quantity' => $quantity
+        ]);
 
         // Envoyer un email de confirmation
         $eventData = [
@@ -103,6 +116,11 @@ class ReservationService
             'city' => $event->city,
             'country' => $event->country
         ];
+
+        Logger::info('Sending confirmation email', [
+            'to' => $user->email,
+            'event' => $event->title
+        ]);
 
         $this->emailService->sendReservationConfirmation(
             $user->email,
@@ -133,9 +151,14 @@ class ReservationService
     {
         $reservations = $this->reservationRepository->getByUserId($userId);
 
+        // Transformer les réservations en DTOs
+        $reservationDTOs = array_map(function($reservation) {
+            return (new ReservationDTO($reservation))->toArray();
+        }, $reservations);
+
         return [
             'success' => true,
-            'data' => $reservations
+            'data' => $reservationDTOs
         ];
     }
 
@@ -175,11 +198,21 @@ class ReservationService
         $cancelled = $this->reservationRepository->cancel($reservationId);
 
         if (!$cancelled) {
+            Logger::error('Failed to cancel reservation', [
+                'reservation_id' => $reservationId,
+                'user_id' => $userId
+            ]);
             return [
                 'success' => false,
                 'message' => 'Erreur lors de l\'annulation de la réservation'
             ];
         }
+
+        Logger::info('Reservation cancelled successfully', [
+            'reservation_id' => $reservationId,
+            'user_id' => $userId,
+            'event_id' => $reservation->event_id
+        ]);
 
         // Envoyer un email de confirmation d'annulation
         if ($user && $event) {
@@ -191,6 +224,11 @@ class ReservationService
                 'city' => $event->city,
                 'country' => $event->country
             ];
+
+            Logger::info('Sending cancellation email', [
+                'to' => $user->email,
+                'event' => $event->title
+            ]);
 
             $this->emailService->sendReservationCancellation(
                 $user->email,

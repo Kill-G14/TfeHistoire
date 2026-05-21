@@ -12,6 +12,10 @@ import {
   setFieldError,
   clearFieldValidation,
 } from "../validators/formValidator.js";
+import {
+  initCancelReservationModal,
+  openCancelReservationModal,
+} from "../components/cancelReservationModal.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -61,6 +65,9 @@ export async function mount(container, params) {
   const clone = templateObjects["profileView"].cloneNode(true);
   container.innerHTML = "";
   container.appendChild(clone);
+
+  // Initialiser la modal d'annulation de réservation
+  await initCancelReservationModal();
 
   // Afficher les informations utilisateur
   displayUserInfo();
@@ -756,13 +763,36 @@ async function loadReservations() {
   const result = await ReservationManager.getMyReservations(token);
 
   if (result.success && result.data && result.data.length > 0) {
-    userReservations = result.data;
-    displayReservations(userReservations);
+    // Filtrer pour ne garder que les réservations confirmées (exclure les annulées)
+    userReservations = result.data.filter(
+      (reservation) => reservation.status === "confirmed",
+    );
 
-    // Mettre à jour le compteur
-    const statReservations = document.getElementById("statReservations");
-    if (statReservations) {
-      statReservations.textContent = userReservations.length;
+    if (userReservations.length > 0) {
+      displayReservations(userReservations);
+
+      // Mettre à jour le compteur
+      const statReservations = document.getElementById("statReservations");
+      if (statReservations) {
+        statReservations.textContent = userReservations.length;
+      }
+    } else {
+      // Aucune réservation confirmée
+      reservationsContainer.innerHTML = `
+        <div class="empty-state-small">
+          <i class="bi bi-ticket-perforated text-muted fs-1 mb-2"></i>
+          <p class="text-muted mb-3">Vous n'avez pas de réservations actives</p>
+          <a href="/" data-link class="btn btn-primary btn-sm">
+            <i class="bi bi-calendar-event"></i> Découvrir des événements
+          </a>
+        </div>
+      `;
+
+      // Mettre à jour le compteur à 0
+      const statReservations = document.getElementById("statReservations");
+      if (statReservations) {
+        statReservations.textContent = "0";
+      }
     }
   } else {
     // Aucune réservation
@@ -770,11 +800,17 @@ async function loadReservations() {
       <div class="empty-state-small">
         <i class="bi bi-ticket-perforated text-muted fs-1 mb-2"></i>
         <p class="text-muted mb-3">Vous n'avez pas encore de réservations</p>
-        <a href="./" class="btn btn-primary btn-sm">
+        <a href="/" data-link class="btn btn-primary btn-sm">
           <i class="bi bi-calendar-event"></i> Découvrir des événements
         </a>
       </div>
     `;
+
+    // Mettre à jour le compteur à 0
+    const statReservations = document.getElementById("statReservations");
+    if (statReservations) {
+      statReservations.textContent = "0";
+    }
   }
 }
 
@@ -867,39 +903,51 @@ function displayReservations(reservations) {
 }
 
 // Fonction globale pour annuler une réservation
-window.cancelReservation = async function (reservationId) {
-  if (!confirm("Êtes-vous sûr de vouloir annuler cette réservation ?")) {
+window.cancelReservation = function (reservationId) {
+  // Trouver les informations de la réservation
+  const reservation = userReservations.find((r) => r.id === reservationId);
+
+  if (!reservation) {
+    helpers.showToast("Réservation introuvable", "error");
     return;
   }
 
-  const btnElement = document.getElementById(
-    `cancel-reservation-${reservationId}`,
-  );
-  if (!btnElement || btnElement.disabled) return;
+  // Préparer les informations de l'événement pour la modal
+  const eventInfo = {
+    name: reservation.event_title,
+    date: reservation.event_date,
+    location: `${reservation.event_city} - ${reservation.event_address}`,
+  };
 
-  const token = auth.getToken();
-  if (!token) {
-    helpers.showToast("Vous devez être connecté", "error");
-    return;
-  }
+  // Ouvrir la modal de confirmation avec un callback
+  openCancelReservationModal(reservationId, eventInfo, async (resId) => {
+    const btnElement = document.getElementById(`cancel-reservation-${resId}`);
+    if (!btnElement || btnElement.disabled) return;
 
-  // Désactiver le bouton pendant le traitement
-  btnElement.disabled = true;
-  btnElement.innerHTML =
-    '<span class="spinner-border spinner-border-sm"></span> Annulation...';
+    const token = auth.getToken();
+    if (!token) {
+      helpers.showToast("Vous devez être connecté", "error");
+      return;
+    }
 
-  const result = await ReservationManager.cancel(reservationId, token);
-
-  if (result.success) {
-    helpers.showToast(result.message, "success");
-    // Recharger les réservations
-    await loadReservations();
-  } else {
-    helpers.showToast(result.message, "error");
-    btnElement.disabled = false;
+    // Désactiver le bouton pendant le traitement
+    btnElement.disabled = true;
     btnElement.innerHTML =
-      '<i class="bi bi-x-circle"></i> Annuler la réservation';
-  }
+      '<span class="spinner-border spinner-border-sm"></span> Annulation...';
+
+    const result = await ReservationManager.cancel(resId, token);
+
+    if (result.success) {
+      helpers.showToast(result.message, "success");
+      // Recharger les réservations
+      await loadReservations();
+    } else {
+      helpers.showToast(result.message, "error");
+      btnElement.disabled = false;
+      btnElement.innerHTML =
+        '<i class="bi bi-x-circle"></i> Annuler la réservation';
+    }
+  });
 };
 
 // Export par défaut

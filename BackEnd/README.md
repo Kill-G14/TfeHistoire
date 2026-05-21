@@ -26,63 +26,66 @@ Ensuite, éditez `config.php` pour configurer :
 ```
 BackEnd/
 ├── Api/                          # Points d'entrée HTTP
-│   ├── auth.php                  # Authentification
-│   ├── events.php                # Gestion des événements
-│   ├── orders.php                # Gestion des commandes
-│   ├── tickets.php               # Gestion des types de billets
-│   ├── ticketsGenerated.php      # Billets achetés
-│   ├── favorites.php             # Favoris utilisateurs
-│   └── scanTicket.php            # Validation QR codes
+│   ├── adminApi.php              # API Admin (gestion complète)
+│   ├── authApi.php               # Authentification
+│   ├── eventsApi.php             # Gestion des événements
+│   ├── favoritesApi.php          # Favoris utilisateurs
+│   ├── reservationsApi.php       # Gestion des réservations
+│   ├── imageApi.php              # Récupération d'images
+│   ├── uploadImageApi.php        # Upload d'images
+│   └── routeApi.php              # Calcul d'itinéraires
 │
 ├── Src/
 │   ├── Models/                   # Entités métier
 │   │   ├── User.php
 │   │   ├── Event.php
-│   │   ├── Order.php
-│   │   ├── OrderItem.php
-│   │   ├── Ticket.php
-│   │   ├── TicketGenerated.php
+│   │   ├── EventModification.php
+│   │   ├── Reservation.php
 │   │   ├── Favorite.php
 │   │   └── ModelsDTO/            # Data Transfer Objects
 │   │       ├── UserDTO.php
 │   │       ├── EventDTO.php
-│   │       ├── OrderDTO.php
-│   │       ├── OrderItemDTO.php
-│   │       ├── TicketDTO.php
-│   │       ├── TicketGeneratedDTO.php
+│   │       ├── EventModificationDTO.php
+│   │       ├── ReservationDTO.php
 │   │       └── FavoriteDTO.php
 │   │
 │   ├── Repositories/             # Accès base de données
 │   │   ├── UserRepository.php
 │   │   ├── EventRepository.php
-│   │   ├── OrderRepository.php
-│   │   ├── OrderItemRepository.php
-│   │   ├── TicketRepository.php
-│   │   ├── PurchasedTicketRepository.php
+│   │   ├── EventModificationRepository.php
+│   │   ├── ReservationRepository.php
 │   │   ├── FavoriteRepository.php
 │   │   └── SessionRepository.php
 │   │
 │   ├── Services/                 # Logique métier
 │   │   ├── AuthService.php
 │   │   ├── EventService.php
-│   │   ├── OrderService.php
-│   │   ├── TicketService.php
+│   │   ├── EventModificationService.php
+│   │   ├── ReservationService.php
 │   │   ├── FavoriteService.php
-│   │   └── SessionService.php
+│   │   ├── UserService.php
+│   │   ├── SessionService.php
+│   │   └── EmailService.php
 │   │
 │   ├── Validators/               # Validation des données
 │   │   ├── UserValidator.php
 │   │   ├── EventValidator.php
-│   │   ├── OrderValidator.php
-│   │   └── TicketValidator.php
+│   │   └── EventModificationValidator.php
 │   │
 │   └── Utils/                    # Utilitaires transversaux
 │       ├── Database.php          # Connexion PDO
 │       ├── Logger.php            # Logs
+│       ├── EnvLoader.php         # Chargement variables d'environnement
 │       └── Helpers.php           # Fonctions utilitaires
 │
+├── storage/                      # Stockage fichiers
+│   ├── images/                   # Images d'événements
+│   └── tickets/                  # Billets PDF (réservé)
+│
+├── logs/                         # Logs applicatifs
 ├── vendor/                       # Autoload Composer
 ├── database.sql                  # Script de création de la base
+├── reset_database.sql            # Script de réinitialisation
 ├── composer.json                 # Configuration autoload
 └── .htaccess                     # Configuration Apache
 ```
@@ -115,12 +118,12 @@ composer dump-autoload
 
 ## API Endpoints
 
-### Authentification (`Api/auth.php`)
+### Authentification (`Api/authApi.php`)
 
 #### Inscription
 
 ```json
-POST /Api/auth.php
+POST /Api/authApi.php
 {
   "action": "register",
   "email": "user@example.com",
@@ -132,7 +135,7 @@ POST /Api/auth.php
 #### Connexion
 
 ```json
-POST /Api/auth.php
+POST /Api/authApi.php
 {
   "action": "login",
   "email": "user@example.com",
@@ -140,22 +143,58 @@ POST /Api/auth.php
 }
 ```
 
-#### Récupérer l'utilisateur connecté
+#### Déconnexion
 
 ```json
-POST /Api/auth.php
-Headers: Authorization: Bearer {token}
+POST /Api/authApi.php
 {
-  "action": "getCurrentUser"
+  "action": "logout",
+  "token": "user_token_here"
 }
 ```
 
-### Événements (`Api/events.php`)
-
-#### Récupérer tous les événements
+#### Récupérer l'utilisateur connecté
 
 ```json
-POST /Api/events.php
+POST /Api/authApi.php
+{
+  "action": "getCurrentUser",
+  "token": "user_token_here"
+}
+```
+
+#### Mettre à jour le profil
+
+```json
+POST /Api/authApi.php
+{
+  "action": "updateProfile",
+  "token": "user_token_here",
+  "name": "Nouveau Nom",
+  "email": "newemail@example.com"
+}
+```
+
+#### Changer le mot de passe
+
+```json
+POST /Api/authApi.php
+{
+  "action": "changePassword",
+  "token": "user_token_here",
+  "old_password": "ancien",
+  "new_password": "nouveau"
+}
+```
+
+---
+
+### Événements (`Api/eventsApi.php`)
+
+#### Récupérer tous les événements approuvés
+
+```json
+POST /Api/eventsApi.php
 {
   "action": "getAll"
 }
@@ -164,7 +203,7 @@ POST /Api/events.php
 #### Récupérer un événement par ID
 
 ```json
-POST /Api/events.php
+POST /Api/eventsApi.php
 {
   "action": "getById",
   "id": 1
@@ -174,142 +213,136 @@ POST /Api/events.php
 #### Rechercher des événements
 
 ```json
-POST /Api/events.php
+POST /Api/eventsApi.php
 {
   "action": "search",
-  "search": "carnaval"
+  "search": "carnaval",
+  "country": "France",
+  "category": "Festival"
+}
+```
+
+#### Récupérer mes événements (authentification requise)
+
+```json
+POST /Api/eventsApi.php
+{
+  "action": "getMyEvents",
+  "token": "user_token_here"
 }
 ```
 
 #### Créer un événement (authentification requise)
 
 ```json
-POST /Api/events.php
-Headers: Authorization: Bearer {token}
+POST /Api/eventsApi.php
 {
   "action": "create",
+  "token": "user_token_here",
   "title": "Titre de l'événement",
   "description": "Description de l'événement",
   "country": "France",
   "city": "Paris",
   "postal_code": "75001",
   "address": "1 Rue de Rivoli",
+  "latitude": 48.8566,
+  "longitude": 2.3522,
   "date": "2026-06-15",
-  "time": "14:00",
-  "price": 25.00,
+  "time": "14:00:00",
   "category": "Festival Médiéval",
-  "available_tickets": 500,
-  "image_url": "https://example.com/image.jpg"
+  "is_free": false,
+  "ticket_price": 25.00,
+  "ticket_quantity": 500,
+  "image_event": "event_image.jpg"
 }
 ```
 
 #### Mettre à jour un événement (authentification requise)
 
 ```json
-POST /Api/events.php
-Headers: Authorization: Bearer {token}
+POST /Api/eventsApi.php
 {
   "action": "update",
+  "token": "user_token_here",
   "id": 1,
   "title": "Nouveau titre",
-  ...
+  "description": "Nouvelle description"
+  // ... autres champs
 }
 ```
 
-#### Supprimer un événement (authentification requise)
+#### Demander modification date/heure (authentification requise)
 
 ```json
-POST /Api/events.php
-Headers: Authorization: Bearer {token}
+POST /Api/eventsApi.php
 {
-  "action": "delete",
-  "id": 1
+  "action": "requestModification",
+  "token": "user_token_here",
+  "event_id": 1,
+  "new_date": "2026-07-20",
+  "new_time": "16:00:00"
 }
 ```
 
-### Commandes (`Api/orders.php`)
-
-Toutes les routes de commande nécessitent l'authentification.
-
-#### Récupérer mes commandes
+#### Demander suppression (authentification requise)
 
 ```json
-POST /Api/orders.php
-Headers: Authorization: Bearer {token}
+POST /Api/eventsApi.php
 {
-  "action": "getMyOrders",
+  "action": "requestDeletion",
+  "token": "user_token_here",
+  "event_id": 1,
+  "deletion_message": "Raison de la suppression"
+}
+```
+
+---
+
+### Réservations (`Api/reservationsApi.php`)
+
+Toutes les routes de réservation nécessitent l'authentification.
+
+#### Créer une réservation
+
+```json
+POST /Api/reservationsApi.php
+{
+  "action": "create",
+  "token": "user_token_here",
+  "event_id": 1,
+  "quantity": 2
+}
+```
+
+#### Récupérer mes réservations
+
+```json
+POST /Api/reservationsApi.php
+{
+  "action": "getMyReservations",
   "token": "user_token_here"
 }
 ```
 
-#### Créer une commande
+#### Annuler une réservation
 
 ```json
-POST /Api/orders.php
-Headers: Authorization: Bearer {token}
-{
-  "action": "create",
-  "token": "user_token_here",
-  "items": [
-    {
-      "ticket_id": 1,
-      "quantity": 2
-    },
-    {
-      "ticket_id": 2,
-      "quantity": 1
-    }
-  ]
-}
-```
-
-#### Annuler une commande
-
-```json
-POST /Api/orders.php
-Headers: Authorization: Bearer {token}
+POST /Api/reservationsApi.php
 {
   "action": "cancel",
   "token": "user_token_here",
-  "id": 1
+  "reservation_id": 1
 }
 ```
 
-### Billets (`Api/tickets.php`)
+---
 
-#### Récupérer les billets d'un événement (public)
+### Favoris (`Api/favoritesApi.php`)
 
-```json
-POST /Api/tickets.php
-{
-  "action": "getByEvent",
-  "event_id": 1
-}
-```
-
-#### Créer un type de billet (organizer)
+#### Ajouter aux favoris (authentification requise)
 
 ```json
-POST /Api/tickets.php
-{
-  "action": "create",
-  "token": "organizer_token_here",
-  "event_id": 1,
-  "name": "Adult Ticket",
-  "description": "Billet adulte",
-  "price": 25.00,
-  "quantity": 100,
-  "start_sale_date": "2026-01-01 00:00:00",
-  "end_sale_date": "2026-12-31 23:59:59"
-}
-```
-
-### Favoris (`Api/favorites.php`)
-
-#### Ajouter aux favoris
-
-```json
-POST /Api/favorites.php
+POST /Api/favoritesApi.php
 {
   "action": "add",
   "token": "user_token_here",
@@ -317,10 +350,10 @@ POST /Api/favorites.php
 }
 ```
 
-#### Retirer des favoris
+#### Retirer des favoris (authentification requise)
 
 ```json
-POST /Api/favorites.php
+POST /Api/favoritesApi.php
 {
   "action": "remove",
   "token": "user_token_here",
@@ -328,16 +361,181 @@ POST /Api/favorites.php
 }
 ```
 
-### Validation de billets (`Api/scanTicket.php`)
-
-#### Valider un billet (organizer)
+#### Récupérer mes favoris (authentification requise)
 
 ```json
-POST /Api/scanTicket.php
+POST /Api/favoritesApi.php
 {
-  "action": "validate",
-  "token": "organizer_token_here",
-  "unique_code": "A1B2C3D4E5F6"
+  "action": "getByUser",
+  "token": "user_token_here"
+}
+```
+
+---
+
+### Admin (`Api/adminApi.php`)
+
+**Nécessite un token admin pour toutes les actions.**
+
+#### Gestion des utilisateurs
+
+```json
+// Liste tous les utilisateurs
+POST /Api/adminApi.php
+{
+  "action": "getAllUsers",
+  "token": "admin_token_here"
+}
+
+// Promouvoir en organisateur
+POST /Api/adminApi.php
+{
+  "action": "promoteToOrganizer",
+  "token": "admin_token_here",
+  "user_id": 5
+}
+
+// Promouvoir en modérateur
+POST /Api/adminApi.php
+{
+  "action": "promoteToModerator",
+  "token": "admin_token_here",
+  "user_id": 5
+}
+
+// Supprimer un utilisateur
+POST /Api/adminApi.php
+{
+  "action": "deleteUser",
+  "token": "admin_token_here",
+  "user_id": 5
+}
+```
+
+#### Gestion des événements
+
+```json
+// Liste tous les événements (y compris pending)
+POST /Api/adminApi.php
+{
+  "action": "getAllEvents",
+  "token": "admin_token_here"
+}
+
+// Approuver un événement
+POST /Api/adminApi.php
+{
+  "action": "approveEvent",
+  "token": "admin_token_here",
+  "event_id": 1
+}
+
+// Rejeter un événement
+POST /Api/adminApi.php
+{
+  "action": "rejectEvent",
+  "token": "admin_token_here",
+  "event_id": 1
+}
+
+// Supprimer un événement
+POST /Api/adminApi.php
+{
+  "action": "deleteEvent",
+  "token": "admin_token_here",
+  "event_id": 1
+}
+```
+
+#### Gestion des modifications d'événements
+
+```json
+// Liste les modifications en attente
+POST /Api/adminApi.php
+{
+  "action": "getPendingModifications",
+  "token": "admin_token_here"
+}
+
+// Approuver une modification
+POST /Api/adminApi.php
+{
+  "action": "approveModification",
+  "token": "admin_token_here",
+  "modification_id": 1
+}
+
+// Rejeter une modification
+POST /Api/adminApi.php
+{
+  "action": "rejectModification",
+  "token": "admin_token_here",
+  "modification_id": 1,
+  "rejection_reason": "Raison du rejet"
+}
+```
+
+#### Gestion des demandes de suppression
+
+```json
+// Liste les demandes de suppression
+POST /Api/adminApi.php
+{
+  "action": "getDeletionRequests",
+  "token": "admin_token_here"
+}
+
+// Approuver une suppression
+POST /Api/adminApi.php
+{
+  "action": "approveDeletion",
+  "token": "admin_token_here",
+  "event_id": 1
+}
+
+// Rejeter une suppression
+POST /Api/adminApi.php
+{
+  "action": "rejectDeletion",
+  "token": "admin_token_here",
+  "event_id": 1
+}
+```
+
+---
+
+### Images (`Api/imageApi.php` et `Api/uploadImageApi.php`)
+
+#### Récupérer une image
+
+```
+GET /Api/imageApi.php?name=event_image.jpg
+```
+
+#### Uploader une image (authentification requise)
+
+```
+POST /Api/uploadImageApi.php
+Content-Type: multipart/form-data
+
+FormData:
+- image: [fichier image]
+```
+
+---
+
+### Itinéraires (`Api/routeApi.php`)
+
+#### Calculer un itinéraire
+
+```json
+POST /Api/routeApi.php
+{
+  "action": "getRoute",
+  "startLat": 48.8566,
+  "startLng": 2.3522,
+  "endLat": 48.8606,
+  "endLng": 2.3376
 }
 ```
 
