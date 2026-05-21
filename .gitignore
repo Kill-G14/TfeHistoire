@@ -4,6 +4,9 @@
 credentials.txt
 *.credentials.txt
 
+# Fichiers de développement (ne pas déployer)
+Archive_Dev/
+
 # Dépendances
 /BackEnd/vendor/
 /node_modules/
