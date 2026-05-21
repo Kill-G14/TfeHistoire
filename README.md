@@ -308,3 +308,33 @@ Projet éducatif - Libre d'utilisation
 Images : Unsplash
 Icons : Bootstrap Icons
 Framework : Bootstrap 5.3
+
+---
+
+## 🔐 Sécurité et Production
+
+### ⚠️ Fichiers sensibles (JAMAIS en ligne)
+
+- `credentials.txt` : Identifiants admin et clés API (ajouté au .gitignore)
+- `BackEnd/.env` : Variables d'environnement (déjà dans .gitignore)
+- `BackEnd/config.php` : Configuration base de données (déjà dans .gitignore)
+- `Archive_Dev/` : Documentation de développement et fichiers de test
+
+### 📋 Documentation de production
+
+Pour déployer ce projet en production, consultez :
+
+- **`Archive_Dev/CHECKLIST_PRODUCTION.md`** : Guide complet de déploiement (57+ étapes)
+- **`Archive_Dev/RESUME_PREPARATION_PRODUCTION.md`** : Résumé des préparations effectuées
+
+⚠️ **Ces fichiers contiennent des informations de configuration mais AUCUN identifiant sensible.**
+
+### 🚀 Déploiement rapide
+
+1. **Ne PAS uploader** le dossier `Archive_Dev/`
+2. Copier `.env.example` vers `.env` et remplir les variables
+3. Importer `BackEnd/database_production.sql` sur le serveur
+4. Configurer Apache avec le `.htaccess` fourni
+5. Changer le mot de passe admin après la première connexion
+
+Pour plus de détails, voir `Archive_Dev/CHECKLIST_PRODUCTION.md`
