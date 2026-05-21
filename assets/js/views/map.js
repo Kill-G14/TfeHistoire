@@ -440,23 +440,22 @@ async function showRoute(eventId) {
 
   try {
     // Appeler le backend qui gérera l'appel à OpenRouteService
-    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
-    const response = await fetch(
-      `${apiUrl}/routeApi.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "getRoute",
-          startLat: userPosition.lat,
-          startLng: userPosition.lng,
-          endLat: parseFloat(event.latitude),
-          endLng: parseFloat(event.longitude),
-        }),
+    const apiUrl =
+      window.__APP_CONFIG__?.API_URL ||
+      "https://memoriaeventia.com/BackEnd/Api";
+    const response = await fetch(`${apiUrl}/routeApi.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        action: "getRoute",
+        startLat: userPosition.lat,
+        startLng: userPosition.lng,
+        endLat: parseFloat(event.latitude),
+        endLng: parseFloat(event.longitude),
+      }),
+    });
 
     const result = await response.json();
 

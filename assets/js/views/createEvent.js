@@ -146,14 +146,13 @@ async function uploadImage(file) {
     const formData = new FormData();
     formData.append("image", file);
 
-    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
-    const response = await fetch(
-      `${apiUrl}/uploadImageApi.php`,
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
+    const apiUrl =
+      window.__APP_CONFIG__?.API_URL ||
+      "https://memoriaeventia.com/BackEnd/Api";
+    const response = await fetch(`${apiUrl}/uploadImageApi.php`, {
+      method: "POST",
+      body: formData,
+    });
 
     return await response.json();
   } catch (error) {

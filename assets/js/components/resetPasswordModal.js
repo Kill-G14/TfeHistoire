@@ -144,22 +144,21 @@ async function handleResetPassword() {
     '<i class="bi bi-hourglass-split me-2"></i>Réinitialisation...';
 
   try {
-    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
-    const response = await fetch(
-      `${apiUrl}/authApi.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "resetPassword",
-          email: currentEmail,
-          code: code,
-          newPassword: newPassword,
-        }),
+    const apiUrl =
+      window.__APP_CONFIG__?.API_URL ||
+      "https://memoriaeventia.com/BackEnd/Api";
+    const response = await fetch(`${apiUrl}/authApi.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        action: "resetPassword",
+        email: currentEmail,
+        code: code,
+        newPassword: newPassword,
+      }),
+    });
 
     const data = await response.json();
 

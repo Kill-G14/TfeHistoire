@@ -104,20 +104,19 @@ async function handleSendCode() {
     '<i class="bi bi-hourglass-split me-2"></i>Envoi en cours...';
 
   try {
-    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
-    const response = await fetch(
-      `${apiUrl}/authApi.php`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "requestPasswordReset",
-          email: email,
-        }),
+    const apiUrl =
+      window.__APP_CONFIG__?.API_URL ||
+      "https://memoriaeventia.com/BackEnd/Api";
+    const response = await fetch(`${apiUrl}/authApi.php`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        action: "requestPasswordReset",
+        email: email,
+      }),
+    });
 
     const data = await response.json();
 
