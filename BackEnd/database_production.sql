@@ -14,8 +14,11 @@
 
 -- Configuration de la session
 SET SESSION wait_timeout = 28800;
+
 SET SESSION interactive_timeout = 28800;
+
 SET SESSION net_read_timeout = 120;
+
 SET SESSION net_write_timeout = 120;
 
 USE memoriaeventia;
@@ -25,12 +28,19 @@ USE memoriaeventia;
 -- ============================================
 -- Ordre important : supprimer d'abord les tables avec foreign keys
 DROP TABLE IF EXISTS reservations;
+
 DROP TABLE IF EXISTS favorites;
+
 DROP TABLE IF EXISTS rate_limiter;
+
 DROP TABLE IF EXISTS sessions;
+
 DROP TABLE IF EXISTS password_resets;
+
 DROP TABLE IF EXISTS event_modifications;
+
 DROP TABLE IF EXISTS events;
+
 DROP TABLE IF EXISTS users;
 
 -- ============================================
@@ -105,7 +115,11 @@ CREATE TABLE IF NOT EXISTS event_modifications (
     new_time TIME NOT NULL COMMENT 'Nouvelle heure proposée',
     old_date DATE NOT NULL COMMENT 'Ancienne date (pour historique)',
     old_time TIME NOT NULL COMMENT 'Ancienne heure (pour historique)',
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending' COMMENT 'Statut de la modification',
+    status ENUM(
+        'pending',
+        'approved',
+        'rejected'
+    ) DEFAULT 'pending' COMMENT 'Statut de la modification',
     rejection_reason TEXT NULL COMMENT 'Raison du rejet par l admin',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Date de la demande',
     validated_at TIMESTAMP NULL COMMENT 'Date de validation/rejet par admin',
@@ -175,16 +189,27 @@ CREATE TABLE IF NOT EXISTS rate_limiter (
 -- INDEX POUR AMÉLIORER LES PERFORMANCES
 -- ============================================
 CREATE INDEX idx_events_date ON events (date);
+
 CREATE INDEX idx_events_country ON events (country);
+
 CREATE INDEX idx_events_city ON events (city);
+
 CREATE INDEX idx_events_category ON events (category);
+
 CREATE INDEX idx_events_pending ON events (is_pending);
+
 CREATE INDEX idx_events_approved ON events (is_approved);
+
 CREATE INDEX idx_events_rejected ON events (is_rejected);
+
 CREATE INDEX idx_events_deleted ON events (is_deleted);
+
 CREATE INDEX idx_events_has_pending_modification ON events (has_pending_modification);
+
 CREATE INDEX idx_events_deletion_requested ON events (deletion_requested);
+
 CREATE INDEX idx_events_location ON events (latitude, longitude);
+
 CREATE INDEX idx_users_deleted ON users (is_deleted);
 
 -- ============================================
@@ -195,23 +220,25 @@ CREATE INDEX idx_users_deleted ON users (is_deleted);
 -- Email: admin@memoriaeventia.com
 -- Mot de passe: @S76XVzqeAhFmEe
 -- Hash BCrypt généré avec PASSWORD_DEFAULT de PHP
-INSERT INTO users (
-    email,
-    password,
-    name,
-    is_admin,
-    is_organizer,
-    is_moderator,
-    is_deleted
-) VALUES (
-    'admin@memoriaeventia.com',
-    '$2y$10$M6Ck5/mcO4XYns8s/ZJQKuIsaWOIthOHyHZe3hxm246XSYtivYtbC',
-    'Administrateur',
-    TRUE,
-    FALSE,
-    FALSE,
-    FALSE
-);
+INSERT INTO
+    users (
+        email,
+        password,
+        name,
+        is_admin,
+        is_organizer,
+        is_moderator,
+        is_deleted
+    )
+VALUES (
+        'admin@memoriaeventia.com',
+        '$2y$10$M6Ck5/mcO4XYns8s/ZJQKuIsaWOIthOHyHZe3hxm246XSYtivYtbC',
+        'Administrateur',
+        TRUE,
+        FALSE,
+        FALSE,
+        FALSE
+    );
 
 -- ============================================
 -- FIN DE L'INSTALLATION

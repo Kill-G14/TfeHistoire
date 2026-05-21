@@ -8,9 +8,11 @@
 ## ✅ MODIFICATIONS EFFECTUÉES
 
 ### 1. 📁 Archivage des fichiers de développement
+
 **Créé:** `Archive_Dev/` (NE PAS UPLOADER EN PRODUCTION)
 
 **Fichiers archivés:**
+
 - `AGENTS.md` → `Archive_Dev/`
 - `COMMANDES_RAPIDES.md` → `Archive_Dev/`
 - `Guidelines.md` → `Archive_Dev/`
@@ -24,6 +26,7 @@
 - `AdminOffice/README.md` → `Archive_Dev/AdminOffice/`
 
 **Logs vidés (fichiers conservés vides):**
+
 - `BackEnd/logs/app.log`
 - `BackEnd/logs/error.log`
 - `BackEnd/logs/uploads.log`
@@ -31,9 +34,11 @@
 ---
 
 ### 2. 🗄️ Base de données de production
+
 **Créé:** `BackEnd/database_production.sql`
 
 **Contenu:**
+
 - ✅ Structure complète de toutes les tables (8 tables)
 - ✅ Tous les index optimisés (23 index)
 - ✅ UN SEUL utilisateur : admin@memoriaeventia.com
@@ -43,6 +48,7 @@
 - ❌ AUCUN autre utilisateur
 
 **Tables créées:**
+
 1. `users` - Utilisateurs
 2. `password_resets` - Réinitialisations de mot de passe
 3. `events` - Événements historiques
@@ -55,41 +61,48 @@
 ---
 
 ### 3. 🔧 Configuration de production
+
 **Modifié:** `BackEnd/.env.example`
 
 **Changements:**
+
 - Mis à jour pour la production
 - APP_ENV=production, APP_DEBUG=false
 - Instructions claires pour chaque variable
 - LOG_LEVEL=info (pas debug)
 - Placeholders pour domaine réel
 
-**⚠️ IMPORTANT:** 
+**⚠️ IMPORTANT:**
 - Copier `.env.example` → `.env` sur le serveur
 - Remplir TOUTES les valeurs avec vraies données
 - Ne JAMAIS committer le `.env` dans Git
 
 ---
 
-### 4. 🌐 Système de configuration centralisé
-**Créé:** `assets/js/utils/config.js`  
-**Créé:** `AdminOffice/assets/js/utils/config.js`
+### 4. 🌐 URLs hardcodées (à remplacer avant mise en ligne)
 
-**Fonctionnalités:**
-- ✅ Détection automatique environnement (localhost vs production)
-- ✅ URLs centralisées (API_URL, BASE_PATH, FRONTEND_URL)
-- ✅ Helper functions : getApiUrl(), getImageUrl(), getFrontendUrl()
-- ✅ Section PRODUCTION à modifier avant mise en ligne
+**État actuel:**
+- Les URLs sont hardcodées dans les managers et composants JS
+- Total : **13 fichiers** contiennent `http://localhost/tfeHistoire/BackEnd/Api`
 
-**⚠️ TODO AVANT MISE EN LIGNE:**
-Modifier la section `production:` dans les 2 fichiers config.js avec votre domaine réel.
+**⚠️ ACTION REQUISE AVANT MISE EN LIGNE:**
+Faire un **Find & Replace** global dans VS Code :
+
+1. **Rechercher:** `http://localhost/tfeHistoire/BackEnd/Api`
+2. **Remplacer par:** `https://votre-domaine.com/BackEnd/Api`
+3. **Fichiers concernés:** 13 fichiers (managers, components, utils)
+
+4. **Rechercher aussi:** `/tfeHistoire` dans `index.html` (balise `<base>`)
+5. **Remplacer par:** `/` ou vide selon installation
 
 ---
 
 ### 5. 🔐 Sécurité HTML
+
 **Modifié:** `AdminOffice/pages/login.html`
 
 **Changements:**
+
 - ❌ Retiré `value="admin@memoriaeventia.com"` (ligne 44)
 - ❌ Retiré `value="password"` (ligne 59)
 - ✅ Champs vides par défaut (sécurité)
@@ -97,9 +110,11 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 ---
 
 ### 6. ✅ Vérifications Linux (case sensitivity)
+
 **Statut:** ✅ TOUT CORRECT
 
 **Vérifications effectuées:**
+
 - ✅ Tous les imports JavaScript avec casse correcte
 - ✅ Tous les namespaces PHP avec casse correcte
 - ✅ Noms de fichiers correspondent exactement aux imports
@@ -112,9 +127,11 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 ---
 
 ### 7. 📋 Documentation de déploiement
+
 **Créé:** `CHECKLIST_PRODUCTION.md`
 
 **Contenu:**
+
 - ✅ Checklist complète étape par étape
 - ✅ Instructions de configuration .env
 - ✅ Commandes Composer pour dépendances
@@ -129,6 +146,7 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 ## ⚠️ ACTIONS REQUISES AVANT MISE EN LIGNE
 
 ### 🚫 NE PAS FAIRE
+
 - ❌ Ne PAS uploader `Archive_Dev/`
 - ❌ Ne PAS uploader `.git/`
 - ❌ Ne PAS uploader `BackEnd/vendor/` (réinstaller avec Composer)
@@ -137,24 +155,23 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 ### ✅ À FAIRE OBLIGATOIREMENT
 1. **Importer** `BackEnd/database_production.sql` sur serveur
 2. **Créer** `.env` sur serveur avec vraies valeurs
-3. **Modifier** `assets/js/utils/config.js` section production
-4. **Modifier** `AdminOffice/assets/js/utils/config.js` section production
-5. **Exécuter** `composer install --no-dev` sur serveur
-6. **Configurer** permissions dossiers (chmod 755)
-7. **Vérifier** SendGrid domaine authentifié
-8. **Installer** SSL (Let's Encrypt)
-9. **Tester** toutes les fonctionnalités
-10. **Changer** mot de passe admin après 1ère connexion
+3. **Find & Replace** URLs dans tous les fichiers JS (13 fichiers)
+4. **Exécuter** `composer install --no-dev` sur serveur
+5. **Configurer** permissions dossiers (chmod 755)
+6. **Vérifier** SendGrid domaine authentifié
+7. **Installer** SSL (Let's Encrypt)
+8. **Tester** toutes les fonctionnalités
+9. **Changer** mot de passe admin après 1ère connexion
 
 ---
 
 ## 📊 STATISTIQUES
 
 **Fichiers archivés:** 15+ fichiers/dossiers  
-**Fichiers créés:** 4 (database_production.sql, 2x config.js, CHECKLIST_PRODUCTION.md)  
+**Fichiers créés:** 2 (database_production.sql, CHECKLIST_PRODUCTION.md)  
 **Fichiers modifiés:** 2 (.env.example, AdminOffice/pages/login.html)  
 **Logs vidés:** 3 fichiers (app.log, error.log, uploads.log)  
-**Taille Archive_Dev:** ~500 KB  
+**Taille Archive_Dev:** ~500 KB
 
 ---
 
@@ -172,11 +189,13 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 ## 📞 INFORMATIONS IMPORTANTES
 
 **Compte admin (par défaut):**
+
 - Email : `admin@memoriaeventia.com`
 - Mot de passe : `@S76XVzqeAhFmEe`
 - ⚠️ À CHANGER après 1ère connexion !
 
 **Base de données:**
+
 - Nom : `memoriaeventia`
 - Charset : `utf8mb4`
 - Collation : `utf8mb4_unicode_ci`
@@ -184,6 +203,7 @@ Modifier la section `production:` dans les 2 fichiers config.js avec votre domai
 - Index : 23
 
 **Dossiers nécessitant permissions 755:**
+
 - `BackEnd/storage/images/`
 - `BackEnd/storage/tickets/`
 - `BackEnd/logs/`
