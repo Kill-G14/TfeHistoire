@@ -16,4 +16,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # Rediriger toutes les requêtes vers index.html
 
-RewriteRule ^(.\*)$ index.html [L]
+RewriteRule ^(.*)$ index.html [L]

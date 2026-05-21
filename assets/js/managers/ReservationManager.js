@@ -31,7 +31,6 @@ class ReservationManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la création de la réservation:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -64,7 +63,6 @@ class ReservationManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la récupération des réservations:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -98,7 +96,6 @@ class ReservationManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de l'annulation de la réservation:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -124,10 +121,6 @@ class ReservationManager {
 
       return await response.json();
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des places disponibles:",
-        error,
-      );
       return {
         success: false,
         message: "Erreur de connexion au serveur",
@@ -161,7 +154,6 @@ class ReservationManager {
 
       return await response.json();
     } catch (error) {
-      console.error("Erreur lors de la vérification de la réservation:", error);
       return {
         success: false,
         message: "Erreur de connexion au serveur",

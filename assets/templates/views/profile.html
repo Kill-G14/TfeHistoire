@@ -172,7 +172,7 @@
     </div>
   </div>
 
-  <!-- Modal Changement de mot de passe -->
+  <!-- Modal Confirmation Changement de mot de passe -->
   <div
     class="modal fade"
     id="changePasswordModal"
@@ -181,63 +181,66 @@
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="changePasswordModalLabel">
-            <i class="bi bi-key me-2"></i>Changer de mot de passe
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-danger border-0">
+          <h5
+            class="modal-title d-flex align-items-center gap-2 text-white"
+            id="changePasswordModalLabel"
+          >
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Réinitialiser le mot de passe
           </h5>
           <button
             type="button"
-            class="btn-close"
+            class="btn-close btn-close-white"
             data-bs-dismiss="modal"
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">
-          <form id="changePasswordForm">
+        <div class="modal-body p-4">
+          <div class="text-center mb-4">
             <div class="mb-3">
-              <label for="currentPassword" class="form-label"
-                >Mot de passe actuel</label
-              >
-              <input
-                type="password"
-                class="form-control"
-                id="currentPassword"
-                required
-              />
-              <div class="invalid-feedback" id="currentPasswordError"></div>
+              <i
+                class="bi bi-shield-exclamation text-danger"
+                style="font-size: 4rem; opacity: 0.8"
+              ></i>
             </div>
-            <div class="mb-3">
-              <label for="newPassword" class="form-label"
-                >Nouveau mot de passe</label
-              >
-              <input
-                type="password"
-                class="form-control"
-                id="newPassword"
-                required
-              />
-              <div class="form-text">Minimum 6 caractères</div>
-              <div class="invalid-feedback" id="newPasswordError"></div>
+            <h6 class="text-dark mb-3">
+              Êtes-vous sûr de vouloir réinitialiser votre mot de passe ?
+            </h6>
+          </div>
+
+          <div class="alert alert-warning border-0 shadow-sm mb-0">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-info-circle-fill text-warning fs-5"></i>
+              <div>
+                <strong class="d-block mb-1"
+                  >Un code de vérification sera envoyé à votre adresse
+                  email.</strong
+                >
+                <small class="text-muted"
+                  >Vous serez déconnecté après la réinitialisation et devrez
+                  vous reconnecter avec votre nouveau mot de passe.</small
+                >
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="confirmPassword" class="form-label"
-                >Confirmer le nouveau mot de passe</label
-              >
-              <input
-                type="password"
-                class="form-control"
-                id="confirmPassword"
-                required
-              />
-              <div class="invalid-feedback" id="confirmPasswordError"></div>
-            </div>
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle me-2"></i>Changer le mot de passe
-              </button>
-            </div>
-          </form>
+          </div>
+        </div>
+        <div class="modal-footer border-0 bg-light">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-bs-dismiss="modal"
+          >
+            <i class="bi bi-x-circle me-2"></i>Non
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="btnConfirmPasswordReset"
+          >
+            <i class="bi bi-check-circle me-2"></i>Oui
+          </button>
         </div>
       </div>
     </div>

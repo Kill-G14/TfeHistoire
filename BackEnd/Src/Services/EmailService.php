@@ -339,4 +339,51 @@ class EmailService {
 
     return $this->sendEmailToAdmins($subject, $message);
   }
+
+  /**
+   * Envoyer un email de réinitialisation de mot de passe
+   */
+  public function sendPasswordResetEmail($user, string $code): bool {
+    $to = $user->email;
+    $toName = $user->name;
+    $subject = '🔐 Réinitialisation de votre mot de passe';
+    
+    $htmlContent = "
+      <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+        <h2 style='color: #1a3a52;'>🔐 Réinitialisation de mot de passe</h2>
+        <p>Bonjour <strong>{$toName}</strong>,</p>
+        <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
+        
+        <div style='background-color: #f8f9fa; padding: 30px; border-radius: 8px; margin: 20px 0; text-align: center;'>
+          <p style='margin: 0 0 15px 0; color: #6c757d; font-size: 14px;'>Votre code de réinitialisation :</p>
+          <div style='font-size: 32px; font-weight: bold; color: #1a3a52; letter-spacing: 8px; font-family: monospace;'>
+            {$code}
+          </div>
+          <p style='margin: 15px 0 0 0; color: #dc3545; font-size: 14px;'>⏱️ Ce code expire dans <strong>10 minutes</strong></p>
+        </div>
+        
+        <p>Entrez ce code sur la page de réinitialisation pour créer un nouveau mot de passe.</p>
+        
+        <div style='background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;'>
+          <p style='margin: 0; color: #856404;'>
+            ⚠️ <strong>Si vous n'avez pas demandé cette réinitialisation</strong>, ignorez cet email.<br>
+            Votre mot de passe actuel reste inchangé.
+          </p>
+        </div>
+        
+        <p style='margin-top: 30px;'>Cordialement,<br><strong>L'équipe MemoriaEventia</strong></p>
+      </div>
+    ";
+    
+    $textContent = "Réinitialisation de mot de passe\n\n";
+    $textContent .= "Bonjour {$toName},\n\n";
+    $textContent .= "Vous avez demandé la réinitialisation de votre mot de passe.\n\n";
+    $textContent .= "Votre code de réinitialisation : {$code}\n\n";
+    $textContent .= "Ce code expire dans 10 minutes.\n\n";
+    $textContent .= "Entrez ce code sur la page de réinitialisation pour créer un nouveau mot de passe.\n\n";
+    $textContent .= "Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\n";
+    $textContent .= "Cordialement,\nL'équipe MemoriaEventia";
+
+    return $this->sendEmail($to, $toName, $subject, $htmlContent, $textContent);
+  }
 }

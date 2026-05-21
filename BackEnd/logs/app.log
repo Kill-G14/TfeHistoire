@@ -124,3 +124,60 @@
 [2026-05-20 17:14:34] [INFO] Reservation created successfully | Context: {"reservation_id":12,"user_id":6,"event_id":12,"quantity":1}
 [2026-05-20 17:14:34] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Carnaval de B\u00e2le"}
 [2026-05-20 17:14:35] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Carnaval de B\u00e2le","status":202}
+[2026-05-21 11:59:32] [INFO] Reservation created successfully | Context: {"reservation_id":13,"user_id":6,"event_id":8,"quantity":1}
+[2026-05-21 11:59:32] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"F\u00eate de la Bastille"}
+[2026-05-21 11:59:33] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : F\u00eate de la Bastille","status":202}
+[2026-05-21 12:00:29] [INFO] Reservation cancelled successfully | Context: {"reservation_id":13,"user_id":6,"event_id":8}
+[2026-05-21 12:00:29] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"F\u00eate de la Bastille"}
+[2026-05-21 12:00:29] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : F\u00eate de la Bastille","status":202}
+[2026-05-21 12:01:01] [INFO] Reservation cancelled successfully | Context: {"reservation_id":12,"user_id":6,"event_id":12}
+[2026-05-21 12:01:01] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"Carnaval de B\u00e2le"}
+[2026-05-21 12:01:01] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : Carnaval de B\u00e2le","status":202}
+[2026-05-21 12:01:02] [INFO] Reservation cancelled successfully | Context: {"reservation_id":9,"user_id":6,"event_id":3}
+[2026-05-21 12:01:02] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival M\u00e9di\u00e9val de Carcassonne"}
+[2026-05-21 12:01:03] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : Festival M\u00e9di\u00e9val de Carcassonne","status":202}
+[2026-05-21 12:01:05] [INFO] Reservation cancelled successfully | Context: {"reservation_id":10,"user_id":6,"event_id":10}
+[2026-05-21 12:01:05] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival Viking de Bergen"}
+[2026-05-21 12:01:05] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : Festival Viking de Bergen","status":202}
+[2026-05-21 12:01:07] [INFO] Reservation cancelled successfully | Context: {"reservation_id":7,"user_id":6,"event_id":6}
+[2026-05-21 12:01:07] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"F\u00eate de la Renaissance"}
+[2026-05-21 12:01:07] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : F\u00eate de la Renaissance","status":202}
+[2026-05-21 12:01:09] [INFO] Reservation cancelled successfully | Context: {"reservation_id":8,"user_id":6,"event_id":13}
+[2026-05-21 12:01:09] [INFO] Sending cancellation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival de la Bi\u00e8re Tch\u00e8que"}
+[2026-05-21 12:01:09] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u274c R\u00e9servation annul\u00e9e : Festival de la Bi\u00e8re Tch\u00e8que","status":202}
+[2026-05-21 12:11:39] [INFO] User logged out successfully
+[2026-05-21 12:12:12] [INFO] User logged in successfully | Context: {"user_id":6}
+[2026-05-21 12:17:34] [INFO] User logged out successfully
+[2026-05-21 12:17:58] [INFO] User logged in successfully | Context: {"user_id":6}
+[2026-05-21 12:28:46] [INFO] User logged out successfully
+[2026-05-21 12:29:06] [INFO] User logged in successfully | Context: {"user_id":6}
+[2026-05-21 12:41:02] [INFO] Sending password reset email | Context: {"email":"killian.godmont@gmail.com","code":"107336"}
+[2026-05-21 12:41:03] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\ud83d\udd10 R\u00e9initialisation de votre mot de passe","status":202}
+[2026-05-21 12:41:03] [INFO] Password reset email sent successfully | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:41:46] [INFO] Invalid or expired code | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:42:08] [INFO] Sending password reset email | Context: {"email":"killian.godmont@gmail.com","code":"473129"}
+[2026-05-21 12:42:09] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\ud83d\udd10 R\u00e9initialisation de votre mot de passe","status":202}
+[2026-05-21 12:42:09] [INFO] Password reset email sent successfully | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:42:36] [INFO] Invalid or expired code | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:44:57] [INFO] Sending password reset email | Context: {"email":"killian.godmont@gmail.com","code":"035237"}
+[2026-05-21 12:44:58] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\ud83d\udd10 R\u00e9initialisation de votre mot de passe","status":202}
+[2026-05-21 12:44:58] [INFO] Password reset email sent successfully | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:45:56] [INFO] resetPassword called | Context: {"email":"killian.godmont@gmail.com","code":"035237","code_length":6,"password_length":8}
+[2026-05-21 12:45:56] [INFO] Looking for password reset | Context: {"user_id":6,"code_received":"035237","code_length":6,"found":false}
+[2026-05-21 12:46:00] [INFO] resetPassword called | Context: {"email":"killian.godmont@gmail.com","code":"035237","code_length":6,"password_length":8}
+[2026-05-21 12:46:00] [INFO] Looking for password reset | Context: {"user_id":6,"code_received":"035237","code_length":6,"found":false}
+[2026-05-21 12:57:49] [INFO] Sending password reset email | Context: {"email":"killian.godmont@gmail.com","code":"194981"}
+[2026-05-21 12:57:50] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\ud83d\udd10 R\u00e9initialisation de votre mot de passe","status":202}
+[2026-05-21 12:57:50] [INFO] Password reset email sent successfully | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:58:18] [INFO] resetPassword called | Context: {"email":"killian.godmont@gmail.com","code":"194981","code_length":6,"password_length":8}
+[2026-05-21 12:58:18] [INFO] Looking for password reset | Context: {"user_id":6,"code_received":"194981","code_length":6,"found":false}
+[2026-05-21 12:58:18] [INFO] All codes for user | Context: {"codes":[{"code":"194981","expires_at":"2026-05-21 13:07:49","created_at":"2026-05-21 14:57:49","now":"2026-05-21 14:58:18"}]}
+[2026-05-21 12:58:18] [INFO] Invalid or expired code | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:58:24] [INFO] resetPassword called | Context: {"email":"killian.godmont@gmail.com","code":"194981","code_length":6,"password_length":8}
+[2026-05-21 12:58:24] [INFO] Looking for password reset | Context: {"user_id":6,"code_received":"194981","code_length":6,"found":false}
+[2026-05-21 12:58:24] [INFO] All codes for user | Context: {"codes":[{"code":"194981","expires_at":"2026-05-21 13:07:49","created_at":"2026-05-21 14:57:49","now":"2026-05-21 14:58:24"}]}
+[2026-05-21 12:58:24] [INFO] Invalid or expired code | Context: {"email":"killian.godmont@gmail.com"}
+[2026-05-21 12:58:27] [INFO] resetPassword called | Context: {"email":"killian.godmont@gmail.com","code":"194981","code_length":6,"password_length":8}
+[2026-05-21 12:58:27] [INFO] Looking for password reset | Context: {"user_id":6,"code_received":"194981","code_length":6,"found":false}
+[2026-05-21 12:58:27] [INFO] All codes for user | Context: {"codes":[{"code":"194981","expires_at":"2026-05-21 13:07:49","created_at":"2026-05-21 14:57:49","now":"2026-05-21 14:58:27"}]}
+[2026-05-21 12:58:27] [INFO] Invalid or expired code | Context: {"email":"killian.godmont@gmail.com"}

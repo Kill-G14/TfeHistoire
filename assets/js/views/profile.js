@@ -7,15 +7,15 @@ import FavoriteManager from "../managers/FavoriteManager.js";
 import EventManager from "../managers/EventManager.js";
 import ReservationManager from "../managers/ReservationManager.js";
 import { showEventDetail } from "../components/eventDetail.js";
-import { validateChangePasswordForm } from "../validators/authValidator.js";
-import {
-  setFieldError,
-  clearFieldValidation,
-} from "../validators/formValidator.js";
 import {
   initCancelReservationModal,
   openCancelReservationModal,
 } from "../components/cancelReservationModal.js";
+import { initForgotPasswordModal } from "../components/forgotPasswordModal.js";
+import {
+  initResetPasswordModal,
+  openResetPasswordModal,
+} from "../components/resetPasswordModal.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -66,8 +66,10 @@ export async function mount(container, params) {
   container.innerHTML = "";
   container.appendChild(clone);
 
-  // Initialiser la modal d'annulation de réservation
+  // Initialiser les modals
   await initCancelReservationModal();
+  await initForgotPasswordModal();
+  await initResetPasswordModal();
 
   // Afficher les informations utilisateur
   displayUserInfo();
@@ -294,10 +296,15 @@ export async function unmount() {
 
 // Attacher les événements de la page profil
 function attachProfileEvents() {
-  // Formulaire de changement de mot de passe
-  const changePasswordForm = document.getElementById("changePasswordForm");
-  if (changePasswordForm) {
-    changePasswordForm.addEventListener("submit", handleChangePassword);
+  // Bouton de confirmation de réinitialisation du mot de passe
+  const btnConfirmPasswordReset = document.getElementById(
+    "btnConfirmPasswordReset",
+  );
+  if (btnConfirmPasswordReset) {
+    btnConfirmPasswordReset.addEventListener(
+      "click",
+      handleConfirmPasswordReset,
+    );
   }
 
   // Navigation entre sections via les stat cards
@@ -337,92 +344,61 @@ function initSectionNavigation() {
   });
 }
 
-// Gérer le changement de mot de passe
-async function handleChangePassword(e) {
-  e.preventDefault();
-
-  const currentPassword = document.getElementById("currentPassword").value;
-  const newPassword = document.getElementById("newPassword").value;
-  const confirmPassword = document.getElementById("confirmPassword").value;
-
-  // Références aux éléments
-  const currentPasswordInput = document.getElementById("currentPassword");
-  const newPasswordInput = document.getElementById("newPassword");
-  const confirmPasswordInput = document.getElementById("confirmPassword");
-  const currentPasswordError = document.getElementById("currentPasswordError");
-  const newPasswordError = document.getElementById("newPasswordError");
-  const confirmPasswordError = document.getElementById("confirmPasswordError");
-
-  // Réinitialiser les erreurs
-  clearFieldValidation(currentPasswordInput, currentPasswordError);
-  clearFieldValidation(newPasswordInput, newPasswordError);
-  clearFieldValidation(confirmPasswordInput, confirmPasswordError);
-
-  // Validation avec le validator
-  const validation = validateChangePasswordForm({
-    currentPassword,
-    newPassword,
-    confirmPassword,
-  });
-
-  if (!validation.valid) {
-    // Afficher les erreurs
-    if (validation.errors.currentPassword) {
-      setFieldError(
-        currentPasswordInput,
-        currentPasswordError,
-        validation.errors.currentPassword,
-      );
-    }
-    if (validation.errors.newPassword) {
-      setFieldError(
-        newPasswordInput,
-        newPasswordError,
-        validation.errors.newPassword,
-      );
-    }
-    if (validation.errors.confirmPassword) {
-      setFieldError(
-        confirmPasswordInput,
-        confirmPasswordError,
-        validation.errors.confirmPassword,
-      );
-    }
+// Gérer la confirmation de réinitialisation du mot de passe
+async function handleConfirmPasswordReset() {
+  const user = auth.getUser();
+  if (!user || !user.email) {
+    helpers.showToast("Erreur : utilisateur non connecté", "error");
     return;
   }
 
-  // Appel API
-  const token = auth.getToken();
-  if (!token) {
-    helpers.showToast("Vous devez être connecté", "error");
-    return;
-  }
+  const btnConfirm = document.getElementById("btnConfirmPasswordReset");
+  if (!btnConfirm) return;
 
-  // Import dynamique de AuthManager
-  const { default: AuthManager } = await import("../managers/AuthManager.js");
-  const result = await AuthManager.changePassword(
-    token,
-    currentPassword,
-    newPassword,
-  );
+  // Désactiver le bouton
+  btnConfirm.disabled = true;
+  btnConfirm.innerHTML =
+    '<i class="bi bi-hourglass-split me-2"></i>Envoi en cours...';
 
-  if (result.success) {
-    helpers.showToast("Mot de passe modifié avec succès", "success");
-
-    // Fermer la modal
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("changePasswordModal"),
+  try {
+    // Envoyer la demande de réinitialisation
+    const response = await fetch(
+      "http://localhost/tfeHistoire/BackEnd/Api/authApi.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "requestPasswordReset",
+          email: user.email,
+        }),
+      },
     );
-    if (modal) modal.hide();
 
-    // Réinitialiser le formulaire
-    document.getElementById("changePasswordForm").reset();
-  } else {
-    if (result.message.includes("actuel")) {
-      setFieldError(currentPasswordInput, currentPasswordError, result.message);
+    const data = await response.json();
+
+    if (data.success) {
+      // Fermer la modal de confirmation
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("changePasswordModal"),
+      );
+      if (modal) modal.hide();
+
+      // Attendre un peu puis ouvrir la modal de réinitialisation
+      setTimeout(() => {
+        openResetPasswordModal(user.email);
+        helpers.showToast("Un code a été envoyé à votre email", "success");
+      }, 300);
     } else {
-      helpers.showToast(result.message, "error");
+      helpers.showToast(data.message, "error");
+      btnConfirm.disabled = false;
+      btnConfirm.innerHTML = '<i class="bi bi-check-circle me-2"></i>Oui';
     }
+  } catch (error) {
+    helpers.showToast("Erreur de connexion au serveur", "error");
+    btnConfirm.disabled = false;
+    btnConfirm.innerHTML = '<i class="bi bi-check-circle me-2"></i>Oui';
   }
 }
 

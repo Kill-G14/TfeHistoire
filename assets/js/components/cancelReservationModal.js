@@ -127,7 +127,6 @@ async function handleConfirmCancel() {
     // Fermer la modal
     modalInstance.hide();
   } catch (error) {
-    console.error("Erreur lors de l'annulation:", error);
     helpers.showToast("Erreur lors de l'annulation", "error");
   } finally {
     // Réactiver le bouton

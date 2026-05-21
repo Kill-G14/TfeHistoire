@@ -20,11 +20,14 @@ require __DIR__ . '/../vendor/autoload.php';
 // repositories 
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
+use App\Repositories\PasswordResetRepository;
 // Validator
 use App\Validators\UserValidator;
 // services
 use App\Services\AuthService;
 use App\Services\SessionService;
+use App\Services\EmailService;
+use App\Services\PasswordResetService;
 // Utils
 use App\Utils\RateLimiter;
 
@@ -32,11 +35,14 @@ use App\Utils\RateLimiter;
 // repositories 
 $userRepository = new UserRepository();
 $sessionRepository = new SessionRepository();
+$passwordResetRepository = new PasswordResetRepository();
 // Validator
 $userValidator = new UserValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
+$emailService = new EmailService($userRepository);
+$passwordResetService = new PasswordResetService($passwordResetRepository, $userRepository, $emailService);
 
 $request = json_decode(file_get_contents("php://input"), true);
 
@@ -145,10 +151,23 @@ switch ($request['action']) {
       break;
     }
     
-    $response = $authService->requestPasswordReset($request);
+    $response = $passwordResetService->requestPasswordReset($email);
     
     // Enregistrer la tentative même en cas de succès (pour éviter l'énumération)
     RateLimiter::recordAttempt('password_reset', $email);
+    break;
+
+  case 'resetPassword':
+    if (!isset($request['email']) || !isset($request['code']) || !isset($request['newPassword'])) {
+      $response = ['success' => false, 'message' => 'Données manquantes'];
+      break;
+    }
+
+    $response = $passwordResetService->resetPassword(
+      $request['email'],
+      $request['code'],
+      $request['newPassword']
+    );
     break;
 
   default:
