@@ -1,7 +1,9 @@
 // Manager pour la gestion des événements côté admin
+import { config } from "../../../../assets/js/config.js";
+
 class EventManager {
   constructor() {
-    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api/adminApi.php";
+    this.apiUrl = `${config.API_URL}/adminApi.php`;
   }
 
   // Récupérer tous les événements

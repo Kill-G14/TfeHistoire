@@ -1,6 +1,7 @@
 // Point d'entrée principal de l'application SPA
 
 // Imports
+import { config } from "./config.js";
 import { Router } from "./router.js";
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
@@ -10,6 +11,9 @@ import { appState } from "./store/appState.js";
 import { auth } from "./utils/auth.js";
 import { migrateLocalStorage } from "./utils/migrateLocalStorage.js";
 import FavoriteManager from "./managers/FavoriteManager.js";
+
+// Exposer la configuration globalement pour un accès facile
+window.__APP_CONFIG__ = config;
 
 // Définition des routes
 const routes = {

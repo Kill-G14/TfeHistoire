@@ -1,7 +1,9 @@
 // Manager pour la gestion des réservations
+import { config } from "../config.js";
+
 class ReservationManager {
   constructor() {
-    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
+    this.apiUrl = config.API_URL;
   }
 
   /**

@@ -1,13 +1,14 @@
 // Routeur SPA avec History API
+import { config } from './config.js';
+
 export class Router {
   constructor(routes, appSelector) {
     this.routes = routes;
     this.appElement = document.querySelector(appSelector);
     this.currentView = null;
     this.params = {};
-    // Détecter le base path depuis la balise <base>
-    const baseTag = document.querySelector("base");
-    this.basePath = baseTag ? new URL(baseTag.href).pathname : "/";
+    // Utiliser le base path depuis la configuration
+    this.basePath = config.BASE_PATH;
     // Enlever le slash final du basePath
     if (this.basePath.endsWith("/") && this.basePath.length > 1) {
       this.basePath = this.basePath.slice(0, -1);

@@ -146,8 +146,9 @@ async function uploadImage(file) {
     const formData = new FormData();
     formData.append("image", file);
 
+    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
     const response = await fetch(
-      "https://memoriaeventia.com/BackEnd/Api/uploadImageApi.php",
+      `${apiUrl}/uploadImageApi.php`,
       {
         method: "POST",
         body: formData,

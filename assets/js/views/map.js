@@ -440,8 +440,9 @@ async function showRoute(eventId) {
 
   try {
     // Appeler le backend qui gérera l'appel à OpenRouteService
+    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
     const response = await fetch(
-      "https://memoriaeventia.com/BackEnd/Api/routeApi.php",
+      `${apiUrl}/routeApi.php`,
       {
         method: "POST",
         headers: {

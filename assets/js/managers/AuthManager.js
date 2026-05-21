@@ -1,7 +1,9 @@
 // Manager pour la gestion de l'authentification
+import { config } from "../config.js";
+
 class AuthManager {
   constructor() {
-    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
+    this.apiUrl = config.API_URL;
   }
 
   // Connexion

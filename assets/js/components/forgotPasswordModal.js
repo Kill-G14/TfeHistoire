@@ -104,8 +104,9 @@ async function handleSendCode() {
     '<i class="bi bi-hourglass-split me-2"></i>Envoi en cours...';
 
   try {
+    const apiUrl = window.__APP_CONFIG__?.API_URL || 'https://memoriaeventia.com/BackEnd/Api';
     const response = await fetch(
-      "https://memoriaeventia.com/BackEnd/Api/authApi.php",
+      `${apiUrl}/authApi.php`,
       {
         method: "POST",
         headers: {

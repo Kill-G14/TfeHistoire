@@ -1,7 +1,9 @@
 // Manager pour la gestion des utilisateurs côté admin
+import { config } from "../../../../assets/js/config.js";
+
 class UserManager {
   constructor() {
-    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api/adminApi.php";
+    this.apiUrl = `${config.API_URL}/adminApi.php`;
   }
 
   // Récupérer tous les utilisateurs

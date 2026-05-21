@@ -1,7 +1,9 @@
 // Manager pour la gestion des favoris
+import { config } from "../config.js";
+
 class FavoriteManager {
   constructor() {
-    this.apiUrl = "https://memoriaeventia.com/BackEnd/Api";
+    this.apiUrl = config.API_URL;
   }
 
   // Récupérer les favoris d'un utilisateur
