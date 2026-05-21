@@ -123,6 +123,10 @@ function attachForgotPasswordEvents() {
 
     // Fermer la modal de login
     if (modalInstance) {
+      // Retirer le focus pour éviter les warnings aria-hidden
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
       modalInstance.hide();
     }
 
@@ -141,6 +145,10 @@ export function openLoginModal() {
 
 export function closeLoginModal() {
   if (modalInstance) {
+    // Retirer le focus pour éviter les warnings aria-hidden
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
     modalInstance.hide();
   }
 }

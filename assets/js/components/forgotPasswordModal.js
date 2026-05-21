@@ -129,7 +129,13 @@ async function handleSendCode() {
         const modal = bootstrap.Modal.getInstance(
           document.getElementById("forgotPasswordModal"),
         );
-        if (modal) modal.hide();
+        if (modal) {
+          // Retirer le focus pour éviter les warnings aria-hidden
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
+          modal.hide();
+        }
 
         // Ouvrir la modal de réinitialisation
         openResetPasswordModal(email);

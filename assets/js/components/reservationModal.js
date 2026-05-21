@@ -145,6 +145,10 @@ async function handleConfirmReservation() {
     const modalElement = document.getElementById("reservationModal");
     const modal = bootstrap.Modal.getInstance(modalElement);
     if (modal) {
+      // Retirer le focus pour éviter les warnings aria-hidden
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
       modal.hide();
     }
 

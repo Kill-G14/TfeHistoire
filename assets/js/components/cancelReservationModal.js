@@ -125,6 +125,10 @@ async function handleConfirmCancel() {
     await onConfirmCallback(currentReservationId);
 
     // Fermer la modal
+    // Retirer le focus pour éviter les warnings aria-hidden
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
     modalInstance.hide();
   } catch (error) {
     helpers.showToast("Erreur lors de l'annulation", "error");
