@@ -1,6 +1,8 @@
 # Configuration sensible
 /BackEnd/config.php
 /BackEnd/.env
+credentials.txt
+*.credentials.txt
 
 # Dépendances
 /BackEnd/vendor/

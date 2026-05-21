@@ -42,7 +42,7 @@
 - ✅ Structure complète de toutes les tables (8 tables)
 - ✅ Tous les index optimisés (23 index)
 - ✅ UN SEUL utilisateur : admin@memoriaeventia.com
-- ✅ Mot de passe admin : `@S76XVzqeAhFmEe` (hash BCrypt)
+- ✅ Mot de passe défini (hash BCrypt - voir fichier credentials.txt)
 - ❌ AUCUNE donnée de test
 - ❌ AUCUN événement pré-créé
 - ❌ AUCUN autre utilisateur
@@ -191,7 +191,7 @@ Faire un **Find & Replace** global dans VS Code :
 **Compte admin (par défaut):**
 
 - Email : `admin@memoriaeventia.com`
-- Mot de passe : `@S76XVzqeAhFmEe`
+- Mot de passe : (voir fichier credentials.txt sécurisé hors Git)
 - ⚠️ À CHANGER après 1ère connexion !
 
 **Base de données:**

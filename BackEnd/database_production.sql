@@ -218,7 +218,7 @@ CREATE INDEX idx_users_deleted ON users (is_deleted);
 
 -- Insertion du compte administrateur UNIQUEMENT
 -- Email: admin@memoriaeventia.com
--- Mot de passe: @S76XVzqeAhFmEe
+-- Mot de passe: voir fichier credentials.txt sécurisé (NON commité dans Git)
 -- Hash BCrypt généré avec PASSWORD_DEFAULT de PHP
 INSERT INTO
     users (

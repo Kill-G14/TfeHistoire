@@ -54,7 +54,7 @@ Les fichiers de développement suivants ont été archivés dans `Archive_Dev/` 
 
 3. **Vérifier les données** :
    - ✅ Un seul utilisateur créé : `admin@memoriaeventia.com`
-   - ✅ Mot de passe admin : `@S76XVzqeAhFmEe`
+   - ✅ Mot de passe défini (voir fichier sécurisé hors Git)
    - ✅ Toutes les tables créées (8 tables au total)
    - ✅ Tous les index créés automatiquement
 
@@ -414,7 +414,7 @@ SOURCE database_production.sql;
 **Compte admin par défaut :**
 
 - Email : `admin@memoriaeventia.com`
-- Mot de passe : `@S76XVzqeAhFmEe`
+- Mot de passe : (voir fichier credentials.txt NON commité)
 - ⚠️ **CHANGER CE MOT DE PASSE** après la première connexion !
 
 ---
