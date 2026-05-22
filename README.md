@@ -644,4 +644,4 @@ Projet éducatif - Libre d'utilisation
 
 Images : Unsplash
 Icons : Bootstrap Icons
-Framework : Bootstrap 5.3
+Framework : Bootstrap 5.3 
