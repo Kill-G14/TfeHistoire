@@ -8,6 +8,10 @@ credentials.txt
 Archive_Dev/
 GUIDE_DEPLOIEMENT.md
 
+# Base de données (ne pas commit les structures SQL locales)
+/BackEnd/database.sql
+/BackEnd/database_production.sql
+
 # Dépendances
 /BackEnd/vendor/
 /node_modules/
