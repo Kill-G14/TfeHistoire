@@ -1,203 +1,387 @@
-# MemoriaEventia - SPA
+# MemoriaEventia 🎭
 
-Application web Single Page Application (SPA) de réservation d'événements historiques européens. Version moderne en vanilla JavaScript avec routeur et Bootstrap 5.
+---
 
-## 🎯 Fonctionnalités
+## 🎯 Description
 
-- **SPA Navigation** : Navigation fluide sans rechargement de page
-- **Liste d'événements** : Affichage de tous les événements historiques d'Europe
-- **Filtres avancés** : Recherche par nom, filtrage par pays et catégorie
-- **Détails d'événement** : Vue détaillée avec réservation de places
-- **Création d'événement** : Formulaire complet pour créer de nouveaux événements
-- **Authentification** : Système de connexion/inscription
-- **Profil utilisateur** : Gestion des réservations et événements créés
-- **Carte interactive** : Visualisation géographique
-- **State Management** : Gestion d'état centralisée avec appState
+**MemoriaEventia** (du latin _Memoria_ = mémoire, _Eventia_ = événements) est une Single Page Application moderne qui permet de :
 
-## 🛠️ Technologies utilisées
+- 🗺️ Découvrir des événements historiques sur une **carte interactive**
+- 🎟️ **Réserver gratuitement** des places pour des événements
+- ✨ **Créer et gérer** ses propres événements historiques
+- ⭐ Sauvegarder ses événements favoris
+- 📅 Visualiser les événements dans un **calendrier**
 
-- **HTML5** : Structure (index.html unique)
-- **CSS3** : Styles personnalisés + animations de transitions
-- **JavaScript ES6+** : Modules, async/await, arrow functions, Router SPA
-- **Bootstrap 5.3** : Framework CSS
-- **Bootstrap Icons** : Icônes
-- **History API** : Navigation SPA sans rechargement
-- **LocalStorage** : Persistance des données
+---
 
-## 📁 Structure du projet (SPA)
+## 📋 Fonctionnalités
 
-```
-index.html           # SEUL fichier HTML de l'application
+### 👤 Utilisateurs
 
-assets/
-  ├── css/
-  │   └── custom.css       # Styles personnalisés + transitions SPA
-  ├── js/
-  │   ├── app.js               # Point d'entrée principal
-  │   ├── router.js            # Routeur SPA (History API)
-  │   ├── components/
-  │   │   ├── header.js        # Header persistant
-  │   │   ├── footer.js        # Footer persistant
-  │   │   ├── eventCard.js     # Carte d'événement
-  │   │   ├── loginModal.js    # Modal de connexion
-  │   │   └── eventDetail.js   # Détail d'événement
-  │   ├── views/
-  │   │   ├── home.js          # Vue accueil
-  │   │   ├── calendar.js      # Vue calendrier
-  │   │   ├── createEvent.js   # Vue création événement
-  │   │   ├── profile.js       # Vue profil
-  │   │   └── map.js           # Vue carte
-  │   ├── managers/
-  │   │   ├── EventManager.js  # Appels API événements
-  │   │   ├── AuthManager.js   # Appels API auth
-  │   │   ├── FavoriteManager.js
-  │   │   └── ReservationManager.js  # Appels API réservations
-  │   ├── validators/
-  │   │   ├── authValidator.js     # Validation auth frontend
-  │   │   ├── formValidator.js     # Validation formulaires
-  │   │   └── imageValidator.js    # Validation images
-  │   ├── store/
-  │   │   └── appState.js      # State management centralisé
-  │   └── utils/
-  │       ├── auth.js          # Gestion authentification
-  │       ├── storage.js       # Gestion localStorage
-  │       ├── config.js        # Configuration app
-  │       └── helpers.js       # Fonctions utilitaires
-  ├── components/
-  │   ├── header.html          # Template header
-  │   ├── footer.html          # Template footer
-  │   ├── eventCard.html       # Template carte événement
-  │   ├── loginModal.html      # Template modal login
-  │   └── eventDetail.html     # Template détail événement
-  └── templates/
-      └── views/
-          ├── home.html        # Template vue accueil
-          ├── calendar.html    # Template vue calendrier
-          ├── createEvent.html # Template vue création
-          ├── profile.html     # Template vue profil
-          └── map.html         # Template vue carte
-```
+- **Réservation gratuite** d'événements avec gestion de places
+- **Système de favoris** pour sauvegarder les événements intéressants
+- **Visualisation géographique** sur carte interactive (Leaflet + OpenStreetMap)
+- **Calendrier** avec filtres par date, catégorie et pays
+- **Recherche avancée** avec filtres multiples
+- **Gestion du profil** avec historique des réservations
+- **Annulation de réservations** avec confirmation par email
 
-## 🚀 Installation et démarrage
+### 🎪 Organisateurs
 
-### Prérequis
+- **Création d'événements** avec formulaire complet (titre, description, date, lieu, images)
+- **Modification d'événements** (système de modération pour changements de date/heure)
+- **Gestion des événements créés** (statut, participants)
+- **Upload d'images** sécurisé (7 couches de validation)
+- **Suppression d'événements** (soft delete avec modération)
 
-- Un serveur web local (WAMP, XAMPP, Live Server, etc.)
-- Un navigateur web moderne compatible ES6+
+### 👨‍💼 Administrateurs
 
-### Installation
+- **Modération des événements** (validation, rejet, suppression)
+- **Gestion des utilisateurs** (voir, bloquer, supprimer)
+- **Validation des modifications** d'événements (date/heure)
+- **Dashboard dédié** (AdminOffice) avec statistiques
+- **Gestion des réservations** (vue globale)
 
-1. Cloner ou télécharger le projet
-2. Placer le dossier dans le répertoire de votre serveur web
-3. Ouvrir le projet avec votre serveur local
+### 🔧 Fonctionnalités transversales
 
-### Utilisation avec WAMP
+- **Authentification** utilisateur
+- **Emails automatiques** (confirmations, annulations, réinitialisation mot de passe)
+- **State management** centralisé
+- **Navigation SPA** sans rechargement
+- **Responsive design** (Bootstrap 5)
+
+---
+
+## 🛠️ Technologies
+
+### Front-end
+
+| Technologie       | Version  | Usage                                     |
+| ----------------- | -------- | ----------------------------------------- |
+| **JavaScript**    | ES6+     | Vanilla JS, modules, async/await, classes |
+| **Bootstrap**     | 5.x      | Framework CSS via CDN                     |
+| **Leaflet**       | Dernière | Carte interactive                         |
+| **OpenStreetMap** | API      | Données cartographiques (10,000 req/jour) |
+| **History API**   | Native   | Navigation SPA sans rechargement          |
+
+### Back-end
+
+| Technologie       | Version  | Usage                                            |
+| ----------------- | -------- | ------------------------------------------------ |
+| **PHP**           | 8.3.6    | Backend natif (sans framework)                   |
+| **MySQL/MariaDB** | Dernière | Base de données relationnelle                    |
+| **PDO**           | Native   | Abstraction base de données (requêtes préparées) |
+| **SendGrid**      | API      | Service d'envoi d'emails (100/jour gratuit)      |
+| **TCPDF**         | Composer | Génération de billets PDF (en cours)             |
+| **Composer**      | Dernière | Gestionnaire de dépendances PHP                  |
+
+### Architecture
+
+- **Pattern Repository** : Séparation données / logique métier
+- **Service Layer** : Logique métier centralisée
+- **Single Page Application** : Navigation sans rechargement de page
+- **API REST** : Communication front-end / back-end
+
+---
+
+## 📁 Structure du projet
 
 ```
-c:\wamp64\www\tfeHistoire\
+TfeHistoire/
+├── index.html                          # Point d'entrée SPA (utilisateurs)
+├── README.md                           # Documentation (ce fichier)
+├── DOCUMENTATION_TECHNIQUE.md          # Documentation technique complète
+│
+├── AdminOffice/                        # Interface administrateur
+│   ├── index.html                      # Point d'entrée admin
+│   ├── pages/                          # Pages admin
+│   │   ├── dashboard.html              # Tableau de bord
+│   │   ├── events.html                 # Gestion événements
+│   │   ├── users.html                  # Gestion utilisateurs
+│   │   └── login.html                  # Connexion admin
+│   └── assets/
+│       ├── css/custom.css              # Styles admin
+│       └── js/
+│           ├── managers/               # Managers API admin
+│           ├── pages/                  # Scripts pages admin
+│           └── utils/                  # Utilitaires admin
+│
+├── assets/                             # Ressources front-end
+│   ├── components/                     # Templates HTML
+│   │   ├── header.html                 # En-tête
+│   │   ├── footer.html                 # Pied de page
+│   │   ├── eventCard.html              # Carte événement
+│   │   ├── eventDetail.html            # Détail événement
+│   │   ├── loginModal.html             # Modal connexion
+│   │   ├── reservationModal.html       # Modal réservation
+│   │   ├── cancelReservationModal.html # Modal annulation
+│   │   ├── forgotPasswordModal.html    # Modal oubli MDP
+│   │   └── resetPasswordModal.html     # Modal réinitialisation MDP
+│   │
+│   ├── templates/views/                # Templates des vues
+│   │   ├── home.html                   # Accueil
+│   │   ├── calendar.html               # Calendrier
+│   │   ├── createEvent.html            # Création événement
+│   │   ├── profile.html                # Profil utilisateur
+│   │   ├── map.html                    # Carte interactive
+│   │   ├── about.html                  # À propos
+│   │   ├── terms.html                  # CGU
+│   │   ├── privacy.html                # Politique de confidentialité
+│   │   └── faq.html                    # FAQ
+│   │
+│   ├── css/
+│   │   └── custom.css                  # Styles personnalisés + animations SPA
+│   │
+│   ├── images/                         # Images statiques
+│   │
+│   └── js/
+│       ├── app.js                      # Point d'entrée application
+│       ├── router.js                   # Routeur SPA (History API)
+│       ├── config.js                   # Configuration (API_BASE_URL)
+│       │
+│       ├── components/                 # Composants JavaScript
+│       │   ├── header.js               # Gestion header
+│       │   ├── footer.js               # Gestion footer
+│       │   ├── eventCard.js            # Gestion cartes événement
+│       │   ├── eventDetail.js          # Gestion détail événement
+│       │   ├── loginModal.js           # Gestion modal connexion
+│       │   ├── reservationModal.js     # Gestion modal réservation
+│       │   ├── cancelReservationModal.js
+│       │   ├── forgotPasswordModal.js
+│       │   └── resetPasswordModal.js
+│       │
+│       ├── views/                      # Vues SPA (mount/unmount)
+│       │   ├── home.js                 # Vue accueil
+│       │   ├── calendar.js             # Vue calendrier
+│       │   ├── createEvent.js          # Vue création événement
+│       │   ├── profile.js              # Vue profil
+│       │   ├── map.js                  # Vue carte (Leaflet)
+│       │   ├── about.js                # Vue à propos
+│       │   ├── terms.js                # Vue CGU
+│       │   ├── privacy.js              # Vue confidentialité
+│       │   └── faq.js                  # Vue FAQ
+│       │
+│       ├── managers/                   # Couche communication API
+│       │   ├── AuthManager.js          # API authentification
+│       │   ├── EventManager.js         # API événements
+│       │   ├── FavoriteManager.js      # API favoris
+│       │   └── ReservationManager.js   # API réservations
+│       │
+│       ├── store/
+│       │   └── appState.js             # State management (Observer pattern)
+│       │
+│       ├── utils/                      # Utilitaires
+│       │   ├── auth.js                 # Gestion authentification
+│       │   ├── storage.js              # Gestion localStorage
+│       │   ├── helpers.js              # Fonctions utilitaires
+│       │   ├── filters.js              # Système de filtres événements
+│       │   ├── countries.js            # Liste pays européens
+│       │   └── migrateLocalStorage.js  # (OBSOLÈTE - supprimé)
+│       │
+│       └── validators/                 # Validation front-end
+│           ├── authValidator.js        # Validation auth (email, MDP)
+│           ├── formValidator.js        # Validation formulaires
+│           └── imageValidator.js       # Validation images
+│
+└── BackEnd/                            # Backend PHP
+    ├── composer.json                   # Dépendances PHP
+    ├── composer.local.json             # Config locale Composer
+    ├── database.sql                    # Schéma complet base de données
+    ├── database_production.sql         # Dump production
+    │
+    ├── Api/                            # Points d'entrée API
+    │   ├── authApi.php                 # Authentification
+    │   ├── eventsApi.php               # Événements CRUD
+    │   ├── favoritesApi.php            # Favoris
+    │   ├── reservationsApi.php         # Réservations
+    │   ├── adminApi.php                # Administration
+    │   ├── imageApi.php                # Récupération images
+    │   ├── uploadImageApi.php          # Upload images sécurisé
+    │   ├── routeApi.php                # Calcul itinéraires
+    │   └── debug.php                   # Debug (dev only)
+    │
+    ├── Src/
+    │   ├── Models/                     # Modèles de données
+    │   │   ├── User.php                # Modèle utilisateur
+    │   │   ├── Event.php               # Modèle événement
+    │   │   ├── Reservation.php         # Modèle réservation
+    │   │   ├── Favorite.php            # Modèle favori
+    │   │   ├── EventModification.php   # Modèle modification événement
+    │   │   ├── PasswordReset.php       # Modèle réinitialisation MDP
+    │   │   └── ModelsDTO/              # Data Transfer Objects
+    │   │
+    │   ├── Repositories/               # Couche accès données (SQL)
+    │   │   ├── EventRepository.php     # Requêtes événements
+    │   │   ├── EventModificationRepository.php
+    │   │   ├── ReservationRepository.php
+    │   │   ├── FavoriteRepository.php
+    │   │   ├── SessionRepository.php   # Gestion tokens
+    │   │   ├── PasswordResetRepository.php
+    │   │   └── (...)                   # Autres repositories
+    │   │
+    │   ├── Services/                   # Logique métier
+    │   │   ├── EventService.php        # Logique événements
+    │   │   ├── AuthService.php         # Logique authentification
+    │   │   ├── ReservationService.php  # Logique réservations
+    │   │   ├── SessionService.php      # Gestion sessions/tokens
+    │   │   ├── EmailService.php        # Envoi emails (SendGrid)
+    │   │   └── (...)                   # Autres services
+    │   │
+    │   ├── Utils/                      # Utilitaires backend
+    │   │   ├── Database.php            # Connexion PDO singleton
+    │   │   ├── RateLimiter.php         # Protection brute-force
+    │   │   ├── Validator.php           # Validation backend
+    │   │   └── (...)                   # Autres utilitaires
+    │   │
+    │   ├── Validators/                 # Validation spécifique
+    │   │
+    │   └── img/                        # Images backend
+    │
+    ├── storage/                        # Stockage fichiers
+    │   ├── images/                     # Images uploadées
+    │   └── tickets/                    # Billets PDF (futur)
+    │
+    ├── logs/                           # Logs application
+    │   └── uploads.log                 # Log uploads images
+    │
+    └── vendor/                         # Dépendances Composer
+        ├── autoload.php                # Autoloader
+        ├── sendgrid/                   # SendGrid SDK
+        ├── starkbank/                  # EcDSA (signatures)
+        ├── tecnickcom/                 # TCPDF (PDFs)
+        └── (...)                       # Autres dépendances
 ```
 
-Accéder à : `http://localhost/tfeHistoire/`
+---
 
-### Utilisation avec Live Server (VS Code)
+## Utilisation
 
-1. Installer l'extension "Live Server"
-2. Ouvrir le dossier du projet
-3. Clic droit sur `index.html` → "Open with Live Server"
+### Navigation (SPA)
 
-## 📖 Guide d'utilisation
+L'application utilise un **routeur custom** basé sur l'History API :
 
-### Navigation SPA
-
-- **URLs propres** : `/`, `/calendar`, `/create-event`, `/profile`
-- **Pas de rechargement** : Navigation instantanée
-- **Boutons précédent/suivant** : Fonctionnels (History API)
-- **Transitions fluides** : Animations CSS entre les vues
+- Navigation **sans rechargement** de page
+- URLs propres et lisibles (`/calendar`, `/profile`, etc.)
+- Boutons **précédent/suivant** du navigateur fonctionnels
+- Transitions fluides entre les vues
 
 ### Routes disponibles
 
-- `/` : Page d'accueil avec liste d'événements et filtres
-- `/calendar` : Calendrier des événements
-- `/create-event` : Création d'événement (authentification requise)
-- `/profile` : Profil utilisateur (authentification requise)
-- `/map` : Carte interactive des événements
+| Route           | Description                            | Auth requise |
+| --------------- | -------------------------------------- | ------------ |
+| `/`             | Page d'accueil avec liste d'événements | Non          |
+| `/calendar`     | Calendrier des événements              | Non          |
+| `/map`          | Carte interactive (Leaflet)            | Non          |
+| `/create-event` | Création d'événement                   | ✅ Oui       |
+| `/profile`      | Profil utilisateur + réservations      | ✅ Oui       |
+| `/about`        | À propos du projet                     | Non          |
+| `/terms`        | Conditions générales d'utilisation     | Non          |
+| `/privacy`      | Politique de confidentialité           | Non          |
+| `/faq`          | Foire aux questions                    | Non          |
 
-### Fonctionnalités principales
+### Interface administrateur
 
-#### Voir les événements
+Accès via `/AdminOffice/`
 
-1. Accéder à la page d'accueil (`/`)
-2. Utiliser les filtres pour affiner la recherche
-3. Cliquer sur une carte pour voir les détails (navigation SPA)
+- Dashboard avec statistiques
+- Modération des événements
+- Gestion des utilisateurs
+- Validation des modifications d'événements
 
-#### Réserver un événement
+---
 
-1. Cliquer sur "Voir détails" d'un événement
-2. Ajuster la quantité de places
-3. Cliquer sur "Réserver maintenant"
-4. Se connecter si nécessaire
-5. Confirmer la réservation (gratuit)
+## 🏗️ Architecture
 
-#### Créer un événement
+### Vue d'ensemble
 
-1. Se connecter avec le bouton "Connexion"
-2. Cliquer sur "Créer un événement"
-3. Remplir le formulaire
-4. Cliquer sur "Publier l'événement"
-
-#### S'authentifier
-
-1. Cliquer sur "Connexion"
-2. Choisir "Connexion" ou "Inscription"
-3. Remplir les champs
-4. La navbar se met à jour automatiquement (state management)
-
-## 🎨 Personnalisation
-
-### Couleurs
-
-Modifier les variables CSS dans `assets/css/custom.css` :
-
-```css
-:root {
-  --color-primary: #1a3a52;
-  --color-accent: #c9a961;
-  --color-background: #f8f9fa;
-}
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        FRONT-END (SPA)                       │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  Views (home.js, calendar.js, profile.js, map.js)   │   │
+│  │                 ↕ mount/unmount                       │   │
+│  │  Router (History API) + appState (Observer pattern)  │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↕ fetch()                          │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │     Managers (EventManager, AuthManager, etc.)       │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                              ↕ HTTP
+┌─────────────────────────────────────────────────────────────┐
+│                        BACK-END (PHP)                        │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │     API Endpoints (eventsApi.php, authApi.php)      │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↕                                  │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │     Services (EventService, AuthService, etc.)       │   │
+│  │             (Logique métier)                         │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↕                                  │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  Repositories (EventRepository, UserRepository...)   │   │
+│  │             (Requêtes SQL)                           │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↕ PDO                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │              MySQL/MariaDB (8 tables)                │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Transitions SPA
+### Patterns architecturaux
 
-Modifier les animations de transitions dans `assets/css/custom.css` :
+#### 1. Repository Pattern
 
-```css
-#app {
-  transition: opacity 0.3s ease-in-out;
-}
+Séparation claire entre accès données et logique métier :
 
-#app.loading {
-  opacity: 0.5;
-  pointer-events: none;
-}
-```
+- **Repositories** : Toutes les requêtes SQL (SELECT, INSERT, UPDATE, DELETE)
+- **Services** : Logique métier, validations, orchestration
+- **Avantages** : Testabilité, maintenabilité, sécurité centralisée
 
-### Événements
+#### 2. State Management
 
-Les événements sont stockés dans le store centralisé `appState` et en localStorage.
+Gestion d'état centralisée permettant de synchroniser les données entre les différents composants de l'application.
 
-## 🔧 Architecture technique (SPA)
+#### 3. Single Page Application (SPA)
 
-### app.js (Point d'entrée)
+Routeur personnalisé permettant la navigation sans rechargement de page, avec gestion du cycle de vie des vues (montage/démontage).
 
-- Définition des routes
-- Instanciation du routeur
-- Chargement des composants persistants (navbar, footer)
-- Initialisation de l'application
+#### 4. Component System
 
-### router.js (Routeur SPA)
+Système de composants réutilisables basé sur des templates HTML, permettant une structure modulaire et maintenable.
 
-- Gestion de l'historique (History API)
-- Correspondance URL ↔ Vue
+### Base de données (8 tables)
+
+- **users** : Informations des utilisateurs et rôles
+- **sessions** : Gestion des sessions utilisateur
+- **events** : Données des événements historiques
+- **event_modifications** : Suivi des modifications d'événements
+- **reservations** : Réservations des utilisateurs
+- **favorites** : Événements favoris des utilisateurs
+- **password_resets** : Gestion de la réinitialisation des mots de passe
+- **rate_limiter** : Protection contre les abus
+
+### Flux d'authentification
+
+1. L'utilisateur saisit ses identifiants
+2. Validation des données côté client
+3. Envoi sécurisé au serveur
+4. Vérification des identifiants
+5. Création d'une session
+6. Stockage de la session
+7. Authentification réussie
+
+### Workflow modification d'événement
+
+1. L'organisateur demande une modification de date/heure
+2. La demande est enregistrée en attente de validation
+3. L'administrateur est notifié
+4. L'administrateur valide ou rejette la modification
+5. Les participants sont notifiés de la décision
+6. L'événement est mis à jour si validé
+
 - Lazy loading des vues
 - Support des paramètres dynamiques (`:id`)
 - Mise à jour des métadonnées (title, description)
@@ -284,6 +468,151 @@ Nécessite un navigateur compatible :
 4. **Mount** : La nouvelle vue est montée (template + données + événements)
 5. **Update** : Mise à jour des métadonnées (title, description)
 
+---
+
+## 📚 Documentation
+
+### Documentation technique complète
+
+Pour une analyse approfondie du projet, consultez [DOCUMENTATION_TECHNIQUE.md](DOCUMENTATION_TECHNIQUE.md) :
+
+- Architecture détaillée (front-end + back-end)
+- Analyse complète de la base de données (8 tables, 23 indexes)
+- Flux de sécurité et authentification
+- Système de composants et state management
+- Performance et optimisation
+- Statistiques du code (~15,500 lignes)
+
+### Fichiers de référence
+
+- **README.md** (ce fichier) : Vue d'ensemble et guide de démarrage
+- **DOCUMENTATION_TECHNIQUE.md** : Documentation technique approfondie pour le TFE
+- **BackEnd/database.sql** : Schéma complet de la base de données
+- **assets/js/utils/FILTERS_DOCUMENTATION.md** : Documentation du système de filtres
+- **assets/js/views/README.md** : Guide de création de vues SPA
+
+---
+
+## 📊 Statistiques du projet
+
+- **~91 fichiers** JavaScript/PHP (hors vendors)
+- **~15,500 lignes de code** (estimé)
+- **8 tables** en base de données
+- **23 indexes** (12 explicites + 11 automatiques)
+- **9 routes** front-end (SPA)
+- **7 API endpoints** backend
+- **4 Managers** (communication API)
+- **7 Services** (logique métier)
+- **6 Repositories** (accès données)
+
+---
+
+## ✨ Points forts du projet
+
+### 1. Architecture modulaire et maintenable
+
+- **Repository Pattern** pour séparer données et logique
+- **Service Layer** pour centraliser la logique métier
+- Code organisé et facilement extensible
+
+### 2. Système robuste
+
+- Validation des données utilisateur
+- Protection de l'application
+- Gestion sécurisée des données
+
+### 3. Workflow innovant
+
+- Système de validation des modifications d'événements
+- Traçabilité des changements
+- Notifications automatiques par email
+
+### 4. Expérience utilisateur fluide
+
+- **SPA** sans rechargement de page
+- **State management** centralisé
+- **Transitions** CSS fluides
+- **Responsive** design complet
+
+### 5. Performance optimisée
+
+- Chargement à la demande des vues
+- Base de données optimisée
+- Système de cache pour les favoris
+- Requêtes optimisées
+
+### 6. Solutions personnalisées
+
+- Routeur SPA développé sur mesure
+- Système de gestion d'état
+- Système de composants réutilisables
+- Développement sans framework pour une meilleure compréhension
+
+---
+
+## 🚀 Améliorations futures
+
+### Court terme
+
+- ✅ Système de favoris (TERMINÉ)
+- ✅ Carte interactive Leaflet (TERMINÉ)
+- 🔄 Génération de billets PDF (TCPDF - en cours)
+- 🔄 Système de notation des événements
+- 🔄 Commentaires et avis utilisateurs
+
+### Moyen terme
+
+- Notifications push (Progressive Web App)
+- Système de recommandations personnalisées
+- Export calendrier (.ics pour Google Calendar, Outlook)
+- Partage sur réseaux sociaux
+- Multi-langues (i18n)
+
+### Long terme
+
+- Application mobile (React Native / Flutter)
+- Système de paiement (Stripe) pour événements payants
+- API publique pour développeurs tiers
+- Webhooks pour intégrations
+- Analytics avancées (tableau de bord organisateur)
+
+---
+
+## 🎓 Contexte académique
+
+### Projet de Travail de Fin d'Études (TFE)
+
+**Institution** : IFAPME Tournai  
+**Formation** : Développeur web front-end  
+**Année** : 2026  
+**Présentation** : 15 minutes présentation + 15 minutes questions
+
+### Objectifs pédagogiques
+
+- Maîtrise du développement **front-end** (JavaScript ES6+, SPA, state management)
+- Compréhension de l'architecture **back-end** (PHP, API, base de données)
+- Implémentation de la **sécurité** web (authentification, validation, protection)
+- Gestion de **projet** (Git, planning, documentation)
+- **Design** et expérience utilisateur (responsive, accessibilité)
+
+### Compétences démontrées
+
+1. **Architecture** : Patterns Repository, Service Layer, Observer, SPA
+2. **Fiabilité** : Application robuste et stable
+3. **Performance** : Optimisation des requêtes et chargement à la demande
+4. **UX/UI** : Design cohérent, responsive, transitions fluides, carte interactive
+5. **Autonomie** : Solutions custom (router, state), recherche documentation
+6. **Innovation** : Workflow validation modifications, emails automatiques
+
+### Critères de notation (400 points)
+
+- **Qualité formelle** (80 pts) : Orthographe, structure, présentation
+- **Qualité du contenu** (120 pts) : Profondeur analyse, justifications techniques
+- **Maîtrise de la réalisation** (80 pts) : Code qualité, architecture
+- **Présentation orale** (120 pts) : Clarté, réponses aux questions, démonstration
+
+---
+
 ## 🤝 Contribution
 
 Respecter les conventions définies dans `AGENTS.md` (architecture SPA) pour toute modification.
@@ -299,6 +628,14 @@ Respecter les conventions définies dans `AGENTS.md` (architecture SPA) pour tou
 - ✅ Support boutons précédent/suivant
 - ✅ Métadonnées dynamiques
 
+---
+
+## 👤 Auteur
+
+**Projet développé dans le cadre du TFE IFAPME Tournai 2026**
+
+---
+
 ## 📄 Licence
 
 Projet éducatif - Libre d'utilisation
@@ -308,33 +645,3 @@ Projet éducatif - Libre d'utilisation
 Images : Unsplash
 Icons : Bootstrap Icons
 Framework : Bootstrap 5.3
-
----
-
-## 🔐 Sécurité et Production
-
-### ⚠️ Fichiers sensibles (JAMAIS en ligne)
-
-- `credentials.txt` : Identifiants admin et clés API (ajouté au .gitignore)
-- `BackEnd/.env` : Variables d'environnement (déjà dans .gitignore)
-- `BackEnd/config.php` : Configuration base de données (déjà dans .gitignore)
-- `Archive_Dev/` : Documentation de développement et fichiers de test
-
-### 📋 Documentation de production
-
-Pour déployer ce projet en production, consultez :
-
-- **`Archive_Dev/CHECKLIST_PRODUCTION.md`** : Guide complet de déploiement (57+ étapes)
-- **`Archive_Dev/RESUME_PREPARATION_PRODUCTION.md`** : Résumé des préparations effectuées
-
-⚠️ **Ces fichiers contiennent des informations de configuration mais AUCUN identifiant sensible.**
-
-### 🚀 Déploiement rapide
-
-1. **Ne PAS uploader** le dossier `Archive_Dev/`
-2. Copier `.env.example` vers `.env` et remplir les variables
-3. Importer `BackEnd/database_production.sql` sur le serveur
-4. Configurer Apache avec le `.htaccess` fourni
-5. Changer le mot de passe admin après la première connexion
-
-Pour plus de détails, voir `Archive_Dev/CHECKLIST_PRODUCTION.md`
