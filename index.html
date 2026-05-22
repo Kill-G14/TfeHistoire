@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Base URL pour l'application SPA -->
-    <base href="/" />
+    <!-- Base URL pour l'application SPA - Détection automatique -->
+    <script>
+      // Détection de l'environnement pour définir le base href correct
+      const hostname = window.location.hostname;
+      const isProduction = hostname === 'memoriaeventia.com' || hostname === 'www.memoriaeventia.com';
+      const basePath = isProduction ? '/' : '/tfeHistoire/';
+      document.write('<base href="' + basePath + '" />');
+    </script>
 
     <link
       rel="icon"
