@@ -1,28 +1,16 @@
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import { auth } from "../utils/auth.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
 let currentEmail = "";
-
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
 
 /**
  * Initialiser la modal de réinitialisation
  */
 export async function initResetPasswordModal() {
-  await loadTemplate("assets/components/resetPasswordModal.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/resetPasswordModal.html"));
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById("resetPasswordModalContainer");

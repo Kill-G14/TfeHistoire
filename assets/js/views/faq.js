@@ -1,5 +1,7 @@
 // Vue FAQ (Foire aux questions)
 
+import { loadHTMLTemplate } from "../utils/templateLoader.js";
+
 // Métadonnées de la vue
 export const meta = {
   title: "FAQ - Questions fréquentes - MemoriaEventia",
@@ -16,8 +18,7 @@ let currentCategory = "all";
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Charger le template
-  const response = await fetch("assets/templates/views/faq.html");
-  template = await response.text();
+  template = await loadHTMLTemplate("assets/templates/views/faq.html");
 
   // Injecter le template
   container.innerHTML = template;

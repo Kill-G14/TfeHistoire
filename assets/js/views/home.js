@@ -6,6 +6,7 @@ import { helpers } from "../utils/helpers.js";
 import { filters } from "../utils/filters.js";
 import { appState } from "../store/appState.js";
 import EventManager from "../managers/EventManager.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -17,19 +18,6 @@ export const meta = {
 // Template HTML
 const templateObjects = {};
 
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
-
 // Variables locales de la vue
 let allEvents = [];
 let filteredEvents = [];
@@ -38,7 +26,7 @@ let unsubscribe = null;
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Charger le template
-  await loadTemplate("assets/templates/views/home.html");
+  Object.assign(templateObjects, await loadTemplate("assets/templates/views/home.html"));
 
   // Injecter le template
   const clone = templateObjects["homeView"].cloneNode(true);

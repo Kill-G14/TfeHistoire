@@ -6,7 +6,7 @@ import { Router } from "./router.js";
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
 import { renderLoginModal } from "./components/loginModal.js";
-import { loadTemplate as loadReservationModalTemplate } from "./components/reservationModal.js";
+import { initReservationModal } from "./components/reservationModal.js";
 import { appState } from "./store/appState.js";
 import { auth } from "./utils/auth.js";
 import FavoriteManager from "./managers/FavoriteManager.js";
@@ -57,7 +57,7 @@ async function init() {
   await renderLoginModal();
 
   // Précharger la modal de réservation
-  await loadReservationModalTemplate("assets/components/reservationModal.html");
+  await initReservationModal();
 
   // Initialiser le routeur
   router.init();

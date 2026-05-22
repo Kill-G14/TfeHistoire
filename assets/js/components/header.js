@@ -2,24 +2,12 @@
 
 import { auth } from "../utils/auth.js";
 import { appState } from "../store/appState.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
 
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
-
 export async function renderHeader() {
-  await loadTemplate("assets/components/header.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/header.html"));
 
   const headerElement = document.getElementById("header");
   if (!headerElement) return;

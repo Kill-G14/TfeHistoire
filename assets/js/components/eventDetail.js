@@ -4,26 +4,14 @@ import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import { showReservationModal } from "./reservationModal.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
 let currentEvent = null;
 let quantity = 1;
 
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
-
 export async function showEventDetail(event) {
-  await loadTemplate("assets/components/eventDetail.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/eventDetail.html"));
 
   currentEvent = event;
   quantity = 1;

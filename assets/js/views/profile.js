@@ -16,6 +16,7 @@ import {
   initResetPasswordModal,
   openResetPasswordModal,
 } from "../components/resetPasswordModal.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -30,19 +31,6 @@ const templateObjects = {};
 let favoriteEvents = [];
 let createdEvents = [];
 let userReservations = [];
-
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
 
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
@@ -59,7 +47,7 @@ export async function mount(container, params) {
   }
 
   // Charger le template
-  await loadTemplate("assets/templates/views/profile.html");
+  Object.assign(templateObjects, await loadTemplate("assets/templates/views/profile.html"));
 
   // Injecter le template
   const clone = templateObjects["profileView"].cloneNode(true);

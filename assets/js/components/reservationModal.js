@@ -4,6 +4,7 @@ import ReservationManager from "../managers/ReservationManager.js";
 import { helpers } from "../utils/helpers.js";
 import { auth } from "../utils/auth.js";
 import { appState } from "../store/appState.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 // Objet pour stocker les templates
 const templateObjects = {};
@@ -11,18 +12,12 @@ const templateObjects = {};
 // Variable pour stocker l'événement en cours de réservation
 let currentEvent = null;
 
-// Chargement du template HTML
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
+/**
+ * Précharger le template de la modal de réservation
+ * (appelé au démarrage de l'application)
+ */
+export async function initReservationModal() {
+  Object.assign(templateObjects, await loadTemplate("assets/components/reservationModal.html"));
 }
 
 // Fonction pour afficher la modal de réservation
@@ -41,7 +36,7 @@ export async function showReservationModal(event) {
 
   // Charger le template si ce n'est pas déjà fait
   if (!templateObjects["reservationModalTemplate"]) {
-    await loadTemplate("assets/components/reservationModal.html");
+    Object.assign(templateObjects, await loadTemplate("assets/components/reservationModal.html"));
   }
 
   // Vérifier si la modal existe déjà dans le DOM

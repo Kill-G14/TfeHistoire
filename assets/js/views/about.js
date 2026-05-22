@@ -1,5 +1,7 @@
 // Vue À propos
 
+import { loadHTMLTemplate } from "../utils/templateLoader.js";
+
 // Métadonnées de la vue
 export const meta = {
   title: "À propos - MemoriaEventia",
@@ -13,8 +15,7 @@ let template = "";
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Charger le template
-  const response = await fetch("assets/templates/views/about.html");
-  template = await response.text();
+  template = await loadHTMLTemplate("assets/templates/views/about.html");
 
   // Injecter le template
   container.innerHTML = template;

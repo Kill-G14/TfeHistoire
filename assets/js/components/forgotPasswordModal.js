@@ -1,26 +1,14 @@
 import { helpers } from "../utils/helpers.js";
 import { openResetPasswordModal } from "./resetPasswordModal.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
-
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
 
 /**
  * Initialiser la modal de mot de passe oublié
  */
 export async function initForgotPasswordModal() {
-  await loadTemplate("assets/components/forgotPasswordModal.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/forgotPasswordModal.html"));
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById("forgotPasswordModalContainer");

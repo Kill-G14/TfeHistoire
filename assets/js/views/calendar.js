@@ -3,6 +3,7 @@
 import EventManager from '../managers/EventManager.js'
 import { helpers } from '../utils/helpers.js'
 import { showEventDetail } from '../components/eventDetail.js'
+import { loadTemplate } from '../utils/templateLoader.js'
 
 // Métadonnées de la vue
 export const meta = {
@@ -21,48 +22,13 @@ const oneYearAhead = new Date()
 sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 oneYearAhead.setFullYear(oneYearAhead.getFullYear() + 1)
 
-async function loadTemplate(path) {
-  try {
-    const response = await fetch(path, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error(`Erreur ${response.status}: ${response.statusText}`)
-    }
-
-    const htmlContent = await response.text()
-    const parser = new DOMParser()
-    const templateDoc = parser.parseFromString(htmlContent, 'text/html')
-    const templates = templateDoc.querySelectorAll('template')
-
-    if (templates.length === 0) {
-      throw new Error('Aucun template trouvé dans le fichier')
-    }
-
-    Object.keys(templateObjects).forEach(key => delete templateObjects[key])
-
-    templates.forEach((template) => {
-      const templateId = template.id
-      templateObjects[templateId] = template.content
-    })
-  } catch (error) {
-    throw error
-  }
-}
-
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Réinitialiser la date au mois actuel
   currentDate = new Date()
   
-  // Charger le template
-  const timestamp = Date.now()
-  await loadTemplate(`assets/templates/views/calendar.html?v=${timestamp}`)
+  // Charger le template avec versioning automatique
+  Object.assign(templateObjects, await loadTemplate('assets/templates/views/calendar.html'))
   
   if (!templateObjects['calendarView']) {
     helpers.showToast('Erreur de chargement de la page', 'error')

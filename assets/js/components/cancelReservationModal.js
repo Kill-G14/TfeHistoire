@@ -1,5 +1,6 @@
 // Modal de confirmation d'annulation de réservation
 import { helpers } from "../utils/helpers.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 // Objet pour stocker le template
 const templateObjects = {};
@@ -11,23 +12,9 @@ let currentReservationId = null;
 let currentEventInfo = null;
 let onConfirmCallback = null;
 
-// Chargement du template HTML
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
-
 // Initialisation de la modal
 export async function initCancelReservationModal() {
-  await loadTemplate("assets/components/cancelReservationModal.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/cancelReservationModal.html"));
 
   // Vérifier si la modal existe déjà
   if (document.getElementById("cancelReservationModal")) {

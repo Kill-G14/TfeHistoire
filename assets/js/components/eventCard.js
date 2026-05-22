@@ -4,24 +4,12 @@ import FavoriteManager from "../managers/FavoriteManager.js";
 import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
 
-async function loadTemplate(path) {
-  const response = await fetch(path);
-  const htmlContent = await response.text();
-  const parser = new DOMParser();
-  const templateDoc = parser.parseFromString(htmlContent, "text/html");
-  const templates = templateDoc.querySelectorAll("template");
-
-  templates.forEach((template) => {
-    const templateId = template.id;
-    templateObjects[templateId] = template.content;
-  });
-}
-
 export async function renderEventCards(events, containerId, onEventClick) {
-  await loadTemplate("assets/components/eventCard.html");
+  Object.assign(templateObjects, await loadTemplate("assets/components/eventCard.html"));
 
   const container = document.getElementById(containerId);
   if (!container) return;

@@ -9,6 +9,7 @@ import {
   validateImageFile,
   createImagePreview,
 } from "../validators/imageValidator.js";
+import { loadTemplate } from "../utils/templateLoader.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -19,34 +20,6 @@ export const meta = {
 
 // Template HTML
 const templateObjects = {};
-
-async function loadTemplate(path) {
-  try {
-    const response = await fetch(path);
-    if (!response.ok) {
-      throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-    }
-
-    const htmlContent = await response.text();
-    const parser = new DOMParser();
-    const templateDoc = parser.parseFromString(htmlContent, "text/html");
-    const templates = templateDoc.querySelectorAll("template");
-
-    if (templates.length === 0) {
-      throw new Error("Aucun template trouvé dans le fichier");
-    }
-
-    // Vider l'objet templateObjects avant de le remplir
-    Object.keys(templateObjects).forEach((key) => delete templateObjects[key]);
-
-    templates.forEach((template) => {
-      const templateId = template.id;
-      templateObjects[templateId] = template.content;
-    });
-  } catch (error) {
-    throw error;
-  }
-}
 
 // Variables locales
 let createEventForm = null;
@@ -68,7 +41,7 @@ export async function mount(container, params) {
   }
 
   // Charger le template
-  await loadTemplate("assets/templates/views/createEvent.html");
+  Object.assign(templateObjects, await loadTemplate("assets/templates/views/createEvent.html"));
 
   // Vérifier que le template est chargé
   if (!templateObjects["createEventView"]) {
