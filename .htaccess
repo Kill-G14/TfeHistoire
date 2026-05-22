@@ -2,9 +2,13 @@
 
 RewriteEngine On
 
-# Définir la base pour l'application
+# Définir la base pour l'application (local: /tfeHistoire/, production: /)
 
-RewriteBase /
+# En local, changez cette ligne à: RewriteBase /tfeHistoire/
+
+# En production, changez cette ligne à: RewriteBase /
+
+RewriteBase /tfeHistoire/
 
 # Si la requête n'est pas un fichier existant
 

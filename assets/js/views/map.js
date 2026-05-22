@@ -457,6 +457,11 @@ async function showRoute(eventId) {
       }),
     });
 
+    // Vérifier si la réponse HTTP est OK
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const result = await response.json();
 
     if (
