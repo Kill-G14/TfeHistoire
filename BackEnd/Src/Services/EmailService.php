@@ -122,7 +122,7 @@ class EmailService {
           <p><strong>👥 Nombre de places :</strong> {$quantity}</p>
         </div>
         
-        <p>Vous recevrez un email de rappel quelques jours avant l'événement.</p>
+        <p>Vous pouvez retrouver les détails de votre réservation à tout moment dans votre profil.</p>
         <p>En cas de question, n'hésitez pas à nous contacter.</p>
         
         <p style='margin-top: 30px;'>Cordialement,<br><strong>L'équipe MemoriaEventia</strong></p>

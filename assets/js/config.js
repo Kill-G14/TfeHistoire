@@ -72,14 +72,6 @@ export const config = {
   },
 };
 
-// Afficher la configuration au chargement (en développement uniquement)
-if (config.DEBUG) {
-  console.log("🚀 MemoriaEventia - Configuration chargée");
-  console.log("   Environnement:", config.ENVIRONMENT);
-  console.log("   API URL:", config.API_URL);
-  console.log("   Base Path:", config.BASE_PATH);
-}
-
 // Exporter aussi les helpers de configuration
 export const isProduction = () => config.ENVIRONMENT === "production";
 export const isDevelopment = () => config.ENVIRONMENT === "development";
