@@ -10,7 +10,10 @@ let currentEmail = "";
  * Initialiser la modal de réinitialisation
  */
 export async function initResetPasswordModal() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/resetPasswordModal.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/resetPasswordModal.html"),
+  );
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById("resetPasswordModalContainer");

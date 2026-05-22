@@ -9,7 +9,10 @@ import { loadTemplate } from "../utils/templateLoader.js";
 const templateObjects = {};
 
 export async function renderEventCards(events, containerId, onEventClick) {
-  Object.assign(templateObjects, await loadTemplate("assets/components/eventCard.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/eventCard.html"),
+  );
 
   const container = document.getElementById(containerId);
   if (!container) return;

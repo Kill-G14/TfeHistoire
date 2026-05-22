@@ -26,7 +26,10 @@ let unsubscribe = null;
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Charger le template
-  Object.assign(templateObjects, await loadTemplate("assets/templates/views/home.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/templates/views/home.html"),
+  );
 
   // Injecter le template
   const clone = templateObjects["homeView"].cloneNode(true);

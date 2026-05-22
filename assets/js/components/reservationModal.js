@@ -17,7 +17,10 @@ let currentEvent = null;
  * (appelé au démarrage de l'application)
  */
 export async function initReservationModal() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/reservationModal.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/reservationModal.html"),
+  );
 }
 
 // Fonction pour afficher la modal de réservation
@@ -36,7 +39,10 @@ export async function showReservationModal(event) {
 
   // Charger le template si ce n'est pas déjà fait
   if (!templateObjects["reservationModalTemplate"]) {
-    Object.assign(templateObjects, await loadTemplate("assets/components/reservationModal.html"));
+    Object.assign(
+      templateObjects,
+      await loadTemplate("assets/components/reservationModal.html"),
+    );
   }
 
   // Vérifier si la modal existe déjà dans le DOM

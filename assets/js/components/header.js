@@ -7,7 +7,10 @@ import { loadTemplate } from "../utils/templateLoader.js";
 const templateObjects = {};
 
 export async function renderHeader() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/header.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/header.html"),
+  );
 
   const headerElement = document.getElementById("header");
   if (!headerElement) return;

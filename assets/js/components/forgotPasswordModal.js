@@ -8,7 +8,10 @@ const templateObjects = {};
  * Initialiser la modal de mot de passe oublié
  */
 export async function initForgotPasswordModal() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/forgotPasswordModal.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/forgotPasswordModal.html"),
+  );
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById("forgotPasswordModalContainer");

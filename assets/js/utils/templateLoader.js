@@ -13,7 +13,7 @@ const TEMPLATE_VERSION = "1.0.0";
 export async function loadTemplate(path) {
   // Ajouter le versioning à l'URL
   const versionedPath = `${path}?v=${TEMPLATE_VERSION}`;
-  
+
   const response = await fetch(versionedPath);
   const htmlContent = await response.text();
   const parser = new DOMParser();
@@ -37,7 +37,7 @@ export async function loadTemplate(path) {
 export async function loadHTMLTemplate(path) {
   // Ajouter le versioning à l'URL
   const versionedPath = `${path}?v=${TEMPLATE_VERSION}`;
-  
+
   const response = await fetch(versionedPath);
   return await response.text();
 }

@@ -11,7 +11,10 @@ let currentEvent = null;
 let quantity = 1;
 
 export async function showEventDetail(event) {
-  Object.assign(templateObjects, await loadTemplate("assets/components/eventDetail.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/eventDetail.html"),
+  );
 
   currentEvent = event;
   quantity = 1;

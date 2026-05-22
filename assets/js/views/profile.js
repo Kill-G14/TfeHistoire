@@ -47,7 +47,10 @@ export async function mount(container, params) {
   }
 
   // Charger le template
-  Object.assign(templateObjects, await loadTemplate("assets/templates/views/profile.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/templates/views/profile.html"),
+  );
 
   // Injecter le template
   const clone = templateObjects["profileView"].cloneNode(true);

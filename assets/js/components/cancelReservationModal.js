@@ -14,7 +14,10 @@ let onConfirmCallback = null;
 
 // Initialisation de la modal
 export async function initCancelReservationModal() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/cancelReservationModal.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/cancelReservationModal.html"),
+  );
 
   // Vérifier si la modal existe déjà
   if (document.getElementById("cancelReservationModal")) {

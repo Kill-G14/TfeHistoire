@@ -27,7 +27,10 @@ const templateObjects = {};
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
   // Charger le template
-  Object.assign(templateObjects, await loadTemplate("assets/templates/views/map.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/templates/views/map.html"),
+  );
 
   // Injecter le template
   const clone = templateObjects["mapView"].cloneNode(true);

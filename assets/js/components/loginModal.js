@@ -20,7 +20,10 @@ const templateObjects = {};
 let modalInstance = null;
 
 export async function renderLoginModal() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/loginModal.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/loginModal.html"),
+  );
 
   // Vérifier si le modal existe déjà
   let modalContainer = document.getElementById("loginModalContainer");

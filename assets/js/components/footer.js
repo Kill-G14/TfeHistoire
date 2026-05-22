@@ -7,7 +7,10 @@ const templateObjects = {};
 
 // Export de la fonction de rendu
 export async function renderFooter() {
-  Object.assign(templateObjects, await loadTemplate("assets/components/footer.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/components/footer.html"),
+  );
 
   const element = document.getElementById("footer");
   if (!element) return;

@@ -41,7 +41,10 @@ export async function mount(container, params) {
   }
 
   // Charger le template
-  Object.assign(templateObjects, await loadTemplate("assets/templates/views/createEvent.html"));
+  Object.assign(
+    templateObjects,
+    await loadTemplate("assets/templates/views/createEvent.html"),
+  );
 
   // Vérifier que le template est chargé
   if (!templateObjects["createEventView"]) {
