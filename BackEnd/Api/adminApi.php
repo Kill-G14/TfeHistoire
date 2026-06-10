@@ -253,6 +253,18 @@ switch ($resource) {
         }
         break;
 
+      case 'updateInfo':
+        if (!isset($request['id']) || !isset($request['name']) || !isset($request['email'])) {
+          $response = ['success' => false, 'message' => 'Données incomplètes'];
+        } else {
+          $response = $userService->updateUserInfo(
+            (int) $request['id'],
+            $request['name'],
+            $request['email']
+          );
+        }
+        break;
+
       case 'delete':
         if (!isset($request['id'])) {
           $response = ['success' => false, 'message' => 'ID non fourni'];

@@ -50,6 +50,9 @@ function renderUsers() {
       </td>
       <td>${helpers.formatDate(user.created_at)}</td>
       <td>
+        <button class="btn btn-sm btn-info" onclick="window.editUserInfo(${user.id})">
+          <i class="fas fa-edit"></i> Modifier info
+        </button>
         <button class="btn btn-sm btn-primary" onclick="window.editUserRoles(${user.id})">
           <i class="fas fa-user-edit"></i> Modifier droits
         </button>
@@ -81,6 +84,20 @@ window.editUserRoles = function (userId) {
   $("#editRolesModal").modal("show");
 };
 
+// Éditer les informations d'un utilisateur
+window.editUserInfo = function (userId) {
+  const user = allUsers.find((u) => u.id === userId);
+  if (!user) return;
+
+  // Remplir le modal
+  document.getElementById("editInfoUserId").value = user.id;
+  document.getElementById("editInfoUserName").value = user.name;
+  document.getElementById("editInfoUserEmail").value = user.email;
+
+  // Afficher le modal
+  $("#editInfoModal").modal("show");
+};
+
 // Sauvegarder les droits
 async function saveRoles() {
   const userId = parseInt(document.getElementById("editUserId").value);
@@ -96,6 +113,38 @@ async function saveRoles() {
   if (result.success) {
     helpers.showToast("Droits mis à jour avec succès", "success");
     $("#editRolesModal").modal("hide");
+    await loadUsers();
+  } else {
+    helpers.showToast(
+      result.message || "Erreur lors de la mise à jour",
+      "error",
+    );
+  }
+}
+
+// Sauvegarder les informations
+async function saveInfo() {
+  const userId = parseInt(document.getElementById("editInfoUserId").value);
+  const name = document.getElementById("editInfoUserName").value.trim();
+  const email = document.getElementById("editInfoUserEmail").value.trim();
+
+  // Validation
+  if (!name || name.length < 2) {
+    helpers.showToast("Le nom doit contenir au moins 2 caractères", "error");
+    return;
+  }
+
+  if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    helpers.showToast("Format d'email invalide", "error");
+    return;
+  }
+
+  const token = storage.getToken();
+  const result = await UserManager.updateInfo(userId, name, email, token);
+
+  if (result.success) {
+    helpers.showToast("Informations mises à jour avec succès", "success");
+    $("#editInfoModal").modal("hide");
     await loadUsers();
   } else {
     helpers.showToast(
@@ -150,6 +199,9 @@ async function init() {
 
   // Event listener pour sauvegarder les droits
   document.getElementById("saveRolesBtn").addEventListener("click", saveRoles);
+
+  // Event listener pour sauvegarder les informations
+  document.getElementById("saveInfoBtn").addEventListener("click", saveInfo);
 }
 
 // Lancer l'initialisation

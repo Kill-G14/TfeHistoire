@@ -76,6 +76,62 @@ class UserService {
     ];
   }
 
+  // Mettre à jour les informations d'un utilisateur (admin)
+  public function updateUserInfo(int $id, string $name, string $email): array {
+    $user = $this->userRepository->getUserById($id);
+
+    if (!$user) {
+      return [
+        'success' => false,
+        'message' => 'Utilisateur non trouvé'
+      ];
+    }
+
+    // Vérifier si l'email est déjà utilisé par un autre utilisateur
+    if ($email !== $user->email) {
+      $existingUser = $this->userRepository->getUserByEmail($email);
+      if ($existingUser && $existingUser->id !== $id) {
+        return [
+          'success' => false,
+          'message' => 'Cet email est déjà utilisé par un autre utilisateur'
+        ];
+      }
+    }
+
+    // Valider le format de l'email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      return [
+        'success' => false,
+        'message' => 'Format d\'email invalide'
+      ];
+    }
+
+    // Valider le nom (non vide et longueur)
+    if (empty(trim($name)) || strlen($name) < 2) {
+      return [
+        'success' => false,
+        'message' => 'Le nom doit contenir au moins 2 caractères'
+      ];
+    }
+
+    $success = $this->userRepository->updateUserInfo($id, trim($name), trim($email));
+
+    if (!$success) {
+      Logger::error('Failed to update user info', ['user_id' => $id]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la mise à jour des informations'
+      ];
+    }
+
+    Logger::info('User info updated successfully', ['user_id' => $id]);
+
+    return [
+      'success' => true,
+      'message' => 'Informations mises à jour avec succès'
+    ];
+  }
+
   // Supprimer un utilisateur (admin)
   public function adminDeleteUser(int $id): array {
     $user = $this->userRepository->getUserById($id);

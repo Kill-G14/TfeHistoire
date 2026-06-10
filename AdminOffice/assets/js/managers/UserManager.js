@@ -58,6 +58,33 @@ class UserManager {
     }
   }
 
+  // Mettre à jour les informations d'un utilisateur (nom et email)
+  async updateInfo(userId, name, email, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "users",
+          action: "updateInfo",
+          id: userId,
+          name: name,
+          email: email,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
   // Supprimer un utilisateur
   async delete(userId, token) {
     try {

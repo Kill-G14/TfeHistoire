@@ -65,6 +65,17 @@ class UserRepository {
     return $stmt->execute();
   }
 
+  // Mettre à jour le nom et l'email d'un utilisateur (admin)
+  public function updateUserInfo(int $id, string $name, string $email): bool {
+    $query = "UPDATE users SET name = :name, email = :email, updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':email', $email);
+    return $stmt->execute();
+  }
+
   // Supprimer un utilisateur (soft delete)
   public function deleteUser(int $id): bool {
     $query = "UPDATE users SET is_deleted = TRUE, updated_at = NOW() WHERE id = :id";
