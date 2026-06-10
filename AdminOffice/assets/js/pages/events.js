@@ -270,9 +270,9 @@ function renderModifications(modifications) {
       <td><strong>${mod.event_title}</strong></td>
       <td>${mod.creator_firstname} ${mod.creator_lastname}</td>
       <td>${helpers.formatDate(mod.old_date)}</td>
-      <td>${mod.old_time}</td>
+      <td>${helpers.formatTime(mod.old_time)}</td>
       <td class="bg-light"><strong>${helpers.formatDate(mod.new_date)}</strong></td>
-      <td class="bg-light"><strong>${mod.new_time}</strong></td>
+      <td class="bg-light"><strong>${helpers.formatTime(mod.new_time)}</strong></td>
       <td>${helpers.formatDate(mod.created_at)}</td>
       <td>
         <button class="btn btn-sm btn-success" onclick="window.approveModification(${mod.id})">

@@ -81,7 +81,7 @@ export async function showReservationModal(event) {
           </div>
           <div class="d-flex align-items-center">
             <i class="bi bi-clock text-muted me-2" style="width: 20px;"></i>
-            <span class="text-muted">${event.time}</span>
+            <span class="text-muted">${helpers.formatTime(event.time)}</span>
           </div>
           <div class="d-flex align-items-center">
             <i class="bi bi-geo-alt-fill text-muted me-2" style="width: 20px;"></i>

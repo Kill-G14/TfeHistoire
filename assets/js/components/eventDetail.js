@@ -66,8 +66,8 @@ function fillEventDetails(event) {
   if (detailDescription) detailDescription.textContent = event.description;
   if (detailLocation)
     detailLocation.textContent = `${event.city}, ${event.country}`;
-  if (detailDate) detailDate.textContent = event.date;
-  if (detailTime) detailTime.textContent = event.time;
+  if (detailDate) detailDate.textContent = helpers.formatDate(event.date);
+  if (detailTime) detailTime.textContent = helpers.formatTime(event.time);
 
   // Afficher les tickets disponibles
   if (detailTickets) {
@@ -80,14 +80,14 @@ function fillEventDetails(event) {
 
   // Tous les événements sont gratuits
   if (detailPrice) {
-    detailPrice.textContent = "0.00";
+    detailPrice.textContent = "0.00 €";
   }
 
   if (quantityEl) quantityEl.textContent = quantity;
 
   // Le total est toujours 0 (gratuit)
   if (totalPrice) {
-    totalPrice.textContent = "0.00";
+    totalPrice.textContent = "0.00 €";
   }
 }
 
@@ -148,7 +148,7 @@ function updateQuantityDisplay() {
   if (quantityEl) quantityEl.textContent = quantity;
   // Tous les événements sont gratuits, total toujours à 0
   if (totalPrice) {
-    totalPrice.textContent = "0.00";
+    totalPrice.textContent = "0.00 €";
   }
 }
 

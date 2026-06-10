@@ -55,8 +55,8 @@ export async function renderEventCards(events, containerId, onEventClick) {
     if (title) title.textContent = event.title;
     if (description) description.textContent = event.description;
     if (location) location.textContent = `${event.city}, ${event.country}`;
-    if (date) date.textContent = event.date;
-    if (time) time.textContent = event.time;
+    if (date) date.textContent = helpers.formatDate(event.date);
+    if (time) time.textContent = helpers.formatTime(event.time);
 
     // Tous les événements sont gratuits
     if (price) {

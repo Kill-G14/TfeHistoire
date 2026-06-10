@@ -45,15 +45,15 @@ class Helpers {
     return $value === null || trim($value) === '';
   }
 
-  // Convertir une date au format d/m/Y vers Y-m-d
+  // Convertir une date au format d-m-Y vers Y-m-d
   public static function convertDateToDb(string $date): ?string {
-    $d = \DateTime::createFromFormat('d/m/Y', $date);
+    $d = \DateTime::createFromFormat('d-m-Y', $date);
     return $d ? $d->format('Y-m-d') : null;
   }
 
-  // Convertir une date au format Y-m-d vers d/m/Y
+  // Convertir une date au format Y-m-d vers d-m-Y
   public static function convertDateFromDb(string $date): ?string {
     $d = \DateTime::createFromFormat('Y-m-d', $date);
-    return $d ? $d->format('d/m/Y') : null;
+    return $d ? $d->format('d-m-Y') : null;
   }
 }
