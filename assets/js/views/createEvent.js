@@ -9,6 +9,10 @@ import {
   validateImageFile,
   createImagePreview,
 } from "../validators/imageValidator.js";
+import {
+  setFieldError,
+  clearFieldValidation,
+} from "../validators/formValidator.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 
 // Métadonnées de la vue
@@ -24,7 +28,6 @@ const templateObjects = {};
 // Variables locales
 let createEventForm = null;
 let selectedImageFile = null;
-let uploadedImageFilename = null;
 
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
@@ -89,7 +92,6 @@ export async function unmount() {
 
   // Réinitialiser les variables
   selectedImageFile = null;
-  uploadedImageFilename = null;
 }
 
 // Attacher les event listeners
@@ -114,6 +116,56 @@ function attachEventListeners() {
   if (removeImageBtn) {
     removeImageBtn.addEventListener("click", handleRemoveImage);
   }
+}
+
+// Mapping des clés d'erreur backend vers les IDs frontend
+const errorFieldMapping = {
+  title: "title",
+  description: "description",
+  category: "category",
+  image_event: "imageEvent",
+  country: "country",
+  city: "city",
+  postal_code: "postalCode",
+  address: "address",
+  date: "date",
+  time: "time",
+};
+
+// Afficher les erreurs de validation sur les champs
+function displayEventErrors(errors) {
+  // D'abord, nettoyer toutes les validations
+  clearAllValidation();
+
+  // Si pas d'erreurs, on s'arrête
+  if (!errors || Object.keys(errors).length === 0) {
+    return;
+  }
+
+  // Appliquer les erreurs sur les champs correspondants
+  Object.keys(errors).forEach((backendKey) => {
+    const frontendKey = errorFieldMapping[backendKey];
+    if (frontendKey) {
+      const input = document.getElementById(frontendKey);
+      const errorDiv = document.getElementById(`${frontendKey}Error`);
+
+      if (input && errorDiv) {
+        setFieldError(input, errorDiv, errors[backendKey]);
+      }
+    }
+  });
+}
+
+// Réinitialiser toutes les validations du formulaire
+function clearAllValidation() {
+  Object.values(errorFieldMapping).forEach((fieldId) => {
+    const input = document.getElementById(fieldId);
+    const errorDiv = document.getElementById(`${fieldId}Error`);
+
+    if (input && errorDiv) {
+      clearFieldValidation(input, errorDiv);
+    }
+  });
 }
 
 // Fonction pour uploader l'image
@@ -260,8 +312,18 @@ async function handleImageSelect(e) {
 async function handleSubmit(e) {
   e.preventDefault();
 
+  // Nettoyer toutes les erreurs de validation précédentes
+  clearAllValidation();
+
   // Vérifier qu'une image a été sélectionnée
   if (!selectedImageFile) {
+    const imageInput = document.getElementById("imageEvent");
+    const imageError = document.getElementById("imageEventError");
+    setFieldError(
+      imageInput,
+      imageError,
+      "Veuillez sélectionner une image pour votre événement",
+    );
     helpers.showToast(
       "Veuillez sélectionner une image pour votre événement",
       "error",
@@ -274,35 +336,10 @@ async function handleSubmit(e) {
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.innerHTML =
-      '<i class="bi bi-hourglass-split"></i> Upload de l\'image...';
+      '<i class="bi bi-hourglass-split"></i> Géolocalisation...';
   }
 
-  // Étape 1 : Upload de l'image
-  const uploadResult = await uploadImage(selectedImageFile);
-
-  if (!uploadResult.success) {
-    helpers.showToast(
-      uploadResult.message || "Erreur lors de l'upload de l'image",
-      "error",
-    );
-
-    // Réactiver le bouton
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML =
-        '<i class="bi bi-check-circle"></i> Créer l\'événement';
-    }
-    return;
-  }
-
-  uploadedImageFilename = uploadResult.data.filename;
-
-  // Étape 2 : Géocoder l'adresse pour obtenir latitude/longitude
-  if (submitBtn) {
-    submitBtn.innerHTML =
-      '<i class="bi bi-hourglass-split"></i> Géolocalisation de l\'adresse...';
-  }
-
+  // Étape 1 : Géocoder l'adresse pour obtenir latitude/longitude
   const address = document.getElementById("address")?.value || "";
   const city = document.getElementById("city").value;
   const postalCode = document.getElementById("postalCode")?.value || "";
@@ -315,7 +352,7 @@ async function handleSubmit(e) {
     country,
   );
 
-  // Étape 3 : Créer l'événement avec le nom de l'image et les coordonnées
+  // Étape 2 : Créer l'événement SANS image
   if (submitBtn) {
     submitBtn.innerHTML =
       '<i class="bi bi-hourglass-split"></i> Création de l\'événement...';
@@ -335,30 +372,91 @@ async function handleSubmit(e) {
     time: document.getElementById("time").value,
     category: document.getElementById("category").value,
     is_free: true,
-    image_event: uploadedImageFilename,
+    image_event: null, // Pas d'image pour le moment
     ticket_price: 0,
     ticket_quantity: 0,
   };
 
   // Appel API pour créer l'événement
   const token = auth.getToken ? auth.getToken() : null;
-  const result = await EventManager.create(eventData, token);
+  const createResult = await EventManager.create(eventData, token);
 
-  if (result.success) {
-    helpers.showToast("Événement créé avec succès !", "success");
-    setTimeout(() => {
-      window.router.navigate("./");
-    }, 1000);
-  } else {
+  // Si la création échoue, afficher les erreurs et s'arrêter
+  if (!createResult.success) {
+    // Afficher les erreurs par champ
+    if (createResult.errors) {
+      displayEventErrors(createResult.errors);
+    }
+
+    // Toast avec le message d'erreur général
     helpers.showToast(
-      result.message || "Erreur lors de la création de l'événement",
+      createResult.message || "Erreur lors de la création de l'événement",
       "error",
     );
+
+    // Réactiver le bouton
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Créer l\'événement';
+      submitBtn.innerHTML =
+        '<i class="bi bi-check-circle"></i> Créer l\'événement';
+    }
+    return; // STOP ICI - pas d'upload d'image
+  }
+
+  // Étape 3 : Upload de l'image (événement créé avec succès)
+  if (submitBtn) {
+    submitBtn.innerHTML =
+      '<i class="bi bi-hourglass-split"></i> Upload de l\'image...';
+  }
+
+  const uploadResult = await uploadImage(selectedImageFile);
+
+  if (!uploadResult.success) {
+    // L'événement est créé mais sans image
+    helpers.showToast(
+      "Événement créé mais l'image n'a pas pu être uploadée. Vous pouvez la modifier plus tard.",
+      "warning",
+    );
+    setTimeout(() => {
+      window.router.navigate("./");
+    }, 2000);
+    return;
+  }
+
+  // Étape 4 : Mettre à jour l'événement avec l'image
+  if (submitBtn) {
+    submitBtn.innerHTML =
+      '<i class="bi bi-hourglass-split"></i> Finalisation...';
+  }
+
+  const eventId = createResult.data?.id;
+  if (eventId) {
+    // Envoyer tous les champs + l'image pour passer la validation backend
+    const updateData = {
+      ...eventData, // Tous les champs originaux
+      image_event: uploadResult.data.filename, // Ajout de l'image
+    };
+
+    const updateResult = await EventManager.update(eventId, updateData, token);
+
+    if (!updateResult.success) {
+      // L'événement est créé mais l'image n'a pas pu être associée
+      helpers.showToast(
+        "Événement créé mais l'image n'a pas pu être associée. Vous pouvez la modifier plus tard.",
+        "warning",
+      );
+      setTimeout(() => {
+        window.router.navigate("./");
+      }, 2000);
+      return;
     }
   }
+
+  // Succès complet
+  helpers.showToast("Événement créé avec succès !", "success");
+  setTimeout(() => {
+    window.router.navigate("./");
+  }, 1000);
 }
 
 // Export par défaut

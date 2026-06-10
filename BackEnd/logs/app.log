@@ -4,3 +4,9 @@
 [2026-06-10 09:24:19] [INFO] User logged in successfully | Context: {"user_id":1}
 [2026-06-10 09:29:56] [INFO] User info updated successfully | Context: {"user_id":4}
 [2026-06-10 09:30:21] [INFO] User info updated successfully | Context: {"user_id":4}
+[2026-06-10 10:31:04] [INFO] Event created successfully | Context: {"event_id":14}
+[2026-06-10 10:31:50] [INFO] Event approved successfully | Context: {"event_id":14}
+[2026-06-10 10:35:25] [INFO] Event deleted by admin | Context: {"event_id":14}
+[2026-06-10 10:37:34] [INFO] Event created successfully | Context: {"event_id":15}
+[2026-06-10 10:37:34] [INFO] Event updated successfully | Context: {"event_id":15}
+[2026-06-10 10:37:43] [INFO] Event approved successfully | Context: {"event_id":15}

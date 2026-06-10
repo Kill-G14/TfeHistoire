@@ -12,6 +12,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   exit;
 }
 
+/**
+ * Redimensionne une image à 650px de largeur en préservant le ratio
+ * 
+ * @param string $sourcePath Chemin vers l'image source
+ * @param string $mimeType Type MIME de l'image
+ * @return bool True si succès, false sinon
+ */
+function resizeImage($sourcePath, $mimeType) {
+  // Vérifier que l'extension GD est disponible
+  if (!extension_loaded('gd')) {
+    return false;
+  }
+
+  // Charger l'image source selon le type MIME
+  $sourceImage = null;
+  switch ($mimeType) {
+    case 'image/jpeg':
+      $sourceImage = @imagecreatefromjpeg($sourcePath);
+      break;
+    case 'image/png':
+      $sourceImage = @imagecreatefrompng($sourcePath);
+      break;
+    case 'image/webp':
+      $sourceImage = @imagecreatefromwebp($sourcePath);
+      break;
+  }
+
+  if (!$sourceImage) {
+    return false;
+  }
+
+  // Obtenir les dimensions originales
+  $originalWidth = imagesx($sourceImage);
+  $originalHeight = imagesy($sourceImage);
+
+  // Largeur cible : 650px
+  $targetWidth = 650;
+
+  // Si l'image est déjà plus petite ou égale à 650px, pas de redimensionnement
+  if ($originalWidth <= $targetWidth) {
+    imagedestroy($sourceImage);
+    return true;
+  }
+
+  // Calculer la hauteur proportionnelle
+  $ratio = $originalHeight / $originalWidth;
+  $targetHeight = (int) round($targetWidth * $ratio);
+
+  // Créer une nouvelle image avec les dimensions cibles
+  $resizedImage = imagecreatetruecolor($targetWidth, $targetHeight);
+
+  // Préserver la transparence pour PNG et WEBP
+  if ($mimeType === 'image/png' || $mimeType === 'image/webp') {
+    imagealphablending($resizedImage, false);
+    imagesavealpha($resizedImage, true);
+    $transparent = imagecolorallocatealpha($resizedImage, 0, 0, 0, 127);
+    imagefilledrectangle($resizedImage, 0, 0, $targetWidth, $targetHeight, $transparent);
+  }
+
+  // Redimensionner l'image avec imagecopyresized
+  imagecopyresized(
+    $resizedImage,
+    $sourceImage,
+    0, 0, 0, 0,
+    $targetWidth,
+    $targetHeight,
+    $originalWidth,
+    $originalHeight
+  );
+
+  // Sauvegarder l'image redimensionnée avec compression 75%
+  $success = false;
+  switch ($mimeType) {
+    case 'image/jpeg':
+      $success = imagejpeg($resizedImage, $sourcePath, 75);
+      break;
+    case 'image/png':
+      // PNG : niveau de compression 0-9 (9 = maximum)
+      $success = imagepng($resizedImage, $sourcePath, 7);
+      break;
+    case 'image/webp':
+      $success = imagewebp($resizedImage, $sourcePath, 75);
+      break;
+  }
+
+  // Libérer les ressources mémoire
+  imagedestroy($sourceImage);
+  imagedestroy($resizedImage);
+
+  return $success;
+}
+
 // Vérifier que c'est une requête POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -104,6 +196,12 @@ elseif (substr($magicBytes, 0, 4) === 'RIFF' && substr($magicBytes, 8, 4) === 'W
 
 if (!$isValidImage) {
   echo json_encode(['success' => false, 'message' => 'La signature du fichier ne correspond pas à un format d\'image valide. Le fichier pourrait avoir été renommé.']);
+  exit;
+}
+
+// Redimensionner l'image à 650px de large (ratio préservé)
+if (!resizeImage($file['tmp_name'], $mimeType)) {
+  echo json_encode(['success' => false, 'message' => 'Erreur lors du redimensionnement de l\'image. Vérifiez que l\'extension GD est activée.']);
   exit;
 }
 
