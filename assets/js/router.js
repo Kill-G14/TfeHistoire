@@ -86,7 +86,7 @@ export class Router {
 
         // Monter la vue
         await this.currentView.mount(this.appElement, this.params);
-        
+
         // Mettre à jour la navigation mobile
         updateActiveNav();
       } catch (error) {

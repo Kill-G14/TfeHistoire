@@ -27,9 +27,9 @@ export async function loadMobileNav() {
 
     // Mettre à jour l'élément actif selon la page
     updateActiveNav();
-  
-  // Écouter les changements de route
-  window.addEventListener("popstate", updateActiveNav);
+
+    // Écouter les changements de route
+    window.addEventListener("popstate", updateActiveNav);
   } catch (error) {
     console.error("Error loading mobile nav:", error);
   }
@@ -38,11 +38,11 @@ export async function loadMobileNav() {
 function updateActiveNav() {
   const currentPath = window.location.pathname;
   const navItems = document.querySelectorAll(".mobile-nav-item");
-  
+
   navItems.forEach((item) => {
     item.classList.remove("active");
     const href = item.getAttribute("href");
-    
+
     if (
       (currentPath === "/" || currentPath === "/index.html") &&
       href === "./"
