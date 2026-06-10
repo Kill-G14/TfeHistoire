@@ -10,3 +10,6 @@
 [2026-06-10 10:37:34] [INFO] Event created successfully | Context: {"event_id":15}
 [2026-06-10 10:37:34] [INFO] Event updated successfully | Context: {"event_id":15}
 [2026-06-10 10:37:43] [INFO] Event approved successfully | Context: {"event_id":15}
+[2026-06-10 10:42:45] [INFO] Reservation created successfully | Context: {"reservation_id":1,"user_id":5,"event_id":13,"quantity":1}
+[2026-06-10 10:42:45] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Festival de la Bi\u00e8re Tch\u00e8que"}
+[2026-06-10 10:42:46] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Festival de la Bi\u00e8re Tch\u00e8que","status":202}

@@ -232,27 +232,6 @@ class EventRepository {
     return $stmt->fetchAll();
   }
 
-  // Décrémenter la quantité de tickets disponibles
-  public function decrementTicketQuantity(int $eventId, int $quantity): bool {
-    $query = "UPDATE events SET ticket_quantity = ticket_quantity - :quantity1 
-              WHERE id = :id AND is_deleted = FALSE AND ticket_quantity >= :quantity2";
-    $stmt = $this->getPdo()->prepare($query);
-    $stmt->bindValue(':id', $eventId, PDO::PARAM_INT);
-    $stmt->bindValue(':quantity1', $quantity, PDO::PARAM_INT);
-    $stmt->bindValue(':quantity2', $quantity, PDO::PARAM_INT);
-    return $stmt->execute();
-  }
-
-  // Incrémenter la quantité de tickets disponibles (en cas d'annulation)
-  public function incrementTicketQuantity(int $eventId, int $quantity): bool {
-    $query = "UPDATE events SET ticket_quantity = ticket_quantity + :quantity 
-              WHERE id = :id AND is_deleted = FALSE";
-    $stmt = $this->getPdo()->prepare($query);
-    $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
-    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
-    return $stmt->execute();
-  }
-
   // Mettre à jour la date et l'heure d'un événement
   public function updateEventDateTime(int $eventId, string $newDate, string $newTime): bool {
     $query = "UPDATE events 
@@ -303,32 +282,29 @@ class EventRepository {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  // Récupérer les utilisateurs ayant acheté des billets pour un événement
-  public function getUsersWhoBoughtTickets(int $eventId): array {
-    $query = "SELECT DISTINCT u.id, u.email, u.name, oi.quantity, o.created_at as purchase_date
+  // Récupérer les utilisateurs ayant des réservations pour un événement
+  public function getUsersWithReservations(int $eventId): array {
+    $query = "SELECT DISTINCT u.id, u.email, u.name, r.quantity, r.created_at as reservation_date
               FROM users u
-              INNER JOIN orders o ON u.id = o.user_id
-              INNER JOIN order_items oi ON o.id = oi.order_id
-              WHERE oi.event_id = :event_id 
-              AND o.is_paid = TRUE 
-              AND o.is_deleted = FALSE
-              AND oi.is_deleted = FALSE
-              ORDER BY o.created_at DESC";
+              INNER JOIN reservations r ON u.id = r.user_id
+              WHERE r.event_id = :event_id 
+              AND r.status = 'confirmed'
+              AND r.is_deleted = FALSE
+              AND u.is_deleted = FALSE
+              ORDER BY r.created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  // Vérifier si un événement a des billets vendus
-  public function hasTicketsSold(int $eventId): bool {
+  // Vérifier si un événement a des réservations confirmées
+  public function hasReservations(int $eventId): bool {
     $query = "SELECT COUNT(*) as count
-              FROM order_items oi
-              INNER JOIN orders o ON oi.order_id = o.id
-              WHERE oi.event_id = :event_id 
-              AND o.is_paid = TRUE 
-              AND o.is_deleted = FALSE
-              AND oi.is_deleted = FALSE";
+              FROM reservations r
+              WHERE r.event_id = :event_id 
+              AND r.status = 'confirmed'
+              AND r.is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
     $stmt->execute();
