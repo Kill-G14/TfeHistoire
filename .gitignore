@@ -8,15 +8,11 @@ credentials.txt
 .htaccess
 
 # Fichiers de développement (ne pas déployer)
-Archive_Dev/
-GUIDE_DEPLOIEMENT.md
 DOCUMENTATION_TECHNIQUE.md
 
 # Scripts et documentation de versioning (outils de développement)
 bump-version.sh
 bump-version.bat
-VERSIONING.md
-VERSIONING_GUIDE_RAPIDE.md
 
 # Base de données (ne pas commit les structures SQL locales)
 /BackEnd/database.sql
