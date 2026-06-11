@@ -1,8 +1,11 @@
 # Configuration sensible
 /BackEnd/config.php
 /BackEnd/.env
+.env.example
+env.exemple
 credentials.txt
 *.credentials.txt
+.htaccess
 
 # Fichiers de développement (ne pas déployer)
 Archive_Dev/
@@ -24,6 +27,7 @@ VERSIONING_GUIDE_RAPIDE.md
 /node_modules/
 
 # Logs
+/BackEnd/logs/
 /BackEnd/vendor/logs/*.log
 *.log
 
