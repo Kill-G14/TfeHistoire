@@ -61,21 +61,21 @@ class ReservationRepository
      */
     public function getByUserId(int $userId): array
     {
-        $query = "SELECT r.*, 
-                         e.title as event_title,
-                         e.date as event_date,
-                         e.time as event_time,
-                         e.city as event_city,
-                         e.address as event_address,
-                         e.image_event as event_image,
-                         e.is_free as event_is_free,
-                         e.ticket_price as event_ticket_price
-                  FROM reservations r
-                  INNER JOIN events e ON r.event_id = e.id
-                  WHERE r.user_id = :user_id 
-                    AND r.is_deleted = FALSE
-                    AND e.is_deleted = FALSE
-                  ORDER BY r.created_at DESC";
+        $query = "SELECT reservation.*, 
+                         event.title as event_title,
+                         event.date as event_date,
+                         event.time as event_time,
+                         event.city as event_city,
+                         event.address as event_address,
+                         event.image_event as event_image,
+                         event.is_free as event_is_free,
+                         event.ticket_price as event_ticket_price
+                  FROM reservations reservation
+                  INNER JOIN events event ON reservation.event_id = event.id
+                  WHERE reservation.user_id = :user_id 
+                    AND reservation.is_deleted = FALSE
+                    AND event.is_deleted = FALSE
+                  ORDER BY reservation.created_at DESC";
 
         $stmt = $this->getPdo()->prepare($query);
         $stmt->bindParam(':user_id', $userId);

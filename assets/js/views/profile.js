@@ -806,7 +806,7 @@ function displayReservations(reservations) {
           const priceDisplay =
             reservation.event_is_free || reservation.event_ticket_price <= 0
               ? "Gratuit"
-              : `${helpers.formatPrice(reservation.event_ticket_price * reservation.quantity)}`;
+              : `${helpers.formatPrice(reservation.event_ticket_price * reservation.quantity)} €`;
 
           // Formater la date de réservation
           const reservationDate = helpers.formatDate(reservation.created_at);
@@ -830,7 +830,7 @@ function displayReservations(reservations) {
             <div class="mb-3">
               <div class="d-flex align-items-center mb-2">
                 <i class="bi bi-calendar-event me-2 text-primary"></i>
-                <span>${eventDate} à ${reservation.event_time}</span>
+                <span>${eventDate} à ${helpers.formatTime(reservation.event_time)}</span>
               </div>
               <div class="d-flex align-items-center mb-2">
                 <i class="bi bi-geo-alt me-2 text-primary"></i>

@@ -26,21 +26,31 @@ export const helpers = {
   // Formater une date
   formatDate(dateString) {
     const date = new Date(dateString);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString("fr-FR", options);
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const formatted = date.toLocaleDateString("fr-FR", options);
+    return formatted.replace(/\//g, "-");
+  },
+
+  // Formater une heure
+  formatTime(timeStr) {
+    if (!timeStr) return "";
+    // Si le format contient des secondes (HH:MM:SS), les enlever
+    if (timeStr.length === 8 && timeStr.split(":").length === 3) {
+      return timeStr.substring(0, 5);
+    }
+    return timeStr;
   },
 
   // Formater une date et heure
   formatDateTime(dateString) {
     const date = new Date(dateString);
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return date.toLocaleDateString("fr-FR", options);
+    const dateOptions = { year: "numeric", month: "2-digit", day: "2-digit" };
+    const timeOptions = { hour: "2-digit", minute: "2-digit" };
+    const formattedDate = date
+      .toLocaleDateString("fr-FR", dateOptions)
+      .replace(/\//g, "-");
+    const formattedTime = date.toLocaleTimeString("fr-FR", timeOptions);
+    return `${formattedDate} ${formattedTime}`;
   },
 
   // Afficher un toast de notification (utilise AdminLTE Toasts)

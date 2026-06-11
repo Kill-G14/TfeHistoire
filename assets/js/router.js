@@ -1,5 +1,6 @@
 // Routeur SPA avec History API
 import { config } from "./config.js";
+import { updateActiveNav } from "./components/mobileNav.js";
 
 export class Router {
   constructor(routes, appSelector) {
@@ -85,6 +86,9 @@ export class Router {
 
         // Monter la vue
         await this.currentView.mount(this.appElement, this.params);
+
+        // Mettre à jour la navigation mobile
+        updateActiveNav();
       } catch (error) {
         this.show404();
       } finally {

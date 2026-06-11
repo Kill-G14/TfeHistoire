@@ -5,6 +5,7 @@ import { config } from "./config.js";
 import { Router } from "./router.js";
 import { renderHeader } from "./components/header.js";
 import { renderFooter } from "./components/footer.js";
+import { loadMobileNav } from "./components/mobileNav.js";
 import { renderLoginModal } from "./components/loginModal.js";
 import { initReservationModal } from "./components/reservationModal.js";
 import { appState } from "./store/appState.js";
@@ -54,6 +55,7 @@ async function init() {
   // Rendre les composants persistants
   await renderHeader();
   await renderFooter();
+  await loadMobileNav();
   await renderLoginModal();
 
   // Précharger la modal de réservation

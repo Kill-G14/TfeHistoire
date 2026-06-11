@@ -5,16 +5,22 @@ export const helpers = {
   formatDate(dateStr) {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("fr-FR", {
+    const formatted = date.toLocaleDateString("fr-FR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
+    return formatted.replace(/\//g, "-");
   },
 
   // Formater une heure
   formatTime(timeStr) {
-    return timeStr || "";
+    if (!timeStr) return "";
+    // Si le format contient des secondes (HH:MM:SS), les enlever
+    if (timeStr.length === 8 && timeStr.split(":").length === 3) {
+      return timeStr.substring(0, 5);
+    }
+    return timeStr;
   },
 
   // Formater le prix

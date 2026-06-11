@@ -145,13 +145,13 @@ class EventModificationService {
     // Approuver la modification
     $this->modificationRepository->approveModification($modificationId);
 
-    // Récupérer les utilisateurs ayant acheté des billets
-    $users = $this->eventRepository->getUsersWhoBoughtTickets($modification->event_id);
+    // Récupérer les utilisateurs ayant des réservations
+    $users = $this->eventRepository->getUsersWithReservations($modification->event_id);
 
     // Récupérer l'email de l'organisateur
     $organizer = $this->userRepository->getUserById($event->user_id);
 
-    // Envoyer un email à tous les acheteurs
+    // Envoyer un email à tous les utilisateurs ayant réservé
     foreach ($users as $user) {
       $this->emailService->sendEventModificationEmail(
         $user['email'],
@@ -264,8 +264,8 @@ class EventModificationService {
       return ['success' => false, 'message' => 'Aucune demande de suppression en attente pour cet événement'];
     }
 
-    // Récupérer les utilisateurs ayant acheté des billets
-    $users = $this->eventRepository->getUsersWhoBoughtTickets($eventId);
+    // Récupérer les utilisateurs ayant des réservations
+    $users = $this->eventRepository->getUsersWithReservations($eventId);
 
     // Récupérer l'organisateur
     $organizer = $this->userRepository->getUserById($event->user_id);
@@ -276,7 +276,7 @@ class EventModificationService {
       $finalMessage .= "\n\nNote de l'administration :\n" . $adminMessage;
     }
 
-    // Envoyer un email à tous les acheteurs
+    // Envoyer un email à tous les utilisateurs ayant réservé
     foreach ($users as $user) {
       $this->emailService->sendEventDeletionEmail(
         $user['email'],

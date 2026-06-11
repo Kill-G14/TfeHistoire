@@ -8,8 +8,8 @@ header("Content-Type: application/json; charset=UTF-8");
 
 // Gérer les requêtes OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+  http_response_code(200);
+  exit();
 }
 
 // Autoload Composer
@@ -35,151 +35,108 @@ $sessionRepository = new SessionRepository();
 $sessionService = new SessionService($sessionRepository);
 $emailService = new EmailService($userRepository);
 $reservationService = new ReservationService(
-    $reservationRepository,
-    $eventRepository,
-    $userRepository,
-    $emailService
+  $reservationRepository,
+  $eventRepository,
+  $userRepository,
+  $emailService
 );
 
-// Récupération des données
-$data = json_decode(file_get_contents("php://input"), true);
-$action = $data['action'] ?? '';
+// Récupération des données de la requête
+$request = json_decode(file_get_contents("php://input"), true);
 
-try {
-    switch ($action) {
-        case 'create':
-            // Créer une réservation
-            $token = $data['token'] ?? '';
-            $eventId = $data['event_id'] ?? 0;
-            $quantity = $data['quantity'] ?? 1;
-
-            if (!$token) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token manquant'
-                ]);
-                exit;
-            }
-
-            // Valider le token
-            $userId = $sessionService->getUserIdByToken($token);
-            if (!$userId) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token invalide ou expir\u00e9'
-                ]);
-                exit;
-            }
-
-            $result = $reservationService->createReservation($userId, $eventId, $quantity);
-            echo json_encode($result);
-            break;
-
-        case 'getMyReservations':
-            // Récupérer les réservations de l'utilisateur
-            $token = $data['token'] ?? '';
-
-            if (!$token) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token manquant'
-                ]);
-                exit;
-            }
-
-            // Valider le token
-            $userId = $sessionService->getUserIdByToken($token);
-            if (!$userId) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token invalide ou expir\u00e9'
-                ]);
-                exit;
-            }
-
-            $result = $reservationService->getUserReservations($userId);
-            echo json_encode($result);
-            break;
-
-        case 'cancel':
-            // Annuler une réservation
-            $token = $data['token'] ?? '';
-            $reservationId = $data['reservation_id'] ?? 0;
-
-            if (!$token) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token manquant'
-                ]);
-                exit;
-            }
-
-            // Valider le token
-            $userId = $sessionService->getUserIdByToken($token);
-            if (!$userId) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token invalide ou expir\u00e9'
-                ]);
-                exit;
-            }
-
-            $result = $reservationService->cancelReservation($reservationId, $userId);
-            echo json_encode($result);
-            break;
-
-        case 'getAvailableTickets':
-            // Récupérer le nombre de places disponibles
-            $eventId = $data['event_id'] ?? 0;
-
-            $result = $reservationService->getAvailableTickets($eventId);
-            echo json_encode($result);
-            break;
-
-        case 'checkReservation':
-            // Vérifier si l'utilisateur a déjà réservé
-            $token = $data['token'] ?? '';
-            $eventId = $data['event_id'] ?? 0;
-
-            if (!$token) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token manquant'
-                ]);
-                exit;
-            }
-
-            // Valider le token
-            $userId = $sessionService->getUserIdByToken($token);
-            if (!$userId) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Token invalide ou expir\u00e9'
-                ]);
-                exit;
-            }
-
-            $hasReservation = $reservationRepository->hasReservation($userId, $eventId);
-
-            echo json_encode([
-                'success' => true,
-                'data' => [
-                    'has_reservation' => $hasReservation
-                ]
-            ]);
-            break;
-
-        default:
-            echo json_encode([
-                'success' => false,
-                'message' => 'Action non reconnue'
-            ]);
-            break;
-    }
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Erreur serveur: ' . $e->getMessage()
-    ]);
+// Vérifier que la requête est valide
+if (!$request || !isset($request['action'])) {
+  $response = ['success' => false, 'message' => 'Requête invalide'];
+  echo json_encode($response);
+  exit;
 }
+
+switch ($request['action']) {
+  case 'create':
+    // Créer une réservation
+    $token = $request['token'] ?? '';
+    $eventId = $request['event_id'] ?? 0;
+    $quantity = $request['quantity'] ?? 1;
+
+    if (!$token) {
+      $response = ['success' => false, 'message' => 'Token manquant'];
+    } else {
+      // Valider le token
+      $userId = $sessionService->getUserIdByToken($token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide ou expiré'];
+      } else {
+        $response = $reservationService->createReservation($userId, $eventId, $quantity);
+      }
+    }
+    break;
+
+  case 'getMyReservations':
+    // Récupérer les réservations de l'utilisateur
+    $token = $request['token'] ?? '';
+
+    if (!$token) {
+      $response = ['success' => false, 'message' => 'Token manquant'];
+    } else {
+      // Valider le token
+      $userId = $sessionService->getUserIdByToken($token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide ou expiré'];
+      } else {
+        $response = $reservationService->getUserReservations($userId);
+      }
+    }
+    break;
+
+  case 'cancel':
+    // Annuler une réservation
+    $token = $request['token'] ?? '';
+    $reservationId = $request['reservation_id'] ?? 0;
+
+    if (!$token) {
+      $response = ['success' => false, 'message' => 'Token manquant'];
+    } else {
+      // Valider le token
+      $userId = $sessionService->getUserIdByToken($token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide ou expiré'];
+      } else {
+        $response = $reservationService->cancelReservation($reservationId, $userId);
+      }
+    }
+    break;
+
+  case 'getAvailableTickets':
+    // Récupérer le nombre de places disponibles
+    $eventId = $request['event_id'] ?? 0;
+    $response = $reservationService->getAvailableTickets($eventId);
+    break;
+
+  case 'checkReservation':
+    // Vérifier si l'utilisateur a déjà réservé
+    $token = $request['token'] ?? '';
+    $eventId = $request['event_id'] ?? 0;
+
+    if (!$token) {
+      $response = ['success' => false, 'message' => 'Token manquant'];
+    } else {
+      // Valider le token
+      $userId = $sessionService->getUserIdByToken($token);
+      if (!$userId) {
+        $response = ['success' => false, 'message' => 'Token invalide ou expiré'];
+      } else {
+        $hasReservation = $reservationRepository->hasReservation($userId, $eventId);
+        $response = [
+          'success' => true,
+          'data' => ['has_reservation' => $hasReservation]
+        ];
+      }
+    }
+    break;
+
+  default:
+    $response = ['success' => false, 'message' => 'Action non reconnue'];
+    break;
+}
+
+echo json_encode($response);
