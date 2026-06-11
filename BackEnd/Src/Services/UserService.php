@@ -147,8 +147,8 @@ class UserService {
     if ($user->is_admin) {
       $allUsers = $this->userRepository->getAllUsers();
       $adminCount = 0;
-      foreach ($allUsers as $u) {
-        if ($u->is_admin) {
+      foreach ($allUsers as $currentUser) {
+        if ($currentUser->is_admin) {
           $adminCount++;
         }
       }

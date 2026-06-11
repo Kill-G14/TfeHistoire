@@ -192,17 +192,18 @@ async function loadEvents() {
 
 // Calculer la distance entre deux points (formule Haversine)
 function calculateDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371; // Rayon de la Terre en km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+  const earthRadiusKm = 6371; // Rayon de la Terre en km
+  const latDifferenceRad = ((lat2 - lat1) * Math.PI) / 180;
+  const lngDifferenceRad = ((lng2 - lng1) * Math.PI) / 180;
+  const haversineA =
+    Math.sin(latDifferenceRad / 2) * Math.sin(latDifferenceRad / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
+      Math.sin(lngDifferenceRad / 2) *
+      Math.sin(lngDifferenceRad / 2);
+  const centralAngle =
+    2 * Math.atan2(Math.sqrt(haversineA), Math.sqrt(1 - haversineA));
+  const distance = earthRadiusKm * centralAngle;
   return Math.round(distance);
 }
 

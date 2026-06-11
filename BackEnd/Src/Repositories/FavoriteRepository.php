@@ -111,11 +111,11 @@ class FavoriteRepository {
 
   // Récupérer les événements favoris avec leurs détails
   public function getFavoriteEventsWithDetails(int $userId): array {
-    $query = "SELECT e.*, f.id as favorite_id, f.created_at as favorited_at 
-              FROM favorites f
-              INNER JOIN events e ON f.event_id = e.id
-              WHERE f.user_id = :user_id AND f.is_deleted = FALSE AND e.is_deleted = FALSE
-              ORDER BY f.created_at DESC";
+    $query = "SELECT event.*, favorite.id as favorite_id, favorite.created_at as favorited_at 
+              FROM favorites favorite
+              INNER JOIN events event ON favorite.event_id = event.id
+              WHERE favorite.user_id = :user_id AND favorite.is_deleted = FALSE AND event.is_deleted = FALSE
+              ORDER BY favorite.created_at DESC";
     
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);

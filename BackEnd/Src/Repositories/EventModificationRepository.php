@@ -48,12 +48,12 @@ class EventModificationRepository {
 
   // Récupérer les modifications en attente
   public function getPendingModifications(): array {
-    $query = "SELECT em.*, e.title as event_title, e.user_id, u.name as user_name, u.email as user_email
-              FROM event_modifications em
-              INNER JOIN events e ON em.event_id = e.id
-              INNER JOIN users u ON e.user_id = u.id
-              WHERE em.status = 'pending'
-              ORDER BY em.created_at DESC";
+    $query = "SELECT event_modification.*, event.title as event_title, event.user_id, user.name as user_name, user.email as user_email
+              FROM event_modifications event_modification
+              INNER JOIN events event ON event_modification.event_id = event.id
+              INNER JOIN users user ON event.user_id = user.id
+              WHERE event_modification.status = 'pending'
+              ORDER BY event_modification.created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

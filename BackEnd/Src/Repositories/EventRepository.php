@@ -272,11 +272,11 @@ class EventRepository {
 
   // Récupérer les événements en attente de suppression
   public function getEventsPendingDeletion(): array {
-    $query = "SELECT e.*, u.name as user_name, u.email as user_email
-              FROM events e
-              INNER JOIN users u ON e.user_id = u.id
-              WHERE e.deletion_requested = TRUE AND e.is_deleted = FALSE
-              ORDER BY e.deletion_requested_at DESC";
+    $query = "SELECT event.*, user.name as user_name, user.email as user_email
+              FROM events event
+              INNER JOIN users user ON event.user_id = user.id
+              WHERE event.deletion_requested = TRUE AND event.is_deleted = FALSE
+              ORDER BY event.deletion_requested_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -284,14 +284,14 @@ class EventRepository {
 
   // Récupérer les utilisateurs ayant des réservations pour un événement
   public function getUsersWithReservations(int $eventId): array {
-    $query = "SELECT DISTINCT u.id, u.email, u.name, r.quantity, r.created_at as reservation_date
-              FROM users u
-              INNER JOIN reservations r ON u.id = r.user_id
-              WHERE r.event_id = :event_id 
-              AND r.status = 'confirmed'
-              AND r.is_deleted = FALSE
-              AND u.is_deleted = FALSE
-              ORDER BY r.created_at DESC";
+    $query = "SELECT DISTINCT user.id, user.email, user.name, reservation.quantity, reservation.created_at as reservation_date
+              FROM users user
+              INNER JOIN reservations reservation ON user.id = reservation.user_id
+              WHERE reservation.event_id = :event_id 
+              AND reservation.status = 'confirmed'
+              AND reservation.is_deleted = FALSE
+              AND user.is_deleted = FALSE
+              ORDER BY reservation.created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
     $stmt->execute();
@@ -301,10 +301,10 @@ class EventRepository {
   // Vérifier si un événement a des réservations confirmées
   public function hasReservations(int $eventId): bool {
     $query = "SELECT COUNT(*) as count
-              FROM reservations r
-              WHERE r.event_id = :event_id 
-              AND r.status = 'confirmed'
-              AND r.is_deleted = FALSE";
+              FROM reservations reservation
+              WHERE reservation.event_id = :event_id 
+              AND reservation.status = 'confirmed'
+              AND reservation.is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
     $stmt->execute();
