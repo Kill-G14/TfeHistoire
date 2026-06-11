@@ -16,3 +16,8 @@
 [2026-06-11 08:22:51] [INFO] Reservation created successfully | Context: {"reservation_id":2,"user_id":5,"event_id":11,"quantity":1}
 [2026-06-11 08:22:51] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Renaissance Florentine"}
 [2026-06-11 08:22:51] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Renaissance Florentine","status":202}
+[2026-06-11 08:45:15] [INFO] Reservation created successfully | Context: {"reservation_id":3,"user_id":5,"event_id":12,"quantity":1}
+[2026-06-11 08:45:15] [INFO] Sending confirmation email | Context: {"to":"killian.godmont@gmail.com","event":"Carnaval de B\u00e2le"}
+[2026-06-11 08:45:16] [INFO] Email envoyé avec succès | Context: {"to":"killian.godmont@gmail.com","subject":"\u2705 R\u00e9servation confirm\u00e9e : Carnaval de B\u00e2le","status":202}
+[2026-06-11 08:45:46] [INFO] Email envoyé avec succès | Context: {"to":"admin@memoriaeventia.com","subject":"\ud83d\udd14 Nouvelle demande de modification d'\u00e9v\u00e9nement","status":202}
+[2026-06-11 08:46:16] [INFO] Event approved successfully | Context: {"event_id":7}

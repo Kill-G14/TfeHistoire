@@ -4,6 +4,7 @@
 import EventManager from "../managers/EventManager.js";
 import { helpers } from "../utils/helpers.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { showEventDetail } from "../components/eventDetail.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -276,13 +277,21 @@ function createEventPopup(event) {
       </p>
       <p class="mb-3 small">${event.description ? event.description.substring(0, 100) + "..." : ""}</p>
       <div class="d-grid gap-2">
-        <a href="event/${event.id}" data-link class="btn btn-sm btn-outline-primary">
+        <button class="btn btn-sm btn-outline-primary w-100" onclick="window.showEventDetailFromMap(${event.id})">
           <i class="bi bi-info-circle me-1"></i>Détails
-        </a>
+        </button>
         ${routeButton}
       </div>
     </div>
   `;
+}
+
+// Afficher les détails d'un événement
+function showEventDetailFromMap(eventId) {
+  const event = events.find((e) => e.id === eventId);
+  if (event) {
+    showEventDetail(event);
+  }
 }
 
 // Filtrer les événements par distance
@@ -336,7 +345,7 @@ function renderEventsList() {
   container.innerHTML = filteredEvents
     .map(
       (event) => `
-    <div class="card mb-3 event-card" data-event-id="${event.id}">
+    <div class="card mb-3 event-card" data-event-id="${event.id}" style="cursor: pointer;">
       <div class="card-body">
         <h6 class="card-title mb-2">${event.title}</h6>
         ${
@@ -351,13 +360,16 @@ function renderEventsList() {
         </p>
         <p class="mb-3 small text-muted">${event.description ? event.description.substring(0, 80) + "..." : ""}</p>
         <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-primary flex-grow-1 zoom-event" data-event-id="${event.id}">
-            <i class="bi bi-zoom-in me-1"></i>Sur la carte
+          <button class="btn btn-sm btn-outline-primary flex-grow-1 view-details" data-event-id="${event.id}">
+            <i class="bi bi-info-circle me-1"></i>Détails
+          </button>
+          <button class="btn btn-sm btn-outline-secondary flex-grow-1 zoom-event" data-event-id="${event.id}">
+            <i class="bi bi-zoom-in me-1"></i>Carte
           </button>
           ${
             userPosition && event.latitude && event.longitude
               ? `<button class="btn btn-sm btn-primary flex-grow-1 show-route" data-event-id="${event.id}">
-                 <i class="bi bi-signpost-2 me-1"></i>Itinéraire
+                 <i class="bi bi-signpost-2 me-1"></i>Route
                </button>`
               : ""
           }
@@ -589,6 +601,14 @@ function attachEventListeners() {
   const eventsList = document.getElementById("eventsList");
   if (eventsList) {
     eventsList.addEventListener("click", (e) => {
+      // Bouton détails
+      if (e.target.closest(".view-details")) {
+        const eventId = parseInt(
+          e.target.closest(".view-details").dataset.eventId,
+        );
+        showEventDetailFromMap(eventId);
+      }
+
       // Bouton zoom
       if (e.target.closest(".zoom-event")) {
         const eventId = parseInt(
@@ -614,8 +634,9 @@ function attachEventListeners() {
     });
   }
 
-  // Rendre showRoute accessible globalement pour les popups
+  // Rendre showRoute et showEventDetailFromMap accessibles globalement pour les popups
   window.showRoute = showRoute;
+  window.showEventDetailFromMap = showEventDetailFromMap;
 }
 
 // Export par défaut
