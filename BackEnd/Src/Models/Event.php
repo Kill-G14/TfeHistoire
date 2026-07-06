@@ -16,8 +16,6 @@ class Event {
   public string $date;
   public string $time;
   public string $category;
-  public bool $is_free;
-  public float $ticket_price;
   public int $ticket_quantity;
   public bool $is_pending;
   public bool $is_approved;

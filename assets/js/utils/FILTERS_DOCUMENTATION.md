@@ -29,8 +29,6 @@ filters.state = {
   category: "all", // Catégorie sélectionnée
   dateFrom: null, // Date de début
   dateTo: null, // Date de fin
-  priceMin: null, // Prix minimum
-  priceMax: null, // Prix maximum
 };
 ```
 
@@ -74,7 +72,6 @@ Met à jour plusieurs filtres en une seule fois.
 filters.updateFilters({
   country: "France",
   category: "Festival",
-  priceMax: 50,
 });
 ```
 
@@ -165,8 +162,6 @@ Configuration par défaut :
   searchInputId: 'searchInput',
   countrySelectId: 'countrySelect',
   categorySelectId: 'categorySelect',
-  priceMinId: 'priceMin',
-  priceMaxId: 'priceMax',
   dateFromId: 'dateFrom',
   dateToId: 'dateTo'
 }

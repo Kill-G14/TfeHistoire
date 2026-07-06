@@ -68,6 +68,14 @@ export async function mount(container, params) {
   // Attacher les événements (le DOM est maintenant prêt)
   attachProfileEvents();
 
+  // Activer la section demandée via l'URL (ex: /profile?section=reservations)
+  const requestedSection = new URLSearchParams(window.location.search).get(
+    "section",
+  );
+  if (requestedSection) {
+    activateSection(requestedSection);
+  }
+
   // Charger et afficher les données utilisateur
   await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
 
@@ -314,25 +322,30 @@ function initSectionNavigation() {
     button.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-
-      // Retirer la classe active de tous les boutons
-      statButtons.forEach((btn) => btn.classList.remove("active"));
-
-      // Ajouter active au bouton cliqué
-      button.classList.add("active");
-
-      // Cacher toutes les sections
-      document.querySelectorAll(".profile-section").forEach((sec) => {
-        sec.style.display = "none";
-      });
-
-      // Afficher la section ciblée
-      const targetElement = document.getElementById(`section-${section}`);
-      if (targetElement) {
-        targetElement.style.display = "block";
-      }
+      activateSection(section);
     });
   });
+}
+
+// Activer une section du profil (bouton actif + affichage), utilisable au clic
+// ou pour pré-sélectionner un onglet à l'arrivée (ex: ?section=reservations)
+function activateSection(section) {
+  const statButtons = document.querySelectorAll(".stat-card-btn");
+  const targetElement = document.getElementById(`section-${section}`);
+  if (!targetElement) return;
+
+  // Retirer la classe active de tous les boutons, puis l'ajouter au bon
+  statButtons.forEach((btn) => btn.classList.remove("active"));
+  const matchingButton = document.querySelector(
+    `.stat-card-btn[data-section="${section}"]`,
+  );
+  if (matchingButton) matchingButton.classList.add("active");
+
+  // Cacher toutes les sections puis afficher celle ciblée
+  document.querySelectorAll(".profile-section").forEach((sec) => {
+    sec.style.display = "none";
+  });
+  targetElement.style.display = "block";
 }
 
 // Gérer la confirmation de réinitialisation du mot de passe
@@ -480,7 +493,7 @@ function displayCreatedEvents(events) {
             statusBadge = '<span class="badge bg-danger">Rejeté</span>';
           }
 
-          const priceDisplay = event.is_free ? "Gratuit" : "Voir billets";
+          const priceDisplay = "Gratuit";
 
           // Boutons d'action selon le statut
           let actionButtons = `
@@ -607,7 +620,7 @@ function displayFavorites(favorites) {
       ${favorites
         .map((event) => {
           // Gérer le prix
-          const priceDisplay = event.is_free ? "Gratuit" : "Voir billets";
+          const priceDisplay = "Gratuit";
 
           return `
         <div class="favorite-card-wrapper" id="favorite-card-${event.id}">
@@ -802,11 +815,8 @@ function displayReservations(reservations) {
             statusClass = "border-danger";
           }
 
-          // Formater le prix
-          const priceDisplay =
-            reservation.event_is_free || reservation.event_ticket_price <= 0
-              ? "Gratuit"
-              : `${helpers.formatPrice(reservation.event_ticket_price * reservation.quantity)} €`;
+          // Tous les événements sont gratuits
+          const priceDisplay = "Gratuit";
 
           // Formater la date de réservation
           const reservationDate = helpers.formatDate(reservation.created_at);

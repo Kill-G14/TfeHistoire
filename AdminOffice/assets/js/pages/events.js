@@ -382,7 +382,7 @@ function renderDeletions(deletions) {
           <i class="fas fa-eye"></i> Voir message
         </button>
       </td>
-      <td><span class="badge badge-warning">${del.tickets_sold || 0}</span></td>
+      <td><span class="badge badge-warning">${del.reservations_count || 0}</span></td>
       <td>${helpers.formatDate(del.deletion_requested_at)}</td>
       <td>
         <button class="btn btn-sm btn-success" onclick="window.approveDeletion(${del.id}, '${del.title.replace(/'/g, "\\'")}')">
@@ -496,6 +496,17 @@ async function init() {
     e.preventDefault();
     logout();
   });
+
+  // Rafraîchir automatiquement les listes (nouveaux événements, actions d'autres admins)
+  let isPolling = false;
+  setInterval(async () => {
+    if (isPolling) return; // évite les appels qui se chevauchent si le réseau est lent
+    isPolling = true;
+    await loadEvents();
+    await loadModifications();
+    await loadDeletions();
+    isPolling = false;
+  }, 20000);
 }
 
 // Lancer l'initialisation

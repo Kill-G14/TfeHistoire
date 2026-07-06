@@ -3,6 +3,7 @@
 import EventManager from "../managers/EventManager.js";
 import { helpers } from "../utils/helpers.js";
 import { showEventDetail } from "../components/eventDetail.js";
+import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 
 // Métadonnées de la vue
@@ -15,6 +16,7 @@ export const meta = {
 const templateObjects = {};
 let currentDate = new Date();
 let allEvents = [];
+let unsubscribe = null;
 const sixMonthsAgo = new Date();
 const oneYearAhead = new Date();
 
@@ -49,6 +51,9 @@ export async function mount(container, params) {
     document.body.appendChild(modalClone);
   }
 
+  // S'abonner aux changements d'état (mise à jour automatique après modération admin)
+  unsubscribe = appState.subscribe("events", handleEventsChange);
+
   // Charger les événements
   await loadEvents();
 
@@ -61,11 +66,22 @@ export async function mount(container, params) {
 
 // Fonction unmount (appelée avant de quitter la vue)
 export async function unmount() {
+  // Désabonner des changements d'état
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
   // Supprimer la modal du DOM
   const modal = document.getElementById("dayEventsModalElement");
   if (modal) {
     modal.remove();
   }
+}
+
+// Réagir à un changement de la liste globale d'événements (polling)
+function handleEventsChange(events) {
+  allEvents = events;
+  renderCalendar();
 }
 
 // Ouvrir la modal avec les événements d'un jour

@@ -11,6 +11,7 @@ import { initReservationModal } from "./components/reservationModal.js";
 import { appState } from "./store/appState.js";
 import { auth } from "./utils/auth.js";
 import FavoriteManager from "./managers/FavoriteManager.js";
+import EventManager from "./managers/EventManager.js";
 
 // Exposer la configuration globalement pour un accès facile
 window.__APP_CONFIG__ = config;
@@ -37,19 +38,20 @@ window.router = router;
 
 // Fonction init
 async function init() {
-  // Vérifier l'authentification
-  const isLoggedIn = auth.isLoggedIn();
-  const user = auth.getUser();
+  // Vérifier l'authentification (valide le token auprès du serveur)
+  if (auth.isLoggedIn()) {
+    const session = await auth.validateSession();
 
-  if (isLoggedIn && user) {
-    appState.set("user", user);
-    appState.set("isAuthenticated", true);
+    if (session.valid) {
+      appState.set("user", session.user);
+      appState.set("isAuthenticated", true);
 
-    // Charger les favoris de l'utilisateur
-    const token = auth.getToken();
-    const favoritesResult = await FavoriteManager.getByUser(token);
-    if (favoritesResult.success) {
-      appState.set("favorites", favoritesResult.data || []);
+      // Charger les favoris de l'utilisateur
+      const token = auth.getToken();
+      const favoritesResult = await FavoriteManager.getByUser(token);
+      if (favoritesResult.success) {
+        appState.set("favorites", favoritesResult.data || []);
+      }
     }
   }
 
@@ -67,6 +69,24 @@ async function init() {
 
   // Écouter les changements d'état utilisateur
   appState.subscribe("user", handleUserChange);
+
+  // Rafraîchir automatiquement les événements (approbation/rejet/suppression par un admin)
+  startEventsPolling();
+}
+
+// Sonder périodiquement les événements pour refléter les actions de modération sans reload
+function startEventsPolling() {
+  setInterval(async () => {
+    if (document.hidden) return; // ne pas solliciter le serveur si l'onglet n'est pas actif
+
+    const result = await EventManager.getAll();
+    if (result.success) {
+      const newData = JSON.stringify(result.data);
+      if (newData !== JSON.stringify(appState.get("events"))) {
+        appState.set("events", result.data);
+      }
+    }
+  }, 45000);
 }
 
 // Gérer les changements d'utilisateur

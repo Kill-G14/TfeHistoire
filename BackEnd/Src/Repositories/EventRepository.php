@@ -97,11 +97,11 @@ class EventRepository {
 
   // Créer un nouvel événement
   public function createEvent(Event $event): ?int {
-    $query = "INSERT INTO events (user_id, title, description, country, city, postal_code, 
-              address, latitude, longitude, date, time, category, is_free, ticket_price, ticket_quantity, image_event, created_at, updated_at)
-              VALUES (:user_id, :title, :description, :country, :city, :postal_code, 
-              :address, :latitude, :longitude, :date, :time, :category, :is_free, :ticket_price, :ticket_quantity, :image_event, NOW(), NOW())";
-    
+    $query = "INSERT INTO events (user_id, title, description, country, city, postal_code,
+              address, latitude, longitude, date, time, category, ticket_quantity, image_event, created_at, updated_at)
+              VALUES (:user_id, :title, :description, :country, :city, :postal_code,
+              :address, :latitude, :longitude, :date, :time, :category, :ticket_quantity, :image_event, NOW(), NOW())";
+
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':user_id', $event->user_id, PDO::PARAM_INT);
     $stmt->bindParam(':title', $event->title);
@@ -115,8 +115,6 @@ class EventRepository {
     $stmt->bindParam(':date', $event->date);
     $stmt->bindParam(':time', $event->time);
     $stmt->bindParam(':category', $event->category);
-    $stmt->bindParam(':is_free', $event->is_free, PDO::PARAM_INT);
-    $stmt->bindParam(':ticket_price', $event->ticket_price);
     $stmt->bindParam(':ticket_quantity', $event->ticket_quantity, PDO::PARAM_INT);
     $stmt->bindParam(':image_event', $event->image_event);
     
@@ -141,13 +139,11 @@ class EventRepository {
               date = :date,
               time = :time,
               category = :category,
-              is_free = :is_free,
-              ticket_price = :ticket_price,
               ticket_quantity = :ticket_quantity,
               image_event = :image_event,
               updated_at = NOW()
               WHERE id = :id AND is_deleted = FALSE";
-    
+
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $event->id, PDO::PARAM_INT);
     $stmt->bindParam(':title', $event->title);
@@ -161,8 +157,6 @@ class EventRepository {
     $stmt->bindParam(':date', $event->date);
     $stmt->bindParam(':time', $event->time);
     $stmt->bindParam(':category', $event->category);
-    $stmt->bindParam(':is_free', $event->is_free, PDO::PARAM_INT);
-    $stmt->bindParam(':ticket_price', $event->ticket_price);
     $stmt->bindParam(':ticket_quantity', $event->ticket_quantity, PDO::PARAM_INT);
     $stmt->bindParam(':image_event', $event->image_event);
     
@@ -214,24 +208,6 @@ class EventRepository {
     return $stmt->fetchAll();
   }
 
-  // Récupérer les événements gratuits
-  public function getFreeEvents(): array {
-    $query = "SELECT * FROM events WHERE is_free = TRUE AND is_deleted = FALSE AND is_approved = TRUE ORDER BY date ASC";
-    $stmt = $this->getPdo()->prepare($query);
-    $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
-  }
-
-  // Récupérer les événements payants
-  public function getPaidEvents(): array {
-    $query = "SELECT * FROM events WHERE is_free = FALSE AND is_deleted = FALSE AND is_approved = TRUE ORDER BY date ASC";
-    $stmt = $this->getPdo()->prepare($query);
-    $stmt->execute();
-    $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
-    return $stmt->fetchAll();
-  }
-
   // Mettre à jour la date et l'heure d'un événement
   public function updateEventDateTime(int $eventId, string $newDate, string $newTime): bool {
     $query = "UPDATE events 
@@ -272,7 +248,9 @@ class EventRepository {
 
   // Récupérer les événements en attente de suppression
   public function getEventsPendingDeletion(): array {
-    $query = "SELECT event.*, user.name as user_name, user.email as user_email
+    $query = "SELECT event.*, user.name as user_name, user.email as user_email,
+              (SELECT COALESCE(SUM(r.quantity), 0) FROM reservations r
+               WHERE r.event_id = event.id AND r.status = 'confirmed' AND r.is_deleted = FALSE) as reservations_count
               FROM events event
               INNER JOIN users user ON event.user_id = user.id
               WHERE event.deletion_requested = TRUE AND event.is_deleted = FALSE

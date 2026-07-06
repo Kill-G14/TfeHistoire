@@ -48,6 +48,56 @@ export const europeanCountries = [
   'Vatican'
 ]
 
+// Correspondance nom de pays (FR) -> code ISO 3166-1 alpha-2, pour le géocodage structuré
+export const countryCodes = {
+  'Albanie': 'al',
+  'Allemagne': 'de',
+  'Andorre': 'ad',
+  'Autriche': 'at',
+  'Belgique': 'be',
+  'Biélorussie': 'by',
+  'Bosnie-Herzégovine': 'ba',
+  'Bulgarie': 'bg',
+  'Chypre': 'cy',
+  'Croatie': 'hr',
+  'Danemark': 'dk',
+  'Espagne': 'es',
+  'Estonie': 'ee',
+  'Finlande': 'fi',
+  'France': 'fr',
+  'Grèce': 'gr',
+  'Hongrie': 'hu',
+  'Irlande': 'ie',
+  'Islande': 'is',
+  'Italie': 'it',
+  'Kosovo': 'xk',
+  'Lettonie': 'lv',
+  'Liechtenstein': 'li',
+  'Lituanie': 'lt',
+  'Luxembourg': 'lu',
+  'Macédoine du Nord': 'mk',
+  'Malte': 'mt',
+  'Moldavie': 'md',
+  'Monaco': 'mc',
+  'Monténégro': 'me',
+  'Norvège': 'no',
+  'Pays-Bas': 'nl',
+  'Pologne': 'pl',
+  'Portugal': 'pt',
+  'République Tchèque': 'cz',
+  'Roumanie': 'ro',
+  'Royaume-Uni': 'gb',
+  'Russie': 'ru',
+  'Saint-Marin': 'sm',
+  'Serbie': 'rs',
+  'Slovaquie': 'sk',
+  'Slovénie': 'si',
+  'Suède': 'se',
+  'Suisse': 'ch',
+  'Ukraine': 'ua',
+  'Vatican': 'va'
+}
+
 // Fonction pour remplir un select avec les pays
 export function populateCountrySelect(selectElement) {
   if (!selectElement) return

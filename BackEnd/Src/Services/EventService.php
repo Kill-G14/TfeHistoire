@@ -136,10 +136,10 @@ class EventService {
     $event->date = $data['date'];
     $event->time = $data['time'];
     $event->category = $data['category'];
-    // Tous les événements sont gratuits (système de réservations sans paiement)
-    $event->is_free = true;
-    $event->ticket_price = 0.00;
-    $event->ticket_quantity = 0;
+    // ticket_quantity = capacité maximale de l'événement (0 = illimité)
+    $event->ticket_quantity = isset($data['ticket_quantity']) && $data['ticket_quantity'] !== ''
+      ? (int) $data['ticket_quantity']
+      : 0;
     $event->image_event = $data['image_event'] ?? null;
 
     // Insérer en base de données
@@ -207,10 +207,10 @@ class EventService {
     $event->date = $data['date'];
     $event->time = $data['time'];
     $event->category = $data['category'];
-    // Tous les événements sont gratuits (système de réservations sans paiement)
-    $event->is_free = true;
-    $event->ticket_price = 0.00;
-    $event->ticket_quantity = 0;
+    // ticket_quantity = capacité maximale de l'événement (0 = illimité)
+    $event->ticket_quantity = isset($data['ticket_quantity']) && $data['ticket_quantity'] !== ''
+      ? (int) $data['ticket_quantity']
+      : 0;
     $event->image_event = $data['image_event'] ?? $event->image_event;
 
     // Mettre à jour en base de données

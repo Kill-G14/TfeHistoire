@@ -20,8 +20,6 @@ class ReservationDTO {
   public ?string $event_city;
   public ?string $event_address;
   public ?string $event_image;
-  public ?bool $event_is_free;
-  public ?float $event_ticket_price;
 
   public function __construct($reservation) {
     // Si c'est un objet Reservation
@@ -41,8 +39,6 @@ class ReservationDTO {
       $this->event_city = null;
       $this->event_address = null;
       $this->event_image = null;
-      $this->event_is_free = null;
-      $this->event_ticket_price = null;
     }
     // Si c'est un tableau associatif (depuis repository avec JOIN)
     else if (is_array($reservation)) {
@@ -61,8 +57,6 @@ class ReservationDTO {
       $this->event_city = $reservation['event_city'] ?? null;
       $this->event_address = $reservation['event_address'] ?? null;
       $this->event_image = $reservation['event_image'] ?? null;
-      $this->event_is_free = isset($reservation['event_is_free']) ? (bool)$reservation['event_is_free'] : null;
-      $this->event_ticket_price = isset($reservation['event_ticket_price']) ? (float)$reservation['event_ticket_price'] : null;
     }
   }
 
@@ -89,8 +83,6 @@ class ReservationDTO {
       $data['event_city'] = $this->event_city;
       $data['event_address'] = $this->event_address;
       $data['event_image'] = $this->event_image;
-      $data['event_is_free'] = $this->event_is_free;
-      $data['event_ticket_price'] = $this->event_ticket_price;
     }
 
     return $data;

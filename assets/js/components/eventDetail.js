@@ -175,7 +175,7 @@ async function handleReservation() {
   closeEventDetail();
 
   // Afficher la modal de confirmation de réservation
-  await showReservationModal(currentEvent);
+  await showReservationModal(currentEvent, quantity);
 }
 
 /**

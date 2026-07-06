@@ -4,7 +4,7 @@ import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import EventManager from "../managers/EventManager.js";
-import { populateCountrySelect } from "../utils/countries.js";
+import { populateCountrySelect, countryCodes } from "../utils/countries.js";
 import {
   validateImageFile,
   createImagePreview,
@@ -130,6 +130,7 @@ const errorFieldMapping = {
   address: "address",
   date: "date",
   time: "time",
+  ticket_quantity: "ticketQuantity",
 };
 
 // Afficher les erreurs de validation sur les champs
@@ -192,55 +193,51 @@ async function uploadImage(file) {
 }
 
 // Fonction pour géocoder une adresse (Nominatim OpenStreetMap)
+// Cascade du plus précis au plus large : rue+cp+ville+pays -> cp+ville+pays -> ville+pays
 async function geocodeAddress(address, city, postalCode, country) {
+  const countrycodes = countryCodes[country] || "";
+
+  const attempts = [
+    { street: address, postalcode: postalCode, city, countrycodes },
+    { postalcode: postalCode, city, countrycodes },
+    { city, countrycodes },
+  ];
+
+  for (let i = 0; i < attempts.length; i++) {
+    const coords = await tryGeocode(attempts[i]);
+    if (coords) {
+      return { success: true, precise: i === 0, ...coords };
+    }
+  }
+
+  return { success: false, precise: false, latitude: null, longitude: null };
+}
+
+// Tente un géocodage structuré Nominatim avec les paramètres fournis
+async function tryGeocode(params) {
+  const query = new URLSearchParams({ format: "json", limit: "1" });
+  if (params.street) query.set("street", params.street);
+  if (params.city) query.set("city", params.city);
+  if (params.postalcode) query.set("postalcode", params.postalcode);
+  if (params.countrycodes) query.set("countrycodes", params.countrycodes);
+
   try {
-    // Construire l'adresse complète pour le géocodage
-    const addressParts = [];
-    if (address) addressParts.push(address);
-    if (postalCode) addressParts.push(postalCode);
-    if (city) addressParts.push(city);
-    if (country) addressParts.push(country);
-
-    const fullAddress = addressParts.join(", ");
-
-    // Encoder l'adresse pour l'URL
-    const encodedAddress = encodeURIComponent(fullAddress);
-
-    // Appeler l'API Nominatim (avec User-Agent requis)
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
-      {
-        headers: {
-          "User-Agent": "MemoriaEventia/1.0",
-        },
-      },
+      `https://nominatim.openstreetmap.org/search?${query.toString()}`,
     );
-
     const data = await response.json();
 
-    // Si on a des résultats, retourner les coordonnées
     if (data && data.length > 0) {
       return {
-        success: true,
         latitude: parseFloat(data[0].lat),
         longitude: parseFloat(data[0].lon),
       };
-    } else {
-      // Pas de résultats trouvés, mais on continue sans erreur
-      return {
-        success: false,
-        latitude: null,
-        longitude: null,
-      };
     }
   } catch (error) {
-    // En cas d'erreur, on continue sans coordonnées
-    return {
-      success: false,
-      latitude: null,
-      longitude: null,
-    };
+    // Échec réseau : on laisse la tentative suivante prendre le relais
   }
+
+  return null;
 }
 
 // Gérer la suppression d'image
@@ -352,6 +349,18 @@ async function handleSubmit(e) {
     country,
   );
 
+  if (!geocodeResult.success) {
+    helpers.showToast(
+      "Adresse non localisée : l'événement sera créé mais n'apparaîtra pas sur la carte. Vous pourrez la corriger plus tard.",
+      "warning",
+    );
+  } else if (!geocodeResult.precise) {
+    helpers.showToast(
+      "Adresse localisée approximativement (ville). Vous pouvez préciser l'adresse plus tard si besoin.",
+      "info",
+    );
+  }
+
   // Étape 2 : Créer l'événement SANS image
   if (submitBtn) {
     submitBtn.innerHTML =
@@ -359,6 +368,7 @@ async function handleSubmit(e) {
   }
 
   // Tous les événements sont gratuits (système de réservations sans paiement)
+  const ticketQuantityInput = document.getElementById("ticketQuantity");
   const eventData = {
     title: document.getElementById("title").value,
     description: document.getElementById("description").value,
@@ -371,10 +381,8 @@ async function handleSubmit(e) {
     date: document.getElementById("date").value,
     time: document.getElementById("time").value,
     category: document.getElementById("category").value,
-    is_free: true,
     image_event: null, // Pas d'image pour le moment
-    ticket_price: 0,
-    ticket_quantity: 0,
+    ticket_quantity: ticketQuantityInput?.value || 0,
   };
 
   // Appel API pour créer l'événement
@@ -418,7 +426,7 @@ async function handleSubmit(e) {
       "warning",
     );
     setTimeout(() => {
-      window.router.navigate("./");
+      window.router.navigate("/profile?section=events");
     }, 2000);
     return;
   }
@@ -446,7 +454,7 @@ async function handleSubmit(e) {
         "warning",
       );
       setTimeout(() => {
-        window.router.navigate("./");
+        window.router.navigate("/profile?section=events");
       }, 2000);
       return;
     }
@@ -455,7 +463,7 @@ async function handleSubmit(e) {
   // Succès complet
   helpers.showToast("Événement créé avec succès !", "success");
   setTimeout(() => {
-    window.router.navigate("./");
+    window.router.navigate("/profile?section=events");
   }, 1000);
 }
 

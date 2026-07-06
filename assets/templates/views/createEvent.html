@@ -194,6 +194,33 @@
         </div>
       </div>
 
+      <!-- Places disponibles -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <i class="bi bi-people text-accent"></i>
+          Places disponibles
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="ticketQuantity" class="form-label"
+              >Nombre de places (optionnel)</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="ticketQuantity"
+              min="0"
+              placeholder="Illimité"
+            />
+            <div class="form-text">
+              Laissez vide ou 0 pour un nombre de places illimité.
+            </div>
+            <div class="invalid-feedback" id="ticketQuantityError"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Information : Événements gratuits -->
       <div class="alert alert-info">
         <i class="bi bi-info-circle"></i>

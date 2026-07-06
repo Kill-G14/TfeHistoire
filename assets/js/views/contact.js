@@ -134,6 +134,11 @@ async function handleSubmit(e) {
   helpers.showToast(result.message || "Votre message a bien été envoyé", "success");
   contactForm.reset();
 
+  const successMessage = document.getElementById("contactSuccessMessage");
+  if (successMessage) {
+    successMessage.classList.remove("d-none");
+  }
+
   if (submitBtn) {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="bi bi-send-fill me-2"></i>Envoyer le message';

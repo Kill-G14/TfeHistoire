@@ -62,4 +62,25 @@ export const auth = {
   getToken() {
     return storage.get(TOKEN_KEY);
   },
+
+  // Vérifier auprès du serveur que le token stocké est encore valide
+  async validateSession() {
+    const token = this.getToken();
+    if (!token) {
+      return { valid: false };
+    }
+
+    const result = await AuthManager.getCurrentUser(token);
+
+    if (!result.success) {
+      // Token expiré/invalide : nettoyer les données locales
+      storage.remove(AUTH_KEY);
+      storage.remove(TOKEN_KEY);
+      return { valid: false };
+    }
+
+    // Rafraîchir le cache utilisateur avec les données à jour du serveur
+    storage.set(AUTH_KEY, result.data);
+    return { valid: true, user: result.data };
+  },
 };

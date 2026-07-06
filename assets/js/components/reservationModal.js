@@ -11,6 +11,7 @@ const templateObjects = {};
 
 // Variable pour stocker l'événement en cours de réservation
 let currentEvent = null;
+let currentQuantity = 1;
 
 /**
  * Précharger le template de la modal de réservation
@@ -24,7 +25,7 @@ export async function initReservationModal() {
 }
 
 // Fonction pour afficher la modal de réservation
-export async function showReservationModal(event) {
+export async function showReservationModal(event, quantity = 1) {
   // Vérifier si l'utilisateur est connecté
   if (!appState.get("isAuthenticated")) {
     helpers.showToast("Vous devez être connecté pour réserver", "error");
@@ -55,8 +56,9 @@ export async function showReservationModal(event) {
     modalElement = document.getElementById("reservationModal");
   }
 
-  // Stocker l'événement
+  // Stocker l'événement et la quantité sélectionnée
   currentEvent = event;
+  currentQuantity = quantity;
 
   // Afficher les informations de l'événement
   const eventInfo = document.getElementById("eventInfoReservation");
@@ -90,6 +92,10 @@ export async function showReservationModal(event) {
           <div class="d-flex align-items-center mt-2">
             <i class="bi bi-tag-fill text-success me-2" style="width: 20px;"></i>
             <span class="badge bg-success">Événement gratuit</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-ticket-perforated-fill text-muted me-2" style="width: 20px;"></i>
+            <span class="text-muted">${quantity} place${quantity > 1 ? "s" : ""}</span>
           </div>
         </div>
       </div>
@@ -133,7 +139,11 @@ async function handleConfirmReservation() {
   const token = auth.getToken();
 
   // Créer la réservation
-  const result = await ReservationManager.create(currentEvent.id, 1, token);
+  const result = await ReservationManager.create(
+    currentEvent.id,
+    currentQuantity,
+    token,
+  );
 
   if (result.success) {
     helpers.showToast(result.message, "success");
@@ -155,12 +165,12 @@ async function handleConfirmReservation() {
 
     // Réinitialiser l'événement
     currentEvent = null;
+    currentQuantity = 1;
 
-    // Rediriger vers le profil ou recharger les données
+    // Rediriger vers l'onglet réservations du profil pour confirmer la réservation
     setTimeout(() => {
-      // Événement personnalisé pour notifier que la réservation a été créée
-      window.dispatchEvent(new CustomEvent("reservationCreated"));
-    }, 500);
+      window.router.navigate("/profile?section=reservations");
+    }, 1000);
   } else {
     helpers.showToast(result.message, "error");
 

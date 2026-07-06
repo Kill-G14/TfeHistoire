@@ -18,6 +18,7 @@ bump-version.bat
 # Base de données (ne pas commit les structures SQL locales)
 /BackEnd/database.sql
 /BackEnd/database_production.sql
+/BackEnd/migration_rate_limiter_contact.sql
 
 # Dépendances
 /BackEnd/vendor/

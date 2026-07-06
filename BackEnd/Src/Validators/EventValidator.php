@@ -62,9 +62,12 @@ class EventValidator {
       $errors['category'] = 'Veuillez choisir une catégorie pour aider les visiteurs à trouver votre événement';
     }
 
-    // Is Free - TOUS LES ÉVÉNEMENTS SONT GRATUITS (système de réservations)
-    // On force toujours is_free = TRUE, les champs ticket_price et ticket_quantity sont ignorés
-    // Pas de validation car la valeur est forcée côté backend
+    // Ticket quantity (optionnel) - capacité maximale de l'événement, 0/vide = illimité
+    if (isset($data['ticket_quantity']) && !Helpers::isEmpty($data['ticket_quantity'])) {
+      if (!is_numeric($data['ticket_quantity']) || (int) $data['ticket_quantity'] < 0) {
+        $errors['ticket_quantity'] = 'Le nombre de places doit être un nombre entier positif';
+      }
+    }
 
     // Latitude (optionnel)
     if (isset($data['latitude']) && !Helpers::isEmpty($data['latitude'])) {

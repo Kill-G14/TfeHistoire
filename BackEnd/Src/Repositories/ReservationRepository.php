@@ -67,9 +67,7 @@ class ReservationRepository
                          event.time as event_time,
                          event.city as event_city,
                          event.address as event_address,
-                         event.image_event as event_image,
-                         event.is_free as event_is_free,
-                         event.ticket_price as event_ticket_price
+                         event.image_event as event_image
                   FROM reservations reservation
                   INNER JOIN events event ON reservation.event_id = event.id
                   WHERE reservation.user_id = :user_id 

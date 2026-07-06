@@ -10,8 +10,6 @@ export const filters = {
     category: "all",
     dateFrom: null,
     dateTo: null,
-    priceMin: null,
-    priceMax: null,
   },
 
   // Réinitialiser tous les filtres
@@ -22,8 +20,6 @@ export const filters = {
       category: "all",
       dateFrom: null,
       dateTo: null,
-      priceMin: null,
-      priceMax: null,
     };
   },
 
@@ -69,16 +65,6 @@ export const filters = {
         this.state.category === "all" ||
         event.category === this.state.category;
 
-      // Filtre par prix minimum
-      const matchesPriceMin =
-        !this.state.priceMin ||
-        event.priceValue >= parseFloat(this.state.priceMin);
-
-      // Filtre par prix maximum
-      const matchesPriceMax =
-        !this.state.priceMax ||
-        event.priceValue <= parseFloat(this.state.priceMax);
-
       // Filtre par date (si implémenté plus tard)
       let matchesDateFrom = true;
       let matchesDateTo = true;
@@ -99,8 +85,6 @@ export const filters = {
         matchesSearch &&
         matchesCountry &&
         matchesCategory &&
-        matchesPriceMin &&
-        matchesPriceMax &&
         matchesDateFrom &&
         matchesDateTo
       );
@@ -197,8 +181,6 @@ export const filters = {
       searchInputId: "searchInput",
       countrySelectId: "countrySelect",
       categorySelectId: "categorySelect",
-      priceMinId: "priceMin",
-      priceMaxId: "priceMax",
       dateFromId: "dateFrom",
       dateToId: "dateTo",
     };
@@ -235,24 +217,6 @@ export const filters = {
       });
     }
 
-    // Event listener pour le prix minimum
-    const priceMin = document.getElementById(finalConfig.priceMinId);
-    if (priceMin) {
-      priceMin.addEventListener("input", (e) => {
-        this.updateFilter("priceMin", e.target.value);
-        callback();
-      });
-    }
-
-    // Event listener pour le prix maximum
-    const priceMax = document.getElementById(finalConfig.priceMaxId);
-    if (priceMax) {
-      priceMax.addEventListener("input", (e) => {
-        this.updateFilter("priceMax", e.target.value);
-        callback();
-      });
-    }
-
     // Event listener pour la date de début
     const dateFrom = document.getElementById(finalConfig.dateFromId);
     if (dateFrom) {
@@ -279,8 +243,6 @@ export const filters = {
     if (this.state.searchTerm) count++;
     if (this.state.country && this.state.country !== "all") count++;
     if (this.state.category && this.state.category !== "all") count++;
-    if (this.state.priceMin) count++;
-    if (this.state.priceMax) count++;
     if (this.state.dateFrom) count++;
     if (this.state.dateTo) count++;
 

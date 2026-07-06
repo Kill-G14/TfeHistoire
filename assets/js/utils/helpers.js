@@ -97,26 +97,12 @@ export const helpers = {
     return `${apiUrl}/imageApi.php?name=${encodeURIComponent(imageName)}`;
   },
 
-  // Transformer un événement pour ajouter l'URL de l'image et les infos de billetterie
+  // Transformer un événement pour ajouter l'URL de l'image et les infos de capacité
   transformEvent(event) {
-    // Déterminer le prix à afficher
-    let displayPrice = "Gratuit";
-    let priceValue = 0;
-
-    if (
-      !event.is_free &&
-      event.ticket_price !== null &&
-      event.ticket_price !== undefined
-    ) {
-      priceValue = parseFloat(event.ticket_price);
-      displayPrice = this.formatPrice(priceValue) + " €";
-    }
-
     return {
       ...event,
       image: this.getImageUrl(event.image_event),
-      price: displayPrice,
-      priceValue: priceValue, // Valeur numérique pour les calculs
+      price: "Gratuit",
       quantity: event.ticket_quantity || 0,
       availableTickets: event.ticket_quantity || 0,
     };

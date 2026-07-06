@@ -18,7 +18,6 @@ class EventDTO {
   public string $date;
   public string $time;
   public string $category;
-  public bool $is_free;
   public bool $is_pending;
   public bool $is_approved;
   public bool $is_rejected;
@@ -28,10 +27,6 @@ class EventDTO {
   public ?string $deletion_requested_at;
   public ?string $image_event;
   public string $created_at;
-  
-  // Informations de billetterie
-  public ?int $ticket_id;
-  public ?float $ticket_price;
   public ?int $ticket_quantity;
 
   public function __construct(Event $event) {
@@ -48,7 +43,6 @@ class EventDTO {
     $this->date = $event->date;
     $this->time = $event->time;
     $this->category = $event->category;
-    $this->is_free = $event->is_free;
     $this->is_pending = $event->is_pending;
     $this->is_approved = $event->is_approved;
     $this->is_rejected = $event->is_rejected;
@@ -58,10 +52,6 @@ class EventDTO {
     $this->deletion_requested_at = $event->deletion_requested_at;
     $this->image_event = $event->image_event;
     $this->created_at = $event->created_at;
-    
-    // Informations de billetterie
-    $this->ticket_id = $event->ticket_id ?? null;
-    $this->ticket_price = $event->ticket_price ?? null;
     $this->ticket_quantity = $event->ticket_quantity ?? null;
   }
 
@@ -80,7 +70,6 @@ class EventDTO {
       'date' => $this->date,
       'time' => $this->time,
       'category' => $this->category,
-      'is_free' => $this->is_free,
       'is_pending' => $this->is_pending,
       'is_approved' => $this->is_approved,
       'is_rejected' => $this->is_rejected,
@@ -90,9 +79,6 @@ class EventDTO {
       'deletion_requested_at' => $this->deletion_requested_at,
       'image_event' => $this->image_event,
       'created_at' => $this->created_at,
-      // Informations de billetterie
-      'ticket_id' => $this->ticket_id,
-      'ticket_price' => $this->ticket_price,
       'ticket_quantity' => $this->ticket_quantity
     ];
   }

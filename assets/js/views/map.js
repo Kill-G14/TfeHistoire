@@ -5,6 +5,7 @@ import EventManager from "../managers/EventManager.js";
 import { helpers } from "../utils/helpers.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 import { showEventDetail } from "../components/eventDetail.js";
+import { appState } from "../store/appState.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -21,6 +22,7 @@ let events = [];
 let eventMarkers = [];
 let routeLayer = null;
 let currentRoute = null;
+let unsubscribe = null;
 
 // Template HTML
 const templateObjects = {};
@@ -41,6 +43,9 @@ export async function mount(container, params) {
   // Initialiser la carte
   await initMap();
 
+  // S'abonner aux changements d'état (mise à jour automatique après modération admin)
+  unsubscribe = appState.subscribe("events", handleEventsChange);
+
   // Charger les événements
   await loadEvents();
 
@@ -50,6 +55,11 @@ export async function mount(container, params) {
 
 // Fonction unmount (appelée avant de quitter la vue)
 export async function unmount() {
+  // Désabonner des changements d'état
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
   // Nettoyer la carte
   if (map) {
     map.remove();
@@ -163,6 +173,22 @@ function addUserMarker() {
   })
     .addTo(map)
     .bindPopup("<b>Votre position</b>");
+}
+
+// Réagir à un changement de la liste globale d'événements (polling)
+function handleEventsChange(newEvents) {
+  events = newEvents;
+
+  // Calculer les distances si l'utilisateur est localisé
+  if (userPosition) {
+    updateEventDistances();
+  }
+
+  // Ajouter les marqueurs sur la carte (nettoie déjà les anciens marqueurs)
+  addEventMarkers();
+
+  // Afficher la liste
+  renderEventsList();
 }
 
 // Charger les événements
