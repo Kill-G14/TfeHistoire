@@ -85,6 +85,33 @@ class UserManager {
     }
   }
 
+  // Créer un utilisateur
+  async create(name, email, password, token) {
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resource: "users",
+          action: "create",
+          name: name,
+          email: email,
+          password: password,
+          token: token,
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
   // Supprimer un utilisateur
   async delete(userId, token) {
     try {

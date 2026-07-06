@@ -154,6 +154,49 @@ async function saveInfo() {
   }
 }
 
+// Créer un utilisateur
+async function saveCreateUser() {
+  const name = document.getElementById("createUserName").value.trim();
+  const email = document.getElementById("createUserEmail").value.trim();
+  const password = document.getElementById("createUserPassword").value;
+
+  // Validation
+  if (!name || name.length < 2) {
+    helpers.showToast("Le nom doit contenir au moins 2 caractères", "error");
+    return;
+  }
+
+  if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    helpers.showToast("Format d'email invalide", "error");
+    return;
+  }
+
+  if (!password || password.length < 6) {
+    helpers.showToast(
+      "Le mot de passe doit contenir au moins 6 caractères",
+      "error",
+    );
+    return;
+  }
+
+  const token = storage.getToken();
+  const result = await UserManager.create(name, email, password, token);
+
+  if (result.success) {
+    helpers.showToast("Utilisateur créé avec succès", "success");
+    $("#createUserModal").modal("hide");
+    document.getElementById("createUserName").value = "";
+    document.getElementById("createUserEmail").value = "";
+    document.getElementById("createUserPassword").value = "";
+    await loadUsers();
+  } else {
+    helpers.showToast(
+      result.message || "Erreur lors de la création",
+      "error",
+    );
+  }
+}
+
 // Supprimer un utilisateur
 window.deleteUser = async function (userId) {
   const confirmed = await helpers.showConfirm(
@@ -202,6 +245,19 @@ async function init() {
 
   // Event listener pour sauvegarder les informations
   document.getElementById("saveInfoBtn").addEventListener("click", saveInfo);
+
+  // Event listener pour ouvrir la modale de création d'utilisateur
+  document.getElementById("addUserBtn").addEventListener("click", () => {
+    document.getElementById("createUserName").value = "";
+    document.getElementById("createUserEmail").value = "";
+    document.getElementById("createUserPassword").value = "";
+    $("#createUserModal").modal("show");
+  });
+
+  // Event listener pour sauvegarder le nouvel utilisateur
+  document
+    .getElementById("saveCreateUserBtn")
+    .addEventListener("click", saveCreateUser);
 }
 
 // Lancer l'initialisation

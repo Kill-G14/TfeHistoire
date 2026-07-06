@@ -132,6 +132,62 @@ class UserService {
     ];
   }
 
+  // Créer un utilisateur (admin)
+  public function createUserByAdmin(string $name, string $email, string $password): array {
+    // Valider le format de l'email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      return [
+        'success' => false,
+        'message' => 'Format d\'email invalide'
+      ];
+    }
+
+    // Valider le nom (non vide et longueur)
+    if (empty(trim($name)) || strlen($name) < 2) {
+      return [
+        'success' => false,
+        'message' => 'Le nom doit contenir au moins 2 caractères'
+      ];
+    }
+
+    // Valider le mot de passe (longueur)
+    if (strlen($password) < 6) {
+      return [
+        'success' => false,
+        'message' => 'Le mot de passe doit contenir au moins 6 caractères'
+      ];
+    }
+
+    // Vérifier si l'email est déjà utilisé
+    if ($this->userRepository->emailExists($email)) {
+      return [
+        'success' => false,
+        'message' => 'Cet email est déjà utilisé'
+      ];
+    }
+
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $userId = $this->userRepository->createUser(trim($email), $hashedPassword, trim($name));
+
+    if (!$userId) {
+      Logger::error('Failed to create user by admin', ['email' => $email]);
+      return [
+        'success' => false,
+        'message' => 'Erreur lors de la création de l\'utilisateur'
+      ];
+    }
+
+    Logger::info('User created by admin successfully', ['user_id' => $userId]);
+
+    $createdUser = $this->userRepository->getUserById($userId);
+
+    return [
+      'success' => true,
+      'message' => 'Utilisateur créé avec succès',
+      'data' => (new UserDTO($createdUser))->toArray()
+    ];
+  }
+
   // Supprimer un utilisateur (admin)
   public function adminDeleteUser(int $id): array {
     $user = $this->userRepository->getUserById($id);

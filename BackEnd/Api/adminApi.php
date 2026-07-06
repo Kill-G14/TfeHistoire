@@ -279,6 +279,18 @@ switch ($resource) {
         }
         break;
 
+      case 'create':
+        if (!isset($request['name']) || !isset($request['email']) || !isset($request['password'])) {
+          $response = ['success' => false, 'message' => 'Données incomplètes'];
+        } else {
+          $response = $userService->createUserByAdmin(
+            $request['name'],
+            $request['email'],
+            $request['password']
+          );
+        }
+        break;
+
       default:
         $response = ['success' => false, 'message' => 'Action non reconnue pour la ressource users'];
         break;
