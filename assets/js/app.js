@@ -26,6 +26,7 @@ const routes = {
   "/terms": () => import("./views/terms.js"),
   "/privacy": () => import("./views/privacy.js"),
   "/faq": () => import("./views/faq.js"),
+  "/contact": () => import("./views/contact.js"),
 };
 
 // Instance du routeur

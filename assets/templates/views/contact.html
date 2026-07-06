@@ -1,0 +1,79 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- En-tête -->
+      <div class="text-center mb-5">
+        <i
+          class="bi bi-envelope-fill text-primary"
+          style="font-size: 4rem"
+        ></i>
+        <h1 class="display-5 fw-bold text-primary mt-3">Contactez-nous</h1>
+        <p class="lead text-muted">
+          Une question, une remarque ? Écrivez-nous, nous vous répondrons dès
+          que possible.
+        </p>
+      </div>
+
+      <!-- Formulaire de contact -->
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <form id="contactForm" novalidate>
+            <div class="mb-3">
+              <label for="contactName" class="form-label">Nom</label>
+              <input
+                type="text"
+                class="form-control"
+                id="contactName"
+                name="name"
+                required
+              />
+              <div class="invalid-feedback" id="contactNameError"></div>
+            </div>
+
+            <div class="mb-3">
+              <label for="contactEmail" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="contactEmail"
+                name="email"
+                required
+              />
+              <div class="invalid-feedback" id="contactEmailError"></div>
+            </div>
+
+            <div class="mb-3">
+              <label for="contactSubject" class="form-label">Sujet</label>
+              <input
+                type="text"
+                class="form-control"
+                id="contactSubject"
+                name="subject"
+                required
+              />
+              <div class="invalid-feedback" id="contactSubjectError"></div>
+            </div>
+
+            <div class="mb-4">
+              <label for="contactMessage" class="form-label">Message</label>
+              <textarea
+                class="form-control"
+                id="contactMessage"
+                name="message"
+                rows="5"
+                required
+              ></textarea>
+              <div class="invalid-feedback" id="contactMessageError"></div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-send-fill me-2"></i>Envoyer le message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

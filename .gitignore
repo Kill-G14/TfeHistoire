@@ -9,6 +9,7 @@ credentials.txt
 
 # Fichiers de développement (ne pas déployer)
 DOCUMENTATION_TECHNIQUE.md
+.claude
 
 # Scripts et documentation de versioning (outils de développement)
 bump-version.sh

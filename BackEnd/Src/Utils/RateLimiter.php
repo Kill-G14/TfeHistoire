@@ -21,6 +21,11 @@ namespace App\Utils;
  */
 class RateLimiter {
   /**
+   * Durée de la fenêtre glissante utilisée pour compter les tentatives (1 heure)
+   */
+  private const WINDOW_DURATION_SECONDS = 3600;
+
+  /**
    * Vérifier si une action est autorisée (pas bloquée)
    * 
    * @param string $action Type d'action (ex: 'login', 'register', 'api_call')
@@ -52,7 +57,7 @@ class RateLimiter {
     // Vérifier si la période de blocage est expirée
     $now = time();
     $blockUntil = $attempts['block_until'] ?? 0;
-    
+
     if ($blockUntil > $now) {
       // Toujours bloqué
       return [
@@ -62,7 +67,7 @@ class RateLimiter {
         'message' => 'Trop de tentatives. Réessayez dans ' . ceil(($blockUntil - $now) / 60) . ' minutes.'
       ];
     }
-    
+
     // Si la période de blocage est expirée, réinitialiser
     if ($blockUntil > 0 && $blockUntil <= $now) {
       self::reset($action, $identifier);
@@ -72,7 +77,18 @@ class RateLimiter {
         'reset_at' => null
       ];
     }
-    
+
+    // Fenêtre glissante : si la première tentative de la fenêtre date de plus d'1h, on repart à zéro
+    $windowStart = $attempts['window_start'] ?? null;
+    if ($windowStart !== null && ($now - $windowStart) > self::WINDOW_DURATION_SECONDS) {
+      self::reset($action, $identifier);
+      return [
+        'allowed' => true,
+        'remaining' => $limits['max_attempts'],
+        'reset_at' => null
+      ];
+    }
+
     // Vérifier le nombre de tentatives
     $attemptCount = $attempts['count'] ?? 0;
     $remaining = max(0, $limits['max_attempts'] - $attemptCount);
@@ -108,10 +124,19 @@ class RateLimiter {
   public static function recordAttempt(string $action, string $identifier): void {
     $key = self::generateKey($action, $identifier);
     $attempts = self::getAttempts($key);
-    
-    $count = isset($attempts['count']) ? $attempts['count'] + 1 : 1;
-    
-    self::saveAttempts($key, $count);
+
+    $now = time();
+    $windowStart = $attempts['window_start'] ?? null;
+
+    // Nouvelle fenêtre si aucune tentative précédente ou fenêtre expirée (> 1h)
+    if ($windowStart === null || ($now - $windowStart) > self::WINDOW_DURATION_SECONDS) {
+      $windowStart = $now;
+      $count = 1;
+    } else {
+      $count = isset($attempts['count']) ? $attempts['count'] + 1 : 1;
+    }
+
+    self::saveAttempts($key, $count, $windowStart);
   }
   
   /**
@@ -134,8 +159,13 @@ class RateLimiter {
    * @return string
    */
   private static function generateKey(string $action, string $identifier): string {
-    // Ajouter l'IP pour plus de sécurité
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+    // Pour le login, le blocage se base uniquement sur l'IP (pas sur l'email tenté)
+    if ($action === 'login') {
+      return hash('sha256', $action . ':' . $ip);
+    }
+
     return hash('sha256', $action . ':' . $identifier . ':' . $ip);
   }
   
@@ -156,6 +186,7 @@ class RateLimiter {
       'login' => $defaults,
       'register' => ['max_attempts' => 3, 'block_duration_minutes' => 30],
       'password_reset' => ['max_attempts' => 3, 'block_duration_minutes' => 60],
+      'contact' => ['max_attempts' => 5, 'block_duration_minutes' => 30],
       'api_call' => ['max_attempts' => 100, 'block_duration_minutes' => 5]
     ];
     
@@ -175,27 +206,27 @@ class RateLimiter {
       // Créer la table si elle n'existe pas
       self::ensureTableExists($pdo);
       
+      // Note : le filtrage sur block_until est volontairement absent ici.
+      // La logique d'expiration du blocage (bloqué / à réinitialiser) est gérée par check().
       $stmt = $pdo->prepare("
-        SELECT attempts_count, block_until, created_at 
-        FROM rate_limiter 
+        SELECT attempts_count, block_until, window_start, created_at
+        FROM rate_limiter
         WHERE lookup_key = :key
-        AND (block_until IS NULL OR block_until > :now)
       ");
-      
-      $now = time();
+
       $stmt->bindParam(':key', $key);
-      $stmt->bindParam(':now', $now, \PDO::PARAM_INT);
       $stmt->execute();
-      
+
       $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-      
+
       if (!$result) {
         return null;
       }
-      
+
       return [
         'count' => (int)$result['attempts_count'],
         'block_until' => $result['block_until'] ? (int)$result['block_until'] : null,
+        'window_start' => $result['window_start'] ? (int)$result['window_start'] : null,
         'created_at' => $result['created_at']
       ];
     } catch (\Exception $e) {
@@ -211,22 +242,30 @@ class RateLimiter {
    * @param int $count
    * @return void
    */
-  private static function saveAttempts(string $key, int $count): void {
+  private static function saveAttempts(string $key, int $count, int $windowStart): void {
     try {
       $pdo = Database::getConnection();
-      
+
+      // Note : chaque placeholder n'est utilisé qu'une seule fois (PDO::ATTR_EMULATE_PREPARES
+      // est désactivé dans Database.php, ce qui interdit de réutiliser un même paramètre nommé).
       $stmt = $pdo->prepare("
-        INSERT INTO rate_limiter (lookup_key, attempts_count, created_at, updated_at)
-        VALUES (:key, :count, :now, :now)
-        ON DUPLICATE KEY UPDATE 
-          attempts_count = :count,
-          updated_at = :now
+        INSERT INTO rate_limiter (lookup_key, attempts_count, window_start, created_at, updated_at)
+        VALUES (:key, :count, :window_start, :created_at, :updated_at)
+        ON DUPLICATE KEY UPDATE
+          attempts_count = :count2,
+          window_start = :window_start2,
+          updated_at = :updated_at2
       ");
-      
+
       $now = time();
       $stmt->bindParam(':key', $key);
       $stmt->bindParam(':count', $count, \PDO::PARAM_INT);
-      $stmt->bindParam(':now', $now, \PDO::PARAM_INT);
+      $stmt->bindParam(':window_start', $windowStart, \PDO::PARAM_INT);
+      $stmt->bindParam(':created_at', $now, \PDO::PARAM_INT);
+      $stmt->bindParam(':updated_at', $now, \PDO::PARAM_INT);
+      $stmt->bindParam(':count2', $count, \PDO::PARAM_INT);
+      $stmt->bindParam(':window_start2', $windowStart, \PDO::PARAM_INT);
+      $stmt->bindParam(':updated_at2', $now, \PDO::PARAM_INT);
       $stmt->execute();
     } catch (\Exception $e) {
       Logger::error('RateLimiter saveAttempts error: ' . $e->getMessage());
@@ -291,12 +330,19 @@ class RateLimiter {
         lookup_key VARCHAR(64) NOT NULL UNIQUE,
         attempts_count INT NOT NULL DEFAULT 0,
         block_until INT NULL,
+        window_start INT NULL,
         created_at INT NOT NULL,
         updated_at INT NOT NULL,
         INDEX idx_lookup (lookup_key),
         INDEX idx_block (block_until)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    // Ajoute la colonne window_start si la table existait déjà avant cette évolution
+    $column = $pdo->query("SHOW COLUMNS FROM rate_limiter LIKE 'window_start'")->fetch();
+    if (!$column) {
+      $pdo->exec("ALTER TABLE rate_limiter ADD COLUMN window_start INT NULL AFTER block_until");
+    }
   }
   
   /**

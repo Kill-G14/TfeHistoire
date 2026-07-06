@@ -9,15 +9,17 @@ require __DIR__ . '/../vendor/autoload.php';
 // Charger les variables d'environnement
 \App\Utils\EnvLoader::load();
 
-// repositories 
+// repositories
 use App\Repositories\UserRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\EventModificationRepository;
 use App\Repositories\SessionRepository;
+use App\Repositories\ContactMessageRepository;
 // Validator
 use App\Validators\UserValidator;
 use App\Validators\EventValidator;
 use App\Validators\EventModificationValidator;
+use App\Validators\ContactValidator;
 // services
 use App\Services\AuthService;
 use App\Services\SessionService;
@@ -25,16 +27,19 @@ use App\Services\UserService;
 use App\Services\EventService;
 use App\Services\EventModificationService;
 use App\Services\EmailService;
+use App\Services\ContactService;
 
-// repositories 
+// repositories
 $userRepository = new UserRepository();
 $eventRepository = new EventRepository();
 $eventModificationRepository = new EventModificationRepository();
 $sessionRepository = new SessionRepository();
+$contactMessageRepository = new ContactMessageRepository();
 // Validator
 $userValidator = new UserValidator();
 $eventValidator = new EventValidator();
 $eventModificationValidator = new EventModificationValidator();
+$contactValidator = new ContactValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
@@ -48,6 +53,7 @@ $eventModificationService = new EventModificationService(
   $emailService,
   $eventModificationValidator
 );
+$contactService = new ContactService($contactMessageRepository, $contactValidator);
 
 $request = json_decode(file_get_contents("php://input"), true);
 
@@ -275,6 +281,30 @@ switch ($resource) {
 
       default:
         $response = ['success' => false, 'message' => 'Action non reconnue pour la ressource users'];
+        break;
+    }
+    break;
+
+  // ============================================
+  // MESSAGES DE CONTACT
+  // ============================================
+  case 'contact_messages':
+    switch ($action) {
+
+      case 'getAll':
+        $response = $contactService->getAllMessages();
+        break;
+
+      case 'markAsTreated':
+        if (!isset($request['id'])) {
+          $response = ['success' => false, 'message' => 'ID non fourni'];
+        } else {
+          $response = $contactService->markAsTreated((int) $request['id']);
+        }
+        break;
+
+      default:
+        $response = ['success' => false, 'message' => 'Action non reconnue pour la ressource contact_messages'];
         break;
     }
     break;
