@@ -296,12 +296,12 @@ function createEventPopup(event) {
 
   return `
     <div style="min-width: 250px;">
-      <h6 class="mb-2">${event.title}</h6>
+      <h6 class="mb-2">${helpers.escapeHtml(event.title)}</h6>
       ${distanceText}
       <p class="mb-2 small text-muted">
         <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.date)}
       </p>
-      <p class="mb-3 small">${event.description ? event.description.substring(0, 100) + "..." : ""}</p>
+      <p class="mb-3 small">${event.description ? helpers.escapeHtml(event.description.substring(0, 100)) + "..." : ""}</p>
       <div class="d-grid gap-2">
         <button class="btn btn-sm btn-outline-primary w-100" onclick="window.showEventDetailFromMap(${event.id})">
           <i class="bi bi-info-circle me-1"></i>Détails
@@ -373,7 +373,7 @@ function renderEventsList() {
       (event) => `
     <div class="card mb-3 event-card" data-event-id="${event.id}" style="cursor: pointer;">
       <div class="card-body">
-        <h6 class="card-title mb-2">${event.title}</h6>
+        <h6 class="card-title mb-2">${helpers.escapeHtml(event.title)}</h6>
         ${
           event.distance !== undefined
             ? `<p class="mb-2 small text-primary">
@@ -384,7 +384,7 @@ function renderEventsList() {
         <p class="mb-2 small text-muted">
           <i class="bi bi-calendar3 me-1"></i>${helpers.formatDate(event.date)}
         </p>
-        <p class="mb-3 small text-muted">${event.description ? event.description.substring(0, 80) + "..." : ""}</p>
+        <p class="mb-3 small text-muted">${event.description ? helpers.escapeHtml(event.description.substring(0, 80)) + "..." : ""}</p>
         <div class="d-flex gap-2">
           <button class="btn btn-sm btn-outline-primary flex-grow-1 view-details" data-event-id="${event.id}">
             <i class="bi bi-info-circle me-1"></i>Détails

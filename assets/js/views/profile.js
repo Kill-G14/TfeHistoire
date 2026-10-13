@@ -201,7 +201,7 @@ function openDeleteEventModal(eventId, eventTitle) {
               <i class="bi bi-exclamation-triangle"></i>
               <strong>Attention !</strong> La suppression devra être validée par un administrateur.
             </div>
-            <p><strong>Événement :</strong> ${eventTitle}</p>
+            <p><strong>Événement :</strong> ${helpers.escapeHtml(eventTitle)}</p>
             <p class="text-muted small">
               Veuillez expliquer la raison de l'annulation. Ce message sera envoyé par email à tous les participants ayant réservé ou acheté des billets.
             </p>
@@ -523,7 +523,7 @@ function displayCreatedEvents(events) {
                 <i class="bi bi-pencil"></i> Modifier
               </button>
               <button class="btn btn-danger btn-sm" 
-                      onclick="event.stopPropagation(); openDeleteEventModal(${event.id}, '${event.title.replace(/'/g, "\\'")}')">
+                      onclick="event.stopPropagation(); openDeleteEventModal(${event.id}, '${helpers.escapeHtml(event.title.replace(/\\/g, "\\\\").replace(/'/g, "\\'"))}')">
                 <i class="bi bi-trash"></i> Supprimer
               </button>
             `;
@@ -536,14 +536,14 @@ function displayCreatedEvents(events) {
                style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start mb-3">
-                <h5 class="card-title text-primary mb-0">${event.title}</h5>
+                <h5 class="card-title text-primary mb-0">${helpers.escapeHtml(event.title)}</h5>
                 ${statusBadge}
               </div>
               
               <div class="mb-3">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-geo-alt text-muted"></i>
-                  <span class="small">${event.city}, ${event.country}</span>
+                  <span class="small">${helpers.escapeHtml(event.city)}, ${helpers.escapeHtml(event.country)}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-calendar3 text-muted"></i>
@@ -671,12 +671,12 @@ function displayFavorites(favorites) {
                onclick="viewEventDetails(${event.id})" 
                style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div class="card-body">
-              <h5 class="card-title text-primary mb-3">${event.title}</h5>
+              <h5 class="card-title text-primary mb-3">${helpers.escapeHtml(event.title)}</h5>
               
               <div class="mb-3">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-geo-alt text-muted"></i>
-                  <span>${event.city}, ${event.country}</span>
+                  <span>${helpers.escapeHtml(event.city)}, ${helpers.escapeHtml(event.country)}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-calendar3 text-muted"></i>
@@ -874,7 +874,7 @@ function displayReservations(reservations) {
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <div>
-                <h6 class="card-title mb-1">${reservation.event_title}</h6>
+                <h6 class="card-title mb-1">${helpers.escapeHtml(reservation.event_title)}</h6>
                 <small class="text-muted">
                   <i class="bi bi-calendar3"></i> Réservé le ${reservationDate}
                 </small>
@@ -889,7 +889,7 @@ function displayReservations(reservations) {
               </div>
               <div class="d-flex align-items-center mb-2">
                 <i class="bi bi-geo-alt me-2 text-primary"></i>
-                <span>${reservation.event_city} - ${reservation.event_address}</span>
+                <span>${helpers.escapeHtml(reservation.event_city)} - ${helpers.escapeHtml(reservation.event_address)}</span>
               </div>
               <div class="d-flex align-items-center">
                 <i class="bi bi-ticket-perforated me-2 text-primary"></i>

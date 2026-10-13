@@ -119,11 +119,11 @@ function openDayEventsModal(date, events) {
         eventCard.innerHTML = `
           <div class="d-flex justify-content-between align-items-start">
             <div class="flex-grow-1">
-              <h6 class="modal-event-title">${event.title}</h6>
+              <h6 class="modal-event-title">${helpers.escapeHtml(event.title)}</h6>
               <p class="modal-event-location mb-1">
-                <i class="bi bi-geo-alt"></i> ${event.location || "Lieu non spécifié"}
+                <i class="bi bi-geo-alt"></i> ${helpers.escapeHtml(event.location || "Lieu non spécifié")}
               </p>
-              ${event.description ? `<p class="modal-event-description">${event.description.substring(0, 150)}${event.description.length > 150 ? "..." : ""}</p>` : ""}
+              ${event.description ? `<p class="modal-event-description">${helpers.escapeHtml(event.description.substring(0, 150))}${event.description.length > 150 ? "..." : ""}</p>` : ""}
             </div>
             <button class="btn btn-sm btn-primary ms-3" data-event-id="${event.id}">
               Voir détails

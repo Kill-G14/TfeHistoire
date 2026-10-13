@@ -121,6 +121,18 @@ export const helpers = {
     modalInstance.hide();
   },
 
+  // Neutralise le HTML d'une donnée saisie par un utilisateur avant de l'insérer dans un gabarit innerHTML
+  escapeHtml(value) {
+    const replacements = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return String(value ?? "").replace(/[&<>"']/g, (char) => replacements[char]);
+  },
+
   // Encoder pour URL
   encodeQueryParam(value) {
     return encodeURIComponent(value);

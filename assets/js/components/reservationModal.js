@@ -71,7 +71,7 @@ export async function showReservationModal(event, quantity = 1) {
     eventInfo.innerHTML = `
       <div class="card-body">
         <h5 class="card-title text-primary mb-3">
-          <i class="bi bi-star-fill me-2"></i>${event.title}
+          <i class="bi bi-star-fill me-2"></i>${helpers.escapeHtml(event.title)}
         </h5>
         <div class="d-flex flex-column gap-2">
           <div class="d-flex align-items-center">
@@ -84,7 +84,7 @@ export async function showReservationModal(event, quantity = 1) {
           </div>
           <div class="d-flex align-items-center">
             <i class="bi bi-geo-alt-fill text-muted me-2" style="width: 20px;"></i>
-            <span class="text-muted">${event.city}, ${event.country}</span>
+            <span class="text-muted">${helpers.escapeHtml(event.city)}, ${helpers.escapeHtml(event.country)}</span>
           </div>
           <div class="d-flex align-items-center mt-2">
             <i class="bi bi-tag-fill text-success me-2" style="width: 20px;"></i>

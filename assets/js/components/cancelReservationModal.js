@@ -81,11 +81,11 @@ function displayEventInfo(eventInfo) {
     <div class="card-body">
       <h6 class="card-title mb-2">
         <i class="bi bi-calendar-event text-primary me-2"></i>
-        ${eventInfo.name}
+        ${helpers.escapeHtml(eventInfo.name)}
       </h6>
       <p class="card-text small text-muted mb-2">
         <i class="bi bi-geo-alt me-2"></i>
-        ${eventInfo.location || "Non spécifié"}
+        ${helpers.escapeHtml(eventInfo.location || "Non spécifié")}
       </p>
       <p class="card-text small text-muted mb-0">
         <i class="bi bi-clock me-2"></i>
