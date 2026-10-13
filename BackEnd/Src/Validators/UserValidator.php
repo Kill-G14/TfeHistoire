@@ -28,6 +28,8 @@ class UserValidator {
       $errors['name'] = 'Veuillez indiquer votre nom pour personnaliser votre profil';
     } elseif (strlen($data['name']) < 2) {
       $errors['name'] = 'Votre nom est trop court. Veuillez saisir au moins 2 caractères';
+    } elseif (Helpers::containsHtml($data['name'])) {
+      $errors['name'] = 'Votre nom ne peut pas contenir de code HTML ou de balises';
     }
 
     return $errors;
@@ -60,6 +62,8 @@ class UserValidator {
     if (isset($data['name']) && !Helpers::isEmpty($data['name'])) {
       if (strlen($data['name']) < 2) {
         $errors['name'] = 'Le nom saisi est trop court. Veuillez entrer au moins 2 caractères';
+      } elseif (Helpers::containsHtml($data['name'])) {
+        $errors['name'] = 'Le nom ne peut pas contenir de code HTML ou de balises';
       }
     }
 

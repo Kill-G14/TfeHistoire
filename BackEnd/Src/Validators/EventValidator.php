@@ -43,6 +43,23 @@ class EventValidator {
       $errors['address'] = 'Veuillez saisir l\'adresse complète du lieu de l\'événement';
     }
 
+    // Aucun HTML dans les champs texte : le front échappe déjà, mais le back ne doit pas
+    // dépendre du front (une requête peut être envoyée sans passer par l'interface)
+    $textFields = [
+      'title' => 'Le titre',
+      'description' => 'La description',
+      'country' => 'Le pays',
+      'city' => 'La ville',
+      'postal_code' => 'Le code postal',
+      'address' => 'L\'adresse',
+      'category' => 'La catégorie',
+    ];
+    foreach ($textFields as $field => $label) {
+      if (!isset($errors[$field]) && Helpers::containsHtml($data[$field] ?? null)) {
+        $errors[$field] = $label . ' ne peut pas contenir de code HTML ou de balises';
+      }
+    }
+
     // Date
     if (Helpers::isEmpty($data['date'] ?? null)) {
       $errors['date'] = 'Veuillez indiquer la date à laquelle aura lieu votre événement';

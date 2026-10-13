@@ -18,6 +18,12 @@ class Helpers {
     return htmlspecialchars(strip_tags(trim($string)), ENT_QUOTES, 'UTF-8');
   }
 
+  // Détecter une balise HTML dans un texte saisi (<b>, </div>, <script, <!-- ...).
+  // Un simple "<" suivi d'un espace ou d'un chiffre (ex. "2 < 3") reste autorisé.
+  public static function containsHtml($value): bool {
+    return is_string($value) && preg_match('/<[a-zA-Z\/!?]/', $value) === 1;
+  }
+
   // Valider une date au format Y-m-d
   public static function isValidDate(string $date): bool {
     $dateTime = \DateTime::createFromFormat('Y-m-d', $date);

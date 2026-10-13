@@ -218,6 +218,10 @@ class EventModificationService {
       return ['success' => false, 'message' => 'Le message d\'excuse est obligatoire'];
     }
 
+    if (\App\Utils\Helpers::containsHtml($deletionMessage)) {
+      return ['success' => false, 'message' => 'Le message ne peut pas contenir de code HTML ou de balises'];
+    }
+
     // Marquer l'événement comme en attente de suppression
     $this->eventRepository->setDeletionRequested($eventId, true, $deletionMessage);
 

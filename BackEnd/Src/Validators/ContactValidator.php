@@ -14,6 +14,8 @@ class ContactValidator {
       $errors['name'] = 'Veuillez indiquer votre nom';
     } elseif (strlen($data['name']) < 2) {
       $errors['name'] = 'Le nom est trop court. Veuillez saisir au moins 2 caractères';
+    } elseif (Helpers::containsHtml($data['name'])) {
+      $errors['name'] = 'Le nom ne peut pas contenir de code HTML ou de balises';
     }
 
     // Email
@@ -28,6 +30,8 @@ class ContactValidator {
       $errors['subject'] = 'Veuillez indiquer le sujet de votre demande';
     } elseif (strlen($data['subject']) < 3) {
       $errors['subject'] = 'Le sujet est trop court. Veuillez saisir au moins 3 caractères';
+    } elseif (Helpers::containsHtml($data['subject'])) {
+      $errors['subject'] = 'Le sujet ne peut pas contenir de code HTML ou de balises';
     }
 
     // Message
@@ -35,6 +39,8 @@ class ContactValidator {
       $errors['message'] = 'Veuillez décrire votre demande';
     } elseif (strlen($data['message']) < 10) {
       $errors['message'] = 'Le message est trop court. Veuillez saisir au moins 10 caractères';
+    } elseif (Helpers::containsHtml($data['message'])) {
+      $errors['message'] = 'Le message ne peut pas contenir de code HTML ou de balises';
     }
 
     return $errors;
