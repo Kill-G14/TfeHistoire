@@ -194,6 +194,21 @@ class ReservationRepository
     }
 
     /**
+     * La réservation est-elle encore dans le délai de retenue des places (paiement possible) ?
+     */
+    public function isPendingWithinHold(int $id): bool
+    {
+        $query = "SELECT COUNT(*) FROM reservations
+                  WHERE id = :id AND status = 'pending_payment'
+                    AND created_at > (NOW() - INTERVAL " . self::PENDING_PAYMENT_MINUTES . " MINUTE)";
+
+        $stmt = $this->getPdo()->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    /**
      * Mémoriser la session de paiement Stripe d'une réservation
      */
     public function setStripeSessionId(int $id, string $sessionId): bool
@@ -260,7 +275,9 @@ class ReservationRepository
     public function cancel(int $id): bool
     {
         $query = "UPDATE reservations 
-                  SET status = 'cancelled', updated_at = NOW()
+                  SET status = 'cancelled',
+                      payment_status = IF(payment_status = 'pending', 'expired', payment_status),
+                      updated_at = NOW()
                   WHERE id = :id";
 
         $stmt = $this->getPdo()->prepare($query);

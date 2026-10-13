@@ -91,6 +91,14 @@ function displayEventInfo(eventInfo) {
         <i class="bi bi-clock me-2"></i>
         ${formattedDate}
       </p>
+      ${
+        eventInfo.isPaid
+          ? `<p class="small text-danger mb-0 mt-3">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        MemoriaEventia ne rembourse pas les réservations payées. Pour un remboursement, contactez l'organisateur${eventInfo.organizerName ? ` (${helpers.escapeHtml(eventInfo.organizerName)})` : ""}.
+      </p>`
+          : ""
+      }
     </div>
   `;
 }

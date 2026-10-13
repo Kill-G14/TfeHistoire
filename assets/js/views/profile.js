@@ -18,6 +18,7 @@ import {
 } from "../components/resetPasswordModal.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 import { renderLoginRequiredPage } from "../components/loginModal.js";
+import PaymentManager from "../managers/PaymentManager.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -76,7 +77,12 @@ export async function mount(container, params) {
   }
 
   // Charger et afficher les données utilisateur
-  await Promise.all([loadFavorites(), loadCreatedEvents(), loadReservations()]);
+  await Promise.all([
+    loadFavorites(),
+    loadCreatedEvents(),
+    loadReservations(),
+    renderStripeConnectBox(),
+  ]);
 
   // Écouter les changements de favoris
   appState.subscribe("favorites", loadFavorites);
@@ -85,6 +91,99 @@ export async function mount(container, params) {
   window.openModifyEventModal = openModifyEventModal;
   window.openDeleteEventModal = openDeleteEventModal;
 }
+
+// Bloc "paiement en ligne" de la section Mes événements :
+// l'organisateur relie son propre compte Stripe, l'argent lui est versé directement
+async function renderStripeConnectBox() {
+  const box = document.getElementById("stripeConnectBox");
+  const token = auth.getToken();
+  if (!box || !token) return;
+
+  const status = await PaymentManager.getStripeAccountStatus(token);
+  const isConnected = Boolean(status.success && status.data?.connected);
+  const hasAccount = Boolean(status.success && status.data?.has_account);
+
+  // Garde le profil d'état à jour sans déclencher les abonnés de "user"
+  const user = appState.get("user");
+  if (user) user.stripe_connected = isConnected;
+
+  box.innerHTML = "";
+
+  const alert = document.createElement("div");
+  alert.className = `alert ${isConnected ? "alert-success" : "alert-info"} mb-0`;
+
+  const message = document.createElement("p");
+  message.className = "mb-0";
+  message.textContent = isConnected
+    ? "Compte Stripe connecté : vous pouvez proposer des événements payants. Les paiements sont versés directement sur votre compte Stripe."
+    : "Pour proposer des événements payants, connectez votre compte Stripe. Les paiements seront versés directement sur votre compte : MemoriaEventia ne perçoit aucun montant.";
+  alert.appendChild(message);
+
+  if (!isConnected) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-primary btn-sm mt-3";
+    button.textContent = hasAccount
+      ? "Terminer la connexion Stripe"
+      : "Connecter mon compte Stripe";
+    button.addEventListener("click", async () => {
+      helpers.setButtonLoading(button, "Redirection vers Stripe...");
+      const result = await PaymentManager.connectStripeAccount(token);
+
+      if (result.success && result.data?.url) {
+        window.location.href = result.data.url;
+        return;
+      }
+
+      helpers.resetButton(button);
+      helpers.showToast(
+        result.message || "Impossible de contacter Stripe",
+        "error",
+      );
+    });
+
+    // Rappel des conditions : simple texte avec lien, aucune case à cocher
+    const terms = document.createElement("p");
+    terms.className = "form-text mt-2 mb-0";
+    terms.append("En connectant votre compte, vous restez responsable de vos événements : ");
+    const termsLink = document.createElement("a");
+    termsLink.href = "/terms";
+    termsLink.setAttribute("data-link", "");
+    termsLink.textContent = "voir les conditions d'utilisation";
+    terms.append(termsLink, ".");
+
+    alert.append(button, terms);
+  }
+
+  box.appendChild(alert);
+
+  // Retour de l'inscription Stripe : message selon le résultat
+  const stripeReturn = new URLSearchParams(window.location.search).get("stripe");
+  if (stripeReturn === "return") {
+    helpers.showToast(
+      isConnected
+        ? "Compte Stripe connecté avec succès"
+        : "Inscription Stripe non terminée : vous pouvez la reprendre à tout moment",
+      isConnected ? "success" : "warning",
+    );
+  }
+}
+
+// Reprendre le paiement d'une réservation en attente (fonction globale pour onclick)
+window.resumePayment = async function (reservationId) {
+  const result = await PaymentManager.createCheckoutSession(
+    reservationId,
+    auth.getToken(),
+  );
+
+  if (result.success && result.data?.url) {
+    window.location.href = result.data.url;
+    return;
+  }
+
+  helpers.showToast(result.message || "Impossible de reprendre le paiement", "error");
+  await loadReservations();
+};
 
 // Ouvrir la modal de modification d'événement
 function openModifyEventModal(eventId, currentDate, currentTime) {
@@ -506,7 +605,7 @@ function displayCreatedEvents(events) {
               '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejeté</span>';
           }
 
-          const priceDisplay = "Gratuit";
+          const priceDisplay = helpers.formatEventPrice(event.price);
 
           // Boutons d'action selon le statut
           let actionButtons = `
@@ -548,7 +647,7 @@ function displayCreatedEvents(events) {
                 <h5 class="card-title text-primary mb-0">${helpers.escapeHtml(event.title)}</h5>
                 ${statusBadge}
               </div>
-              
+
               <div class="mb-3">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-geo-alt text-muted"></i>
@@ -563,7 +662,7 @@ function displayCreatedEvents(events) {
                   <span class="fw-bold text-primary small">${priceDisplay}</span>
                 </div>
               </div>
-              
+
               <div class="d-flex gap-2">
                 ${actionButtons}
               </div>
@@ -633,7 +732,7 @@ function displayFavorites(favorites) {
       ${favorites
         .map((event) => {
           // Gérer le prix
-          const priceDisplay = "Gratuit";
+          const priceDisplay = helpers.formatEventPrice(event.price);
 
           return `
         <div class="favorite-card-wrapper" id="favorite-card-${event.id}">
@@ -642,7 +741,7 @@ function displayFavorites(favorites) {
                style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div class="card-body">
               <h5 class="card-title text-primary mb-3">${helpers.escapeHtml(event.title)}</h5>
-              
+
               <div class="mb-3">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-geo-alt text-muted"></i>
@@ -657,7 +756,7 @@ function displayFavorites(favorites) {
                   <span class="fw-bold text-primary">${priceDisplay}</span>
                 </div>
               </div>
-              
+
               <div class="d-flex gap-2">
                 <button class="btn btn-primary btn-sm flex-grow-1" 
                         onclick="event.stopPropagation(); viewEventDetails(${event.id})">
@@ -756,9 +855,11 @@ async function loadReservations() {
   const result = await ReservationManager.getMyReservations(token);
 
   if (result.success && result.data && result.data.length > 0) {
-    // Filtrer pour ne garder que les réservations confirmées (exclure les annulées)
+    // Garder les réservations confirmées et celles en attente de paiement (exclure les annulées)
     userReservations = result.data.filter(
-      (reservation) => reservation.status === "confirmed",
+      (reservation) =>
+        reservation.status === "confirmed" ||
+        reservation.status === "pending_payment",
     );
 
     if (userReservations.length > 0) {
@@ -820,9 +921,17 @@ function displayReservations(reservations) {
           let statusBadge = "";
           let statusClass = "";
 
-          if (reservation.status === "confirmed") {
+          if (reservation.status === "pending_payment") {
+            statusBadge =
+              '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>Paiement en attente</span>';
+          } else if (reservation.status === "confirmed") {
             statusBadge =
               '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Confirmée</span>';
+            // Réservation payante réglée : badge supplémentaire
+            if (reservation.payment_status === "paid") {
+              statusBadge +=
+                ' <span class="badge bg-primary"><i class="bi bi-credit-card me-1"></i>Payée</span>';
+            }
           } else if (reservation.status === "cancelled") {
             statusBadge =
               '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Annulée</span>';
@@ -830,7 +939,14 @@ function displayReservations(reservations) {
           }
 
           // Tous les événements sont gratuits
-          const priceDisplay = "Gratuit";
+          // Montant réellement dû (prix x places) pour une réservation payante
+          const priceDisplay =
+            Number(reservation.event_price) > 0
+              ? helpers.formatEventPrice(
+                  reservation.amount_total ??
+                    Number(reservation.event_price) * reservation.quantity,
+                )
+              : "Gratuit";
 
           const reservationDate = helpers.formatDate(reservation.created_at);
           const eventDate = helpers.formatDate(reservation.event_date);
@@ -863,10 +979,22 @@ function displayReservations(reservations) {
                   <i class="bi bi-tag text-muted"></i>
                   <span class="fw-bold text-primary">${priceDisplay}</span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 mb-2">
                   <i class="bi bi-clock-history text-muted"></i>
                   <span class="small text-muted">Réservé le ${reservationDate}</span>
                 </div>
+                ${
+                  reservation.organizer_name
+                    ? `<div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-person-badge text-muted"></i>
+                  <span class="small">Organisateur : ${helpers.escapeHtml(reservation.organizer_name)}${
+                    reservation.organizer_email
+                      ? ` &middot; <a href="mailto:${helpers.escapeHtml(reservation.organizer_email)}" onclick="event.stopPropagation()">${helpers.escapeHtml(reservation.organizer_email)}</a>`
+                      : ""
+                  }</span>
+                </div>`
+                    : ""
+                }
               </div>
 
               <!-- Étape 7 : l'emplacement des billets (QR + PDF) viendra ici, au-dessus des boutons -->
@@ -876,7 +1004,18 @@ function displayReservations(reservations) {
                   <i class="bi bi-eye"></i> Voir détails
                 </button>
                 ${
-                  reservation.status === "confirmed"
+                  reservation.status === "pending_payment"
+                    ? `
+                <button class="btn btn-warning btn-sm"
+                        onclick="event.stopPropagation(); resumePayment(${reservation.id})"
+                        title="Payer maintenant">
+                  <i class="bi bi-credit-card"></i> Payer
+                </button>
+                `
+                    : ""
+                }
+                ${
+                  reservation.status === "confirmed" || reservation.status === "pending_payment"
                     ? `
                 <button class="btn btn-outline-danger btn-sm"
                         onclick="event.stopPropagation(); cancelReservation(${reservation.id})"
@@ -926,6 +1065,9 @@ window.cancelReservation = function (reservationId) {
     name: reservation.event_title,
     date: reservation.event_date,
     location: `${reservation.event_city} - ${reservation.event_address}`,
+    // Aucun remboursement automatique pour une réservation déjà payée
+    isPaid: reservation.payment_status === "paid",
+    organizerName: reservation.organizer_name,
   };
 
   // Ouvrir la modal de confirmation avec un callback

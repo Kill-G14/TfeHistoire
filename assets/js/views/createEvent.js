@@ -71,6 +71,38 @@ export async function mount(container, params) {
 
   // Indicateur d'étapes
   initSteps();
+
+  // Champ prix : modifiable seulement si le compte Stripe de l'organisateur est connecté
+  setupPriceField();
+}
+
+function setupPriceField() {
+  const priceInput = document.getElementById("price");
+  const priceHelp = document.getElementById("priceHelp");
+  if (!priceInput || !priceHelp) return;
+
+  const user = appState.get("user");
+
+  if (user?.stripe_connected) {
+    priceInput.type = "number";
+    priceInput.readOnly = false;
+    priceInput.value = "0";
+    priceInput.min = "0";
+    priceInput.max = "500";
+    priceInput.step = "0.01";
+    priceHelp.textContent =
+      "0 = événement gratuit. Pour un événement payant : minimum 0,50 €. Le paiement est versé directement sur votre compte Stripe.";
+    return;
+  }
+
+  // Pas de compte Stripe connecté : l'événement reste gratuit
+  priceHelp.textContent =
+    "Votre événement sera gratuit tant que votre compte Stripe n'est pas connecté. ";
+  const link = document.createElement("a");
+  link.href = "/profile?section=events";
+  link.setAttribute("data-link", "");
+  link.textContent = "Connecter mon compte Stripe";
+  priceHelp.appendChild(link);
 }
 
 // Champs obligatoires de chaque étape : une étape est "complète" quand ils sont tous remplis
@@ -188,6 +220,7 @@ const errorFieldMapping = {
   date: "date",
   time: "time",
   ticket_quantity: "ticketQuantity",
+  price: "price",
 };
 
 // Afficher les erreurs de validation sur les champs
@@ -529,6 +562,11 @@ async function handleSubmit(e) {
     category: document.getElementById("category").value,
     image_event: null, // Pas d'image pour le moment
     ticket_quantity: ticketQuantityInput?.value || 0,
+    // Seul un champ numérique (compte Stripe connecté) peut envoyer un prix
+    price:
+      document.getElementById("price")?.type === "number"
+        ? document.getElementById("price").value || 0
+        : 0,
   };
 
   // Appel API pour créer l'événement

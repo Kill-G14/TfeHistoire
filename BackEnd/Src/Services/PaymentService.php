@@ -152,6 +152,12 @@ class PaymentService
             return ['success' => false, 'message' => 'Cette réservation n\'est plus en attente de paiement'];
         }
 
+        // Délai de retenue dépassé : les places ont pu être reprises, il faut réserver à nouveau
+        if (!$this->reservationRepository->isPendingWithinHold($reservation->id)) {
+            $this->reservationRepository->markPaymentUnsuccessful($reservation->id, 'expired');
+            return ['success' => false, 'message' => 'Le délai de paiement est dépassé, veuillez réserver à nouveau'];
+        }
+
         $event = $this->eventRepository->getEventById($reservation->event_id);
         $organizer = $event ? $this->userRepository->getUserById($event->user_id) : null;
         $user = $this->userRepository->getUserById($userId);
