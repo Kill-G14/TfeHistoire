@@ -88,6 +88,12 @@ export async function mount(container, params) {
   // Attacher les événements de filtrage
   filters.attachFilterListeners({}, applyFilters);
 
+  // Réinitialisation des filtres (bouton toujours à portée, à côté du tri)
+  const resetFiltersButton = document.getElementById("resetFiltersBtn");
+  if (resetFiltersButton) {
+    resetFiltersButton.addEventListener("click", resetFilters);
+  }
+
   // Tri
   const sortSelect = document.getElementById("sortSelect");
   if (sortSelect) {
@@ -150,7 +156,12 @@ async function displayEvents() {
   }
 
   // Le bouton de réinitialisation n'a de sens que si des filtres sont actifs
-  const onReset = filters.hasActiveFilters() ? resetFilters : null;
+  const hasActiveFilters = filters.hasActiveFilters();
+  const resetFiltersButton = document.getElementById("resetFiltersBtn");
+  if (resetFiltersButton) {
+    resetFiltersButton.hidden = !hasActiveFilters;
+  }
+  const onReset = hasActiveFilters ? resetFilters : null;
   await renderEventCards(
     sortedEvents,
     "eventsList",

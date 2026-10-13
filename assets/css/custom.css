@@ -1803,3 +1803,43 @@ html {
     font-size: 1.75rem;
   }
 }
+
+/* Accueil : barre compteur / réinitialiser / tri */
+.results-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: "count reset sort";
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.results-count {
+  grid-area: count;
+}
+
+.results-reset {
+  grid-area: reset;
+  white-space: nowrap;
+}
+
+.results-reset[hidden] {
+  display: none;
+}
+
+.results-sort {
+  grid-area: sort;
+}
+
+/* Téléphone : compteur et réinitialisation sur la première ligne, tri pleine largeur dessous */
+@media (max-width: 575px) {
+  .results-bar {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "count reset"
+      "sort sort";
+  }
+
+  .results-sort .form-select {
+    flex: 1;
+  }
+}
