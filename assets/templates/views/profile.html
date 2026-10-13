@@ -25,12 +25,16 @@
     </div>
 
     <!-- Statistiques cliquables -->
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-4" role="tablist" aria-label="Sections du profil">
       <div class="col-md-4">
         <button
           class="profile-stat-card stat-card-btn w-100"
           data-section="events"
           type="button"
+          role="tab"
+          id="tab-events"
+          aria-controls="section-events"
+          aria-selected="false"
         >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon">
@@ -48,6 +52,10 @@
           class="profile-stat-card stat-card-btn w-100"
           data-section="reservations"
           type="button"
+          role="tab"
+          id="tab-reservations"
+          aria-controls="section-reservations"
+          aria-selected="false"
         >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon">
@@ -65,6 +73,10 @@
           class="profile-stat-card stat-card-btn w-100 active"
           data-section="favorites"
           type="button"
+          role="tab"
+          id="tab-favorites"
+          aria-controls="section-favorites"
+          aria-selected="true"
         >
           <div class="d-flex align-items-center gap-3">
             <div class="stat-icon">
@@ -80,7 +92,9 @@
     </div>
 
     <!-- Section Mes Événements (cachée par défaut) -->
-    <div class="profile-section" id="section-events" style="display: none">
+    <div class="profile-section" id="section-events"
+      role="tabpanel"
+      aria-labelledby="tab-events" style="display: none">
       <div class="profile-section-card">
         <div class="section-header">
           <div
@@ -119,6 +133,8 @@
     <div
       class="profile-section"
       id="section-reservations"
+      role="tabpanel"
+      aria-labelledby="tab-reservations"
       style="display: none"
     >
       <div class="profile-section-card">
@@ -145,7 +161,9 @@
     </div>
 
     <!-- Section Mes Favoris (affichée par défaut) -->
-    <div class="profile-section" id="section-favorites">
+    <div class="profile-section" id="section-favorites"
+      role="tabpanel"
+      aria-labelledby="tab-favorites">
       <div class="profile-section-card">
         <div class="section-header">
           <div class="d-flex align-items-center gap-3 mb-3">

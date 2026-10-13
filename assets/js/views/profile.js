@@ -334,11 +334,17 @@ function activateSection(section) {
   if (!targetElement) return;
 
   // Retirer la classe active de tous les boutons, puis l'ajouter au bon
-  statButtons.forEach((btn) => btn.classList.remove("active"));
+  statButtons.forEach((btn) => {
+    btn.classList.remove("active");
+    btn.setAttribute("aria-selected", "false");
+  });
   const matchingButton = document.querySelector(
     `.stat-card-btn[data-section="${section}"]`,
   );
-  if (matchingButton) matchingButton.classList.add("active");
+  if (matchingButton) {
+    matchingButton.classList.add("active");
+    matchingButton.setAttribute("aria-selected", "true");
+  }
 
   // Cacher toutes les sections puis afficher celle ciblée
   document.querySelectorAll(".profile-section").forEach((sec) => {
@@ -485,16 +491,19 @@ function displayCreatedEvents(events) {
           let statusBadge = "";
           if (event.deletion_requested) {
             statusBadge =
-              '<span class="badge bg-dark">En attente de suppression</span>';
+              '<span class="badge bg-dark"><i class="bi bi-trash me-1"></i>En attente de suppression</span>';
           } else if (event.has_pending_modification) {
             statusBadge =
-              '<span class="badge bg-info">Modification en attente</span>';
+              '<span class="badge bg-info"><i class="bi bi-pencil me-1"></i>Modification en attente</span>';
           } else if (event.is_pending) {
-            statusBadge = '<span class="badge bg-warning">En attente</span>';
+            statusBadge =
+              '<span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>En attente</span>';
           } else if (event.is_approved) {
-            statusBadge = '<span class="badge bg-success">Approuvé</span>';
+            statusBadge =
+              '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approuvé</span>';
           } else if (event.is_rejected) {
-            statusBadge = '<span class="badge bg-danger">Rejeté</span>';
+            statusBadge =
+              '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rejeté</span>';
           }
 
           const priceDisplay = "Gratuit";
@@ -812,9 +821,11 @@ function displayReservations(reservations) {
           let statusClass = "";
 
           if (reservation.status === "confirmed") {
-            statusBadge = '<span class="badge bg-success">Confirmée</span>';
+            statusBadge =
+              '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Confirmée</span>';
           } else if (reservation.status === "cancelled") {
-            statusBadge = '<span class="badge bg-danger">Annulée</span>';
+            statusBadge =
+              '<span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Annulée</span>';
             statusClass = "border-danger";
           }
 
@@ -858,6 +869,7 @@ function displayReservations(reservations) {
                 </div>
               </div>
 
+              <!-- Étape 7 : l'emplacement des billets (QR + PDF) viendra ici, au-dessus des boutons -->
               <div class="d-flex gap-2">
                 <button class="btn btn-primary btn-sm flex-grow-1"
                         onclick="event.stopPropagation(); viewReservationEventDetails(${reservation.event_id})">

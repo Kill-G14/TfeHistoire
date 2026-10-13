@@ -1817,3 +1817,34 @@ html {
     flex: 1;
   }
 }
+
+/* Onglet actif : bordure colorée (déjà en place) + fond blanc plein et ombre plus marquée */
+.stat-card-btn.active {
+  background: white;
+  transform: translateY(-2px);
+}
+
+.stat-card-btn:not(.active) {
+  opacity: 0.85;
+}
+
+.stat-card-btn:not(.active):hover,
+.stat-card-btn:not(.active):focus-visible {
+  opacity: 1;
+}
+
+/* États vides : icône dans un cercle coloré pour un rendu plus soigné */
+.empty-state-small > i {
+  width: 88px;
+  height: 88px;
+  line-height: 88px;
+  border-radius: 50%;
+  background: rgba(15, 94, 89, 0.08);
+  color: var(--color-primary) !important;
+  font-size: 2.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.empty-state-small p {
+  color: var(--color-text-muted);
+}
