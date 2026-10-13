@@ -13,6 +13,7 @@ class ComposerStaticInit759a1d9f42300b059b0e00aa19de5de7
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
+            'Stripe\\' => 7,
             'SendGrid\\Stats\\' => 15,
             'SendGrid\\Mail\\' => 14,
             'SendGrid\\Helper\\' => 16,
@@ -31,6 +32,10 @@ class ComposerStaticInit759a1d9f42300b059b0e00aa19de5de7
     );
 
     public static $prefixDirsPsr4 = array (
+        'Stripe\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
         'SendGrid\\Stats\\' => 
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/stats',
