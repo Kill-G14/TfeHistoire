@@ -566,6 +566,45 @@ function displayCreatedEvents(events) {
         .join("")}
     </div>
   `;
+
+  // Le conteneur est réutilisé à chaque rechargement : on n'attache les écouteurs qu'une fois
+  if (!reservationsContainer.dataset.cardEventsAttached) {
+    attachReservationCardEvents(reservationsContainer);
+    reservationsContainer.dataset.cardEventsAttached = "true";
+  }
+}
+
+// Ouvre le détail de l'événement lié à une réservation (clic ou clavier sur la carte)
+function attachReservationCardEvents(container) {
+  const openEventFromCard = async (card) => {
+    // Le détail attend un événement complet : la réservation ne contient qu'un résumé
+    const result = await EventManager.getById(Number(card.dataset.eventId));
+
+    if (result.success && result.data) {
+      showEventDetail(result.data);
+    } else {
+      helpers.showToast("Cet événement n'est plus disponible", "error");
+    }
+  };
+
+  container.addEventListener("click", (e) => {
+    // Le bouton d'annulation garde son propre comportement
+    if (e.target.closest("button")) return;
+
+    const card = e.target.closest(".reservation-card");
+    if (card) openEventFromCard(card);
+  });
+
+  container.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target.closest("button")) return;
+
+    const card = e.target.closest(".reservation-card");
+    if (card) {
+      e.preventDefault();
+      openEventFromCard(card);
+    }
+  });
 }
 
 // Voir les détails d'un événement créé (fonction globale pour onclick)
@@ -829,7 +868,9 @@ function displayReservations(reservations) {
           const eventDate = helpers.formatDate(reservation.event_date);
 
           return `
-        <div class="card ${statusClass}" style="border-width: 2px;">
+        <div class="card reservation-card ${statusClass}" style="border-width: 2px; cursor: pointer;"
+             role="button" tabindex="0"
+             data-event-id="${reservation.event_id}">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <div>
