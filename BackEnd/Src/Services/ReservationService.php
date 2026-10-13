@@ -11,6 +11,9 @@ use App\Utils\Logger;
 
 class ReservationService
 {
+    // Plafond de places par commande (limite les abus et simplifie le paiement)
+    public const MAX_QUANTITY_PER_ORDER = 10;
+
     private ReservationRepository $reservationRepository;
     private EventRepository $eventRepository;
     private UserRepository $userRepository;
@@ -66,28 +69,57 @@ class ReservationService
             ];
         }
 
-        // Vérifier qu'il reste des places disponibles
-        // Si ticket_quantity = 0, cela signifie "illimité" (événement gratuit sans limite)
-        if ($event->ticket_quantity > 0) {
-            $reservedCount = $this->reservationRepository->getReservedCount($eventId);
-            $availableTickets = $event->ticket_quantity - $reservedCount;
+        // Quantité : entiers de 1 à 10 par commande
+        $quantity = (int) $quantity;
+        if ($quantity < 1 || $quantity > self::MAX_QUANTITY_PER_ORDER) {
+            return [
+                'success' => false,
+                'message' => 'Vous pouvez réserver entre 1 et ' . self::MAX_QUANTITY_PER_ORDER . ' places par commande'
+            ];
+        }
 
-            if ($availableTickets < $quantity) {
+        // Événement payant : le prix vient de la base, jamais du navigateur
+        $price = (float) $event->price;
+        $isPaid = $price > 0;
+
+        if ($isPaid) {
+            $organizer = $this->userRepository->getUserById($event->user_id);
+            if (!$organizer || !$organizer->stripe_onboarding_completed || empty($organizer->stripe_account_id)) {
+                return [
+                    'success' => false,
+                    'message' => 'L\'organisateur ne peut pas encaisser de paiement pour le moment'
+                ];
+            }
+
+            // Un paiement abandonné par le même utilisateur ne doit plus retenir de places
+            $this->reservationRepository->expirePendingForUser($userId, $eventId);
+        }
+
+        // Créer la réservation : les places sont retenues pendant le paiement
+        $reservation = new Reservation();
+        $reservation->user_id = $userId;
+        $reservation->event_id = $eventId;
+        $reservation->quantity = $quantity;
+        $reservation->status = $isPaid ? 'pending_payment' : 'confirmed';
+        $reservation->payment_status = $isPaid ? 'pending' : 'not_required';
+        $reservation->amount_total = $isPaid ? round($price * $quantity, 2) : null;
+
+        try {
+            // Contrôle des places et insertion dans une même transaction (pas de survente)
+            // ticket_quantity = 0 signifie "illimité"
+            $createdReservation = $this->reservationRepository->createWithSeatCheck(
+                $reservation,
+                (int) $event->ticket_quantity
+            );
+        } catch (\RuntimeException $exception) {
+            if ($exception->getMessage() === 'no_seats') {
                 return [
                     'success' => false,
                     'message' => 'Plus assez de places disponibles'
                 ];
             }
+            throw $exception;
         }
-
-        // Créer la réservation
-        $reservation = new Reservation();
-        $reservation->user_id = $userId;
-        $reservation->event_id = $eventId;
-        $reservation->quantity = $quantity;
-        $reservation->status = 'confirmed';
-
-        $createdReservation = $this->reservationRepository->create($reservation);
 
         if (!$createdReservation) {
             Logger::error('Failed to create reservation', [
@@ -107,33 +139,37 @@ class ReservationService
             'quantity' => $quantity
         ]);
 
-        // Envoyer un email de confirmation
-        $eventData = [
-            'title' => $event->title,
-            'date' => $event->date,
-            'time' => $event->time,
-            'address' => $event->address,
-            'city' => $event->city,
-            'country' => $event->country
-        ];
+        // Événement payant : l'e-mail est envoyé par le webhook, une fois le paiement confirmé
+        if (!$isPaid) {
+            $eventData = [
+                'title' => $event->title,
+                'date' => $event->date,
+                'time' => $event->time,
+                'address' => $event->address,
+                'city' => $event->city,
+                'country' => $event->country
+            ];
 
-        Logger::info('Sending confirmation email', [
-            'to' => $user->email,
-            'event' => $event->title
-        ]);
+            Logger::info('Sending confirmation email', [
+                'to' => $user->email,
+                'event' => $event->title
+            ]);
 
-        $this->emailService->sendReservationConfirmation(
-            $user->email,
-            $user->name,
-            $eventData,
-            $quantity
-        );
+            $this->emailService->sendReservationConfirmation(
+                $user->email,
+                $user->name,
+                $eventData,
+                $quantity
+            );
+        }
 
         return [
             'success' => true,
-            'message' => 'Réservation effectuée avec succès',
+            'message' => $isPaid ? 'Réservation créée, en attente de paiement' : 'Réservation effectuée avec succès',
             'data' => [
                 'reservation_id' => $createdReservation->id,
+                'requires_payment' => $isPaid,
+                'amount_total' => $createdReservation->amount_total,
                 'event' => [
                     'id' => $event->id,
                     'title' => $event->title,
@@ -258,7 +294,7 @@ class ReservationService
         }
 
         $reservedCount = $this->reservationRepository->getReservedCount($eventId);
-        
+
         // Si ticket_quantity = 0, cela signifie "illimité" (événement gratuit sans limite)
         if ($event->ticket_quantity === 0) {
             return [
