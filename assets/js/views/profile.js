@@ -615,7 +615,7 @@ async function loadFavorites() {
   } else {
     // Aucun favori
     favoritesContainer.innerHTML = `
-      <div class="text-center py-5">
+      <div class="empty-state-small">
         <i class="bi bi-heart text-muted fs-1 mb-2"></i>
         <p class="text-muted mb-0">Aucun événement en favoris</p>
       </div>

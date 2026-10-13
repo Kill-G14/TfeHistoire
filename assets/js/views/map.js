@@ -23,6 +23,8 @@ let eventMarkers = [];
 let routeLayer = null;
 let currentRoute = null;
 let unsubscribe = null;
+// Vrai quand l'utilisateur demande à voir tous les événements malgré le rayon de distance
+let showAllDistances = false;
 
 // Template HTML
 const templateObjects = {};
@@ -73,6 +75,7 @@ export async function unmount() {
   eventMarkers = [];
   routeLayer = null;
   currentRoute = null;
+  showAllDistances = false;
 }
 
 // Initialiser la carte Leaflet
@@ -86,7 +89,8 @@ async function initMap() {
   map = L.map("map").setView([defaultLat, defaultLng], defaultZoom);
 
   // Ajouter les tuiles OpenStreetMap
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  // Serveur de tuiles unique recommandé par OpenStreetMap (plus de sous-domaines a/b/c)
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
@@ -328,8 +332,10 @@ function getFilteredEvents() {
   const sortBy = document.getElementById("sortBy")?.value || "distance";
 
   let filtered = events.filter((event) => {
-    // Si pas de position utilisateur, afficher tous les événements
-    if (!userPosition || event.distance === undefined) return true;
+    // Si pas de position utilisateur (ou affichage complet demandé), afficher tous les événements
+    if (showAllDistances || !userPosition || event.distance === undefined) {
+      return true;
+    }
     return event.distance <= maxDistance;
   });
 
@@ -368,7 +374,19 @@ function renderEventsList() {
     return;
   }
 
-  container.innerHTML = filteredEvents
+  // Les marqueurs de la carte montrent tous les événements : on explique pourquoi la liste en montre moins
+  const hiddenCount = events.length - filteredEvents.length;
+  const distanceNotice =
+    hiddenCount > 0
+      ? `<div class="alert alert-info small d-flex flex-wrap align-items-center justify-content-between gap-2">
+          <span>${hiddenCount} événement${hiddenCount > 1 ? "s" : ""} masqué${hiddenCount > 1 ? "s" : ""} (plus loin que ${document.getElementById("distanceFilter")?.value || 500} km).</span>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="showAllDistances">Tout afficher</button>
+        </div>`
+      : "";
+
+  container.innerHTML =
+    distanceNotice +
+    filteredEvents
     .map(
       (event) => `
     <div class="card mb-3 event-card" data-event-id="${event.id}" style="cursor: pointer;">
@@ -598,6 +616,7 @@ function attachEventListeners() {
 
   if (distanceFilter && distanceValue) {
     distanceFilter.addEventListener("input", (e) => {
+      showAllDistances = false;
       distanceValue.textContent = e.target.value;
       renderEventsList();
     });
@@ -651,8 +670,15 @@ function attachEventListeners() {
         showRoute(eventId);
       }
 
+      // Bouton "Tout afficher" de l'avis de distance
+      if (e.target.closest("#showAllDistances")) {
+        showAllDistances = true;
+        renderEventsList();
+      }
+
       // Bouton reset
       if (e.target.closest("#resetFilter")) {
+        showAllDistances = true;
         document.getElementById("distanceFilter").value = 2000;
         document.getElementById("distanceValue").textContent = "2000";
         renderEventsList();
