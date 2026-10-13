@@ -65,6 +65,61 @@ export async function mount(container, params) {
 
   // Attacher les événements
   attachEventListeners();
+
+  // Indicateur d'étapes
+  initSteps();
+}
+
+// Champs obligatoires de chaque étape : une étape est "complète" quand ils sont tous remplis
+const stepRequiredFields = {
+  "step-general": ["title", "description", "category", "imageEvent"],
+  "step-location": ["country", "city", "postalCode", "address"],
+  "step-datetime": ["date", "time"],
+  // Places et tarif : tout est optionnel, pas de coche
+  "step-places": [],
+};
+
+function isFieldFilled(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (!field) return false;
+  if (field.type === "file") return field.files.length > 0;
+  return field.value.trim() !== "";
+}
+
+function updateSteps() {
+  document.querySelectorAll(".create-step").forEach((stepButton) => {
+    const fields = stepRequiredFields[stepButton.dataset.target] || [];
+    const isComplete = fields.length > 0 && fields.every(isFieldFilled);
+    const number = stepButton.querySelector(".create-step-number");
+
+    stepButton.classList.toggle("is-complete", isComplete);
+    if (number) {
+      // ✓ quand l'étape est complète, sinon son numéro
+      const index = Array.from(
+        document.querySelectorAll(".create-step"),
+      ).indexOf(stepButton);
+      number.textContent = isComplete ? "✓" : String(index + 1);
+    }
+  });
+}
+
+function initSteps() {
+  // Clic sur une étape : défilement vers la section correspondante
+  document.querySelectorAll(".create-step").forEach((stepButton) => {
+    stepButton.addEventListener("click", () => {
+      document
+        .getElementById(stepButton.dataset.target)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  const form = document.getElementById("createEventForm");
+  if (form) {
+    form.addEventListener("input", updateSteps);
+    form.addEventListener("change", updateSteps);
+  }
+
+  updateSteps();
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
@@ -259,6 +314,9 @@ function handleRemoveImage() {
   if (previewContainer) {
     previewContainer.style.display = "none";
   }
+
+  // Vider le champ ne déclenche pas d'événement : on met l'indicateur d'étapes à jour
+  updateSteps();
 }
 
 // Gérer l'annulation

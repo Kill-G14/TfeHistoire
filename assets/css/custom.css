@@ -1848,3 +1848,75 @@ html {
 .empty-state-small p {
   color: var(--color-text-muted);
 }
+
+/* Création d'événement : indicateur d'étapes */
+.create-steps {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.create-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.create-step:hover {
+  border-color: var(--color-accent);
+}
+
+.create-step-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  border: 2px solid #dee2e6;
+  font-size: 0.9rem;
+}
+
+.create-step.is-complete {
+  border-color: #198754;
+}
+
+.create-step.is-complete .create-step-number {
+  background: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+@media (max-width: 575px) {
+  /* Sur téléphone : seuls les numéros restent, les libellés prendraient trop de place */
+  .create-step {
+    justify-content: center;
+  }
+
+  .create-step-label {
+    display: none;
+  }
+}
+
+/* Aperçu de l'image : même ratio que la carte d'événement */
+.image-preview-img {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}

@@ -20,10 +20,30 @@
       </p>
     </div>
 
+    <!-- Indicateur d'étapes : chaque étape mène à sa section et se coche une fois complète -->
+    <nav class="create-steps mb-4" aria-label="Étapes de création de l'événement">
+      <button type="button" class="create-step" data-target="step-general">
+        <span class="create-step-number">1</span>
+        <span class="create-step-label">Informations</span>
+      </button>
+      <button type="button" class="create-step" data-target="step-location">
+        <span class="create-step-number">2</span>
+        <span class="create-step-label">Lieu</span>
+      </button>
+      <button type="button" class="create-step" data-target="step-datetime">
+        <span class="create-step-number">3</span>
+        <span class="create-step-label">Date</span>
+      </button>
+      <button type="button" class="create-step" data-target="step-places">
+        <span class="create-step-number">4</span>
+        <span class="create-step-label">Places et tarif</span>
+      </button>
+    </nav>
+
     <!-- Create Event Form -->
     <form id="createEventForm">
       <!-- Informations générales -->
-      <div class="form-section">
+      <div class="form-section" id="step-general">
         <div class="form-section-title">
           <i class="bi bi-info-circle text-accent"></i>
           Informations générales
@@ -91,17 +111,15 @@
             </small>
             <div class="invalid-feedback" id="imageEventError"></div>
             <div id="imagePreview" class="mt-2" style="display: none">
+              <p class="small fw-semibold mb-1">
+                Aperçu tel qu'il apparaîtra sur la carte de l'événement
+              </p>
               <img
                 id="previewImg"
+                class="image-preview-img"
                 src=""
                 alt="Aperçu"
                 loading="lazy"
-                style="
-                  max-width: 200px;
-                  max-height: 200px;
-                  border-radius: 0.5rem;
-                  border: 2px solid #dee2e6;
-                "
               />
               <button
                 type="button"
@@ -116,7 +134,7 @@
       </div>
 
       <!-- Localisation -->
-      <div class="form-section">
+      <div class="form-section" id="step-location">
         <div class="form-section-title">
           <i class="bi bi-geo-alt text-accent"></i>
           Localisation
@@ -173,7 +191,7 @@
       </div>
 
       <!-- Date et horaires -->
-      <div class="form-section">
+      <div class="form-section" id="step-datetime">
         <div class="form-section-title">
           <i class="bi bi-clock text-accent"></i>
           Date et horaires
@@ -194,11 +212,11 @@
         </div>
       </div>
 
-      <!-- Places disponibles -->
-      <div class="form-section">
+      <!-- Places et tarif -->
+      <div class="form-section" id="step-places">
         <div class="form-section-title">
           <i class="bi bi-people text-accent"></i>
-          Places disponibles
+          Places et tarif
         </div>
 
         <div class="row g-3">
@@ -218,14 +236,27 @@
             </div>
             <div class="invalid-feedback" id="ticketQuantityError"></div>
           </div>
-        </div>
-      </div>
 
-      <!-- Information : Événements gratuits -->
-      <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i>
-        <strong>Tous les événements sont gratuits.</strong> Les participants
-        peuvent réserver leur place sans paiement.
+          <!-- Prix : affiché en lecture seule pour l'instant (tous les événements sont gratuits) -->
+          <div class="col-md-6">
+            <label for="price" class="form-label">Prix par place</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                id="price"
+                value="Gratuit"
+                readonly
+                aria-describedby="priceHelp"
+              />
+              <span class="input-group-text">€</span>
+            </div>
+            <div class="form-text" id="priceHelp">
+              Tous les événements sont gratuits : les participants réservent
+              sans paiement.
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Buttons -->
