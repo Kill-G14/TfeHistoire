@@ -121,14 +121,14 @@ function fillEventDetails(event) {
 
   // Tous les événements sont gratuits
   if (detailPrice) {
-    detailPrice.textContent = "0.00 €";
+    detailPrice.textContent = "Gratuit";
   }
 
   if (quantityEl) quantityEl.textContent = quantity;
 
-  // Le total est toujours 0 (gratuit)
+  // Le total est toujours gratuit
   if (totalPrice) {
-    totalPrice.textContent = "0.00 €";
+    totalPrice.textContent = "Gratuit";
   }
 }
 
@@ -189,7 +189,7 @@ function updateQuantityDisplay() {
   if (quantityEl) quantityEl.textContent = quantity;
   // Tous les événements sont gratuits, total toujours à 0
   if (totalPrice) {
-    totalPrice.textContent = "0.00 €";
+    totalPrice.textContent = "Gratuit";
   }
 }
 
