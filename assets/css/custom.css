@@ -122,21 +122,22 @@ h3, h4, h5, h6,
 }
 
 .header-logo-img {
-  height: 88px;
+  height: 120px;
   width: auto;
   object-fit: contain;
 }
 
-/* Tablette : logo réduit pour garder un header compact */
+/* Tablette : très légèrement réduit */
 @media (max-width: 991px) {
   .header-logo-img {
-    height: 56px;
+    height: 100px;
   }
 }
 
+/* Téléphone */
 @media (max-width: 575px) {
   .header-logo-img {
-    height: 40px;
+    height: 88px;
   }
 }
 
