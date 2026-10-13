@@ -86,6 +86,20 @@ class EventValidator {
       }
     }
 
+    // Prix par place (optionnel, 0 = gratuit) : format, plafond et minimum Stripe (0,50 EUR)
+    if (isset($data['price']) && !Helpers::isEmpty((string) $data['price'])) {
+      $price = $data['price'];
+      if (!is_numeric($price) || (float) $price < 0) {
+        $errors['price'] = 'Le prix doit être un nombre positif ou nul';
+      } elseif ((float) $price > 0 && (float) $price < 0.5) {
+        $errors['price'] = 'Le prix minimum d\'une place payante est de 0,50 €';
+      } elseif ((float) $price > 500) {
+        $errors['price'] = 'Le prix d\'une place ne peut pas dépasser 500 €';
+      } elseif (round((float) $price, 2) !== (float) $price) {
+        $errors['price'] = 'Le prix ne peut pas avoir plus de 2 décimales';
+      }
+    }
+
     // Latitude (optionnel)
     if (isset($data['latitude']) && !Helpers::isEmpty($data['latitude'])) {
       if (!is_numeric($data['latitude']) || $data['latitude'] < -90 || $data['latitude'] > 90) {
@@ -105,7 +119,7 @@ class EventValidator {
       // Vérifier que c'est un nom de fichier valide (avec extension d'image)
       $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
       $extension = strtolower(pathinfo($data['image_event'], PATHINFO_EXTENSION));
-      
+
       if (!in_array($extension, $allowedExtensions)) {
         $errors['image_event'] = 'Le format de l\'image n\'est pas supporté. Utilisez JPG, JPEG, PNG, GIF ou WEBP uniquement';
       }

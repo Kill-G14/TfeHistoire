@@ -28,7 +28,7 @@ class EventRepository {
 
   // Récupérer un événement par ID
   public function getEventById(int $id): ?Event {
-    $query = "SELECT * FROM events WHERE id = :id AND is_deleted = FALSE";
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events WHERE id = :id AND is_deleted = FALSE";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
@@ -39,7 +39,7 @@ class EventRepository {
 
   // Récupérer tous les événements (approuvés uniquement)
   public function getAllEvents(): array {
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE is_deleted = FALSE AND is_approved = TRUE 
               ORDER BY date ASC";
     $stmt = $this->getPdo()->prepare($query);
@@ -50,7 +50,7 @@ class EventRepository {
 
   // Récupérer tous les événements pour l'admin (tous les statuts)
   public function getAllEventsForAdmin(): array {
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE is_deleted = FALSE 
               ORDER BY created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
@@ -61,7 +61,7 @@ class EventRepository {
 
   // Récupérer les événements en attente de modération
   public function getPendingEvents(): array {
-    $query = "SELECT * FROM events WHERE is_deleted = FALSE AND is_pending = TRUE ORDER BY created_at DESC";
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events WHERE is_deleted = FALSE AND is_pending = TRUE ORDER BY created_at DESC";
     $stmt = $this->getPdo()->prepare($query);
     $stmt->execute();
     $stmt->setFetchMode(PDO::FETCH_CLASS, Event::class);
@@ -70,7 +70,7 @@ class EventRepository {
 
   // Récupérer les événements par pays
   public function getEventsByCountry(string $country): array {
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE country = :country AND is_deleted = FALSE AND is_approved = TRUE 
               ORDER BY date ASC";
     $stmt = $this->getPdo()->prepare($query);
@@ -82,7 +82,7 @@ class EventRepository {
 
   // Récupérer les événements par catégorie
   public function getEventsByCategory(string $category): array {
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE category = :category AND is_deleted = FALSE AND is_approved = TRUE 
               ORDER BY date ASC";
     $stmt = $this->getPdo()->prepare($query);
@@ -94,7 +94,7 @@ class EventRepository {
 
   // Récupérer les événements par utilisateur
   public function getEventsByUserId(int $userId): array {
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE user_id = :user_id AND is_deleted = FALSE 
               ORDER BY date ASC";
     $stmt = $this->getPdo()->prepare($query);
@@ -107,9 +107,9 @@ class EventRepository {
   // Créer un nouvel événement
   public function createEvent(Event $event): ?int {
     $query = "INSERT INTO events (user_id, title, description, country, city, postal_code,
-              address, latitude, longitude, date, time, category, ticket_quantity, image_event, created_at, updated_at)
+              address, latitude, longitude, date, time, category, ticket_quantity, price, image_event, created_at, updated_at)
               VALUES (:user_id, :title, :description, :country, :city, :postal_code,
-              :address, :latitude, :longitude, :date, :time, :category, :ticket_quantity, :image_event, NOW(), NOW())";
+              :address, :latitude, :longitude, :date, :time, :category, :ticket_quantity, :price, :image_event, NOW(), NOW())";
 
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':user_id', $event->user_id, PDO::PARAM_INT);
@@ -125,12 +125,13 @@ class EventRepository {
     $stmt->bindParam(':time', $event->time);
     $stmt->bindParam(':category', $event->category);
     $stmt->bindParam(':ticket_quantity', $event->ticket_quantity, PDO::PARAM_INT);
+    $stmt->bindParam(':price', $event->price);
     $stmt->bindParam(':image_event', $event->image_event);
-    
+
     if ($stmt->execute()) {
       return (int) $this->getPdo()->lastInsertId();
     }
-    
+
     return null;
   }
 
@@ -149,12 +150,14 @@ class EventRepository {
               time = :time,
               category = :category,
               ticket_quantity = :ticket_quantity,
+              price = :price,
               image_event = :image_event,
               updated_at = NOW()
               WHERE id = :id AND is_deleted = FALSE";
 
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':id', $event->id, PDO::PARAM_INT);
+    $stmt->bindParam(':price', $event->price);
     $stmt->bindParam(':title', $event->title);
     $stmt->bindParam(':description', $event->description);
     $stmt->bindParam(':country', $event->country);
@@ -168,7 +171,7 @@ class EventRepository {
     $stmt->bindParam(':category', $event->category);
     $stmt->bindParam(':ticket_quantity', $event->ticket_quantity, PDO::PARAM_INT);
     $stmt->bindParam(':image_event', $event->image_event);
-    
+
     return $stmt->execute();
   }
 
@@ -201,7 +204,7 @@ class EventRepository {
   // Rechercher des événements
   public function searchEvents(string $search): array {
     $searchTerm = '%' . $search . '%';
-    $query = "SELECT * FROM events 
+    $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 
               WHERE (title LIKE :search 
               OR description LIKE :search 
               OR country LIKE :search 
@@ -209,7 +212,7 @@ class EventRepository {
               OR category LIKE :search)
               AND is_deleted = FALSE AND is_approved = TRUE
               ORDER BY date ASC";
-    
+
     $stmt = $this->getPdo()->prepare($query);
     $stmt->bindParam(':search', $searchTerm);
     $stmt->execute();
@@ -283,6 +286,18 @@ class EventRepository {
     $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // Vérifier si un événement a des réservations actives (confirmées ou en attente de paiement)
+  public function hasActiveReservations(int $eventId): bool {
+    $query = "SELECT COUNT(*) FROM reservations
+              WHERE event_id = :event_id
+              AND status IN ('confirmed', 'pending_payment')
+              AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+    $stmt->execute();
+    return (int) $stmt->fetchColumn() > 0;
   }
 
   // Vérifier si un événement a des réservations confirmées

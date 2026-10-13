@@ -17,6 +17,10 @@ class Event {
   public string $time;
   public string $category;
   public int $ticket_quantity;
+  // Prix unitaire en EUR (0 = gratuit)
+  public float $price = 0.0;
+  // Nom de l'organisateur (colonne calculée par les requêtes de lecture, absente de la table events)
+  public ?string $organizer_name = null;
   public bool $is_pending;
   public bool $is_approved;
   public bool $is_rejected;

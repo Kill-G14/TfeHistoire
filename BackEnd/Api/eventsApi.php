@@ -39,7 +39,7 @@ $userValidator = new UserValidator();
 // services
 $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, $userValidator, $sessionService);
-$eventService = new EventService($eventRepository, $eventValidator);
+$eventService = new EventService($eventRepository, $eventValidator, $userRepository);
 $emailService = new EmailService($userRepository);
 $eventModificationService = new EventModificationService(
   $eventRepository, 

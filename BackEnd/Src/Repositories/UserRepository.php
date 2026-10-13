@@ -39,6 +39,27 @@ class UserRepository {
     return $user ?: null;
   }
 
+  // Enregistrer le compte Stripe Connect d'un organisateur (création, onboarding pas encore terminé)
+  public function setStripeAccountId(int $userId, string $stripeAccountId): bool {
+    $query = "UPDATE users SET stripe_account_id = :stripe_account_id,
+              stripe_onboarding_completed = FALSE, updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':stripe_account_id', $stripeAccountId);
+    $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+    return $stmt->execute();
+  }
+
+  // Marquer le compte Stripe comme prêt (ou non) à encaisser
+  public function setStripeOnboardingCompleted(int $userId, bool $completed): bool {
+    $query = "UPDATE users SET stripe_onboarding_completed = :completed, updated_at = NOW()
+              WHERE id = :id AND is_deleted = FALSE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindValue(':completed', $completed ? 1 : 0, PDO::PARAM_INT);
+    $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+    return $stmt->execute();
+  }
+
   // Créer un nouvel utilisateur
   public function createUser(string $email, string $password, string $name): ?int {
     $query = "INSERT INTO users (email, password, name, created_at, updated_at)
@@ -47,11 +68,11 @@ class UserRepository {
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':password', $password);
     $stmt->bindParam(':name', $name);
-    
+
     if ($stmt->execute()) {
       return (int) $this->getPdo()->lastInsertId();
     }
-    
+
     return null;
   }
 

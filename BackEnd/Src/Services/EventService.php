@@ -5,22 +5,25 @@ namespace App\Services;
 use App\Models\Event;
 use App\Models\ModelsDTO\EventDTO;
 use App\Repositories\EventRepository;
+use App\Repositories\UserRepository;
 use App\Validators\EventValidator;
 use App\Utils\Logger;
 
 class EventService {
   private EventRepository $eventRepository;
   private EventValidator $eventValidator;
+  private ?UserRepository $userRepository;
 
-  public function __construct(EventRepository $eventRepository, EventValidator $eventValidator) {
+  public function __construct(EventRepository $eventRepository, EventValidator $eventValidator, ?UserRepository $userRepository = null) {
     $this->eventRepository = $eventRepository;
     $this->eventValidator = $eventValidator;
+    $this->userRepository = $userRepository;
   }
 
   // Récupérer tous les événements
   public function getAllEvents(): array {
     $events = $this->eventRepository->getAllEvents();
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -35,7 +38,7 @@ class EventService {
   // Récupérer tous les événements pour l'admin (tous les statuts)
   public function getAllEventsForAdmin(): array {
     $events = $this->eventRepository->getAllEventsForAdmin();
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -68,7 +71,7 @@ class EventService {
   // Récupérer les événements par pays
   public function getEventsByCountry(string $country): array {
     $events = $this->eventRepository->getEventsByCountry($country);
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -83,7 +86,7 @@ class EventService {
   // Récupérer les événements par catégorie
   public function getEventsByCategory(string $category): array {
     $events = $this->eventRepository->getEventsByCategory($category);
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -98,7 +101,7 @@ class EventService {
   // Récupérer les événements créés par un utilisateur
   public function getEventsByUserId(int $userId): array {
     $events = $this->eventRepository->getEventsByUserId($userId);
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -110,6 +113,21 @@ class EventService {
     ];
   }
 
+  // Un prix > 0 exige un organisateur dont le compte Stripe est connecté et prêt à encaisser.
+  // Retourne un message d'erreur, ou null si tout est correct.
+  private function checkOrganizerCanSellAt(float $price, int $userId): ?string {
+    if ($price <= 0) {
+      return null;
+    }
+
+    $organizer = $this->userRepository ? $this->userRepository->getUserById($userId) : null;
+    if (!$organizer || !$organizer->stripe_onboarding_completed || empty($organizer->stripe_account_id)) {
+      return 'Connectez votre compte Stripe depuis votre profil pour proposer un événement payant';
+    }
+
+    return null;
+  }
+
   // Créer un événement
   public function createEvent(array $data, int $userId): array {
     // Validation
@@ -119,6 +137,17 @@ class EventService {
         'success' => false,
         'message' => 'Erreur de validation',
         'errors' => $errors
+      ];
+    }
+
+    // Un prix n'est accepté que si l'organisateur peut réellement encaisser (compte Stripe connecté)
+    $price = isset($data['price']) && $data['price'] !== '' ? round((float) $data['price'], 2) : 0.0;
+    $priceError = $this->checkOrganizerCanSellAt($price, $userId);
+    if ($priceError) {
+      return [
+        'success' => false,
+        'message' => 'Erreur de validation',
+        'errors' => ['price' => $priceError]
       ];
     }
 
@@ -140,6 +169,7 @@ class EventService {
     $event->ticket_quantity = isset($data['ticket_quantity']) && $data['ticket_quantity'] !== ''
       ? (int) $data['ticket_quantity']
       : 0;
+    $event->price = $price;
     $event->image_event = $data['image_event'] ?? null;
 
     // Insérer en base de données
@@ -195,6 +225,27 @@ class EventService {
       ];
     }
 
+    // Le prix ne change plus dès qu'une réservation existe : les acheteurs ont vu un montant précis
+    $price = isset($data['price']) && $data['price'] !== '' ? round((float) $data['price'], 2) : (float) $event->price;
+    if ($price !== (float) $event->price) {
+      if ($this->eventRepository->hasActiveReservations($id)) {
+        return [
+          'success' => false,
+          'message' => 'Erreur de validation',
+          'errors' => ['price' => 'Le prix ne peut plus être modifié : des réservations existent déjà']
+        ];
+      }
+
+      $priceError = $this->checkOrganizerCanSellAt($price, $userId);
+      if ($priceError) {
+        return [
+          'success' => false,
+          'message' => 'Erreur de validation',
+          'errors' => ['price' => $priceError]
+        ];
+      }
+    }
+
     // Mettre à jour les propriétés
     $event->title = $data['title'];
     $event->description = $data['description'];
@@ -211,6 +262,7 @@ class EventService {
     $event->ticket_quantity = isset($data['ticket_quantity']) && $data['ticket_quantity'] !== ''
       ? (int) $data['ticket_quantity']
       : 0;
+    $event->price = $price;
     $event->image_event = $data['image_event'] ?? $event->image_event;
 
     // Mettre à jour en base de données
@@ -278,7 +330,7 @@ class EventService {
   // Rechercher des événements
   public function searchEvents(string $search): array {
     $events = $this->eventRepository->searchEvents($search);
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);
@@ -293,7 +345,7 @@ class EventService {
   // Récupérer les événements en attente (admin)
   public function getPendingEvents(): array {
     $events = $this->eventRepository->getPendingEvents();
-    
+
     $eventDTOs = array_map(function($event) {
       return (new EventDTO($event))->toArray();
     }, $events);

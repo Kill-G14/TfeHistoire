@@ -28,6 +28,8 @@ class EventDTO {
   public ?string $image_event;
   public string $created_at;
   public ?int $ticket_quantity;
+  public float $price;
+  public ?string $organizer_name;
 
   public function __construct(Event $event) {
     $this->id = $event->id;
@@ -53,6 +55,8 @@ class EventDTO {
     $this->image_event = $event->image_event;
     $this->created_at = $event->created_at;
     $this->ticket_quantity = $event->ticket_quantity ?? null;
+    $this->price = (float) $event->price;
+    $this->organizer_name = $event->organizer_name;
   }
 
   public function toArray(): array {
@@ -79,7 +83,9 @@ class EventDTO {
       'deletion_requested_at' => $this->deletion_requested_at,
       'image_event' => $this->image_event,
       'created_at' => $this->created_at,
-      'ticket_quantity' => $this->ticket_quantity
+      'ticket_quantity' => $this->ticket_quantity,
+      'price' => $this->price,
+      'organizer_name' => $this->organizer_name
     ];
   }
 }

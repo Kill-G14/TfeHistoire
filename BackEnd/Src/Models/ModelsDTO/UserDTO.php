@@ -11,6 +11,8 @@ class UserDTO {
   public bool $is_admin;
   public bool $is_organizer;
   public bool $is_moderator;
+  // Indique seulement si l'organisateur peut encaisser : l'identifiant Stripe reste côté serveur
+  public bool $stripe_connected;
   public string $created_at;
 
   public function __construct(User $user) {
@@ -20,6 +22,7 @@ class UserDTO {
     $this->is_admin = $user->is_admin;
     $this->is_organizer = $user->is_organizer;
     $this->is_moderator = $user->is_moderator;
+    $this->stripe_connected = $user->stripe_onboarding_completed && !empty($user->stripe_account_id);
     $this->created_at = $user->created_at;
   }
 
@@ -31,6 +34,7 @@ class UserDTO {
       'is_admin' => $this->is_admin,
       'is_organizer' => $this->is_organizer,
       'is_moderator' => $this->is_moderator,
+      'stripe_connected' => $this->stripe_connected,
       'created_at' => $this->created_at
     ];
   }

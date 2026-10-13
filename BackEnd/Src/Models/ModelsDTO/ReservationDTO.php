@@ -12,7 +12,10 @@ class ReservationDTO {
   public string $status;
   public string $created_at;
   public ?string $updated_at;
-  
+  public string $payment_status;
+  public ?float $amount_total;
+  public ?string $paid_at;
+
   // Informations de l'événement (optionnelles, depuis JOIN)
   public ?string $event_title;
   public ?string $event_date;
@@ -20,6 +23,11 @@ class ReservationDTO {
   public ?string $event_city;
   public ?string $event_address;
   public ?string $event_image;
+  public ?float $event_price;
+
+  // Organisateur : l'acheteur doit savoir à qui s'adresser (litiges, remboursements)
+  public ?string $organizer_name;
+  public ?string $organizer_email;
 
   public function __construct($reservation) {
     // Si c'est un objet Reservation
@@ -31,7 +39,10 @@ class ReservationDTO {
       $this->status = $reservation->status;
       $this->created_at = $reservation->created_at;
       $this->updated_at = $reservation->updated_at ?? null;
-      
+      $this->payment_status = $reservation->payment_status;
+      $this->amount_total = $reservation->amount_total;
+      $this->paid_at = $reservation->paid_at;
+
       // Pas d'informations d'événement depuis un objet simple
       $this->event_title = null;
       $this->event_date = null;
@@ -39,6 +50,9 @@ class ReservationDTO {
       $this->event_city = null;
       $this->event_address = null;
       $this->event_image = null;
+      $this->event_price = null;
+      $this->organizer_name = null;
+      $this->organizer_email = null;
     }
     // Si c'est un tableau associatif (depuis repository avec JOIN)
     else if (is_array($reservation)) {
@@ -49,7 +63,10 @@ class ReservationDTO {
       $this->status = $reservation['status'];
       $this->created_at = $reservation['created_at'];
       $this->updated_at = $reservation['updated_at'] ?? null;
-      
+      $this->payment_status = $reservation['payment_status'] ?? 'not_required';
+      $this->amount_total = isset($reservation['amount_total']) ? (float) $reservation['amount_total'] : null;
+      $this->paid_at = $reservation['paid_at'] ?? null;
+
       // Informations de l'événement (depuis JOIN)
       $this->event_title = $reservation['event_title'] ?? null;
       $this->event_date = $reservation['event_date'] ?? null;
@@ -57,6 +74,9 @@ class ReservationDTO {
       $this->event_city = $reservation['event_city'] ?? null;
       $this->event_address = $reservation['event_address'] ?? null;
       $this->event_image = $reservation['event_image'] ?? null;
+      $this->event_price = isset($reservation['event_price']) ? (float) $reservation['event_price'] : null;
+      $this->organizer_name = $reservation['organizer_name'] ?? null;
+      $this->organizer_email = $reservation['organizer_email'] ?? null;
     }
   }
 
@@ -67,6 +87,9 @@ class ReservationDTO {
       'event_id' => $this->event_id,
       'quantity' => $this->quantity,
       'status' => $this->status,
+      'payment_status' => $this->payment_status,
+      'amount_total' => $this->amount_total,
+      'paid_at' => $this->paid_at,
       'created_at' => $this->created_at
     ];
 
@@ -83,6 +106,9 @@ class ReservationDTO {
       $data['event_city'] = $this->event_city;
       $data['event_address'] = $this->event_address;
       $data['event_image'] = $this->event_image;
+      $data['event_price'] = $this->event_price;
+      $data['organizer_name'] = $this->organizer_name;
+      $data['organizer_email'] = $this->organizer_email;
     }
 
     return $data;
