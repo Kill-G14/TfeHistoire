@@ -14,75 +14,61 @@
   --color-accent-hover: #B38842;
   --color-accent-light: #E1C48A;
   
-  /* Fond et textes */
+  /* Fond et textes (contraste AA sur le fond crème) */
   --color-background: #F5F1E8;
-  --color-text: #000000;
-  --color-text-muted: #000000;
+  --color-text: #1f2a2a;
+  --color-text-muted: #5c6b6a;
+
+  /* Rayons et ombres partagés par les cartes, modals et boutons */
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Styles généraux */
 body {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
   background-color: var(--color-background);
   color: var(--color-text);
   min-height: 100vh;
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.6;
-  font-weight: 600;
+  font-weight: 400;
 }
 
-/* Typographie - Titres avec Cinzel (alternative à Trajan Pro) */
-h1, h2, h3, h4, h5, h6,
+/* Typographie - Cinzel réservé aux titres h1/h2 et au logo (identité historique) */
+h1, h2,
 .page-title,
 .footer-title,
-.modal-title,
-.form-section-title,
-.eventCard .card-title {
+.header-logo {
   font-family: 'Cinzel', serif;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-/* Tailles de texte réduites pour meilleure lisibilité */
-.eventCard .card-text,
-.eventCard small,
-.footer-text,
-.footer-links,
-.footer-contact,
-.nav-link,
-.badge,
-.form-text,
-.text-muted,
-small,
-.small {
-  font-size: 1.1rem;
+/* Cinzel est peu lisible en petit : h3 à h6 et titres de cartes en Source Sans 3 */
+h3, h4, h5, h6,
+.modal-title,
+.form-section-title,
+.eventCard .card-title {
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* Éléments qui gardent un poids 600 : boutons, labels, badges */
+.btn,
+.form-label,
+.badge {
   font-weight: 600;
 }
 
 .footer-links a,
 .footer-contact li {
   font-size: 1rem;
-  font-weight: 600;
-}
-
-.btn {
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.form-label {
-  font-size: 1.1rem;
-  font-weight: 600;
 }
 
 .page-subtitle {
   font-size: 1.2rem;
-  font-weight: 600;
-}
-
-/* Assurer que tous les textes sont en gras */
-p, span, a, td, th, li, label, input, textarea, select, .card-text {
-  font-weight: 600;
 }
 
 /* Surcharges Bootstrap */
@@ -136,9 +122,15 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 }
 
 .header-logo-img {
-  height: 120px;
+  height: 56px;
   width: auto;
   object-fit: contain;
+}
+
+@media (max-width: 575px) {
+  .header-logo-img {
+    height: 40px;
+  }
 }
 
 .header-logo:hover {
@@ -147,7 +139,7 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 
 .nav-link {
   color: var(--color-primary);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   transition: color 0.2s;
   text-decoration: none;
 }
@@ -215,16 +207,19 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
   border: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .eventCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .eventCard img {
-  height: 200px;
+  aspect-ratio: 16 / 9;
+  width: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
@@ -302,7 +297,7 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 .eventCard .eventCard-time,
 .eventCard .small,
 .eventCard small {
-  font-size: 1.2rem !important;
+  font-size: 1rem !important;
 }
 
 /* Textes des cards en noir pour meilleure lisibilité (sauf titres) */
@@ -349,15 +344,15 @@ p, span, a, td, th, li, label, input, textarea, select, .card-text {
 .filterContainer select,
 .filterContainer .form-control,
 .filterContainer .form-select {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #000000 !important;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text) !important;
 }
 
 .filterContainer input::placeholder {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #000000 !important;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text-muted) !important;
 }
 
 /* Modal / Dialog */
@@ -1508,8 +1503,7 @@ html {
 
 .leaflet-popup-content {
   margin: 1rem;
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 600;
+  font-family: 'Source Sans 3', system-ui, sans-serif;
 }
 
 /* Cartes d'événements dans la liste */
@@ -1675,4 +1669,22 @@ html {
 
 .mobile-nav-item span {
   font-weight: 600;
+}
+
+/* Accessibilité : anneau de focus visible au clavier */
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Accessibilité : coupe les animations pour les utilisateurs qui le demandent */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
