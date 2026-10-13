@@ -5,6 +5,7 @@ import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import { showReservationModal } from "./reservationModal.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { requireLogin } from "./loginModal.js";
 
 const templateObjects = {};
 let currentEvent = null;
@@ -157,17 +158,12 @@ async function handleReservation() {
   const isAuthenticated = appState.get("isAuthenticated");
 
   if (!isAuthenticated) {
-    // Afficher la modale de connexion
-    helpers.showToast(
-      "Vous devez être connecté pour réserver un événement",
-      "warning",
-    );
+    // Connexion puis ouverture automatique de la réservation (sans reclic)
+    helpers.showToast("Connectez-vous pour réserver", "warning");
+    const eventToReserve = currentEvent;
+    const quantityToReserve = quantity;
     closeEventDetail();
-    const loginModal = document.getElementById("loginModal");
-    if (loginModal) {
-      const modal = new bootstrap.Modal(loginModal);
-      modal.show();
-    }
+    requireLogin(() => showReservationModal(eventToReserve, quantityToReserve));
     return;
   }
 

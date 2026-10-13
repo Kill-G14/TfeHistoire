@@ -112,25 +112,23 @@ async function handleSendCode() {
     const data = await response.json();
 
     if (data.success) {
-      showAlert(data.message, "success");
+      // Le message de succès est un toast : l'alerte disparaît avec le modal
+      helpers.showToast(data.message, "success");
 
-      // Attendre 2 secondes puis ouvrir la modal de réinitialisation
-      setTimeout(() => {
-        // Fermer la modal actuelle
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("forgotPasswordModal"),
-        );
-        if (modal) {
-          // Retirer le focus pour éviter les warnings aria-hidden
-          if (document.activeElement) {
-            document.activeElement.blur();
-          }
-          modal.hide();
-        }
+      // Retirer le focus pour éviter les warnings aria-hidden
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
 
-        // Ouvrir la modal de réinitialisation
+      // Fermer la modal actuelle puis ouvrir celle de réinitialisation
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("forgotPasswordModal"),
+      );
+      if (modal) {
+        helpers.closeModalThen(modal, () => openResetPasswordModal(email));
+      } else {
         openResetPasswordModal(email);
-      }, 2000);
+      }
     } else {
       showAlert(data.message, "danger");
       btnSend.disabled = false;

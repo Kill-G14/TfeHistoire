@@ -5,6 +5,7 @@ import { helpers } from "../utils/helpers.js";
 import { auth } from "../utils/auth.js";
 import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { requireLogin } from "./loginModal.js";
 
 // Objet pour stocker les templates
 const templateObjects = {};
@@ -28,13 +29,9 @@ export async function initReservationModal() {
 export async function showReservationModal(event, quantity = 1) {
   // Vérifier si l'utilisateur est connecté
   if (!appState.get("isAuthenticated")) {
-    helpers.showToast("Vous devez être connecté pour réserver", "error");
-    // Ouvrir la modal de connexion
-    const loginModalElement = document.getElementById("loginModal");
-    if (loginModalElement) {
-      const loginModal = new bootstrap.Modal(loginModalElement);
-      loginModal.show();
-    }
+    helpers.showToast("Connectez-vous pour réserver", "warning");
+    // Connexion puis réouverture automatique de la réservation
+    requireLogin(() => showReservationModal(event, quantity));
     return;
   }
 
@@ -132,9 +129,7 @@ async function handleConfirmReservation() {
   if (!confirmBtn) return;
 
   // Désactiver le bouton pendant le traitement
-  confirmBtn.disabled = true;
-  confirmBtn.innerHTML =
-    '<span class="spinner-border spinner-border-sm me-2"></span>Réservation...';
+  helpers.setButtonLoading(confirmBtn, "Réservation...");
 
   const token = auth.getToken();
 
@@ -149,34 +144,33 @@ async function handleConfirmReservation() {
     helpers.showToast(result.message, "success");
 
     // Réactiver le bouton
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = '<i class="bi bi-check-circle"></i> Oui, réserver';
-
-    // Fermer la modal
-    const modalElement = document.getElementById("reservationModal");
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    if (modal) {
-      // Retirer le focus pour éviter les warnings aria-hidden
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
-      modal.hide();
-    }
+    helpers.resetButton(confirmBtn);
 
     // Réinitialiser l'événement
     currentEvent = null;
     currentQuantity = 1;
 
-    // Rediriger vers l'onglet réservations du profil pour confirmer la réservation
-    setTimeout(() => {
+    // Retirer le focus pour éviter les warnings aria-hidden
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+
+    // Fermer la modal puis rediriger vers l'onglet réservations du profil
+    const modalElement = document.getElementById("reservationModal");
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    const goToReservations = () =>
       window.router.navigate("/profile?section=reservations");
-    }, 1000);
+
+    if (modal) {
+      helpers.closeModalThen(modal, goToReservations);
+    } else {
+      goToReservations();
+    }
   } else {
     helpers.showToast(result.message, "error");
 
     // Réactiver le bouton
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = '<i class="bi bi-check-circle"></i> Oui, réserver';
+    helpers.resetButton(confirmBtn);
   }
 }
 

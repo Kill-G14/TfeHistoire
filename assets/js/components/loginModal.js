@@ -19,6 +19,84 @@ import { loadTemplate } from "../utils/templateLoader.js";
 const templateObjects = {};
 let modalInstance = null;
 
+// Clé sessionStorage : page à rouvrir après connexion (survit à un rechargement complet, ex. lien d'e-mail)
+const REDIRECT_KEY = "memoriaeventia_redirect_after_login";
+
+// Action à rejouer après connexion (réserver, ajouter un favori...)
+let pendingAction = null;
+
+// Ouvre la connexion puis rejoue l'action demandée : l'utilisateur n'a pas à recliquer
+export function requireLogin(onSuccess) {
+  pendingAction = onSuccess;
+  openLoginModal();
+}
+
+// Mémorise la page demandée pour y revenir après connexion
+export function saveRedirectAfterLogin(path) {
+  try {
+    sessionStorage.setItem(REDIRECT_KEY, path);
+  } catch (error) {
+    // sessionStorage indisponible : on ignore, l'utilisateur reste sur l'accueil
+  }
+}
+
+function takeRedirectAfterLogin() {
+  try {
+    const path = sessionStorage.getItem(REDIRECT_KEY);
+    sessionStorage.removeItem(REDIRECT_KEY);
+    return path;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Affiche à la place d'une page protégée un message avec un bouton de connexion
+export function renderLoginRequiredPage(container, message) {
+  saveRedirectAfterLogin(window.location.pathname + window.location.search);
+
+  container.innerHTML = "";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "container py-5 text-center";
+
+  const icon = document.createElement("i");
+  icon.className = "bi bi-lock fs-1 mb-3 d-block text-primary";
+
+  const text = document.createElement("p");
+  text.className = "fs-5 mb-4";
+  text.textContent = message;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn btn-primary";
+  button.textContent = "Se connecter";
+  button.addEventListener("click", () => {
+    // Le modal fermé sans connexion a effacé la page demandée : on la mémorise à nouveau
+    saveRedirectAfterLogin(window.location.pathname + window.location.search);
+    openLoginModal();
+  });
+
+  wrapper.append(icon, text, button);
+  container.appendChild(wrapper);
+
+  openLoginModal();
+}
+
+// Après une connexion réussie : ferme le modal puis redirige ou rejoue l'action en attente
+function continueAfterLogin() {
+  const action = pendingAction;
+  pendingAction = null;
+  const redirectPath = takeRedirectAfterLogin();
+
+  helpers.closeModalThen(modalInstance, () => {
+    if (redirectPath) {
+      window.router.navigate(redirectPath);
+    } else if (action) {
+      action();
+    }
+  });
+}
+
 export async function renderLoginModal() {
   Object.assign(
     templateObjects,
@@ -47,6 +125,14 @@ export async function renderLoginModal() {
   const modalElement = document.getElementById("loginModal");
   modalInstance = new bootstrap.Modal(modalElement);
 
+  // Modal fermé sans connexion : on oublie l'action et la page demandées
+  modalElement.addEventListener("hidden.bs.modal", () => {
+    if (!appState.get("isAuthenticated")) {
+      pendingAction = null;
+      takeRedirectAfterLogin();
+    }
+  });
+
   // Écouter l'événement d'ouverture personnalisé
   window.addEventListener("openLoginModal", openLoginModal);
 
@@ -61,20 +147,27 @@ function attachLoginEvents() {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+    // Déjà en cours d'envoi : on ignore le double clic
+    if (submitButton.disabled) return;
+
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
+    helpers.setButtonLoading(submitButton, "Connexion...");
     const result = await auth.login(email, password);
+    helpers.resetButton(submitButton);
 
     if (result.success) {
-      closeLoginModal();
       helpers.showToast("Connexion réussie !", "success");
 
       // Mettre à jour l'état global
       appState.set("user", result.data.user);
       appState.set("isAuthenticated", true);
+
+      continueAfterLogin();
     } else {
-      helpers.showToast("Erreur de connexion", "error");
+      helpers.showToast(result.message || "Erreur de connexion", "error");
     }
   });
 }
@@ -90,17 +183,24 @@ function attachRegisterEvents() {
     const email = document.getElementById("registerEmail").value;
     const password = document.getElementById("registerPassword").value;
 
+    const submitButton = document.getElementById("registerSubmitBtn");
+    // Déjà en cours d'envoi : on ignore le double clic
+    if (submitButton.dataset.originalHtml !== undefined) return;
+
+    helpers.setButtonLoading(submitButton, "Inscription...");
     const result = await auth.register(email, password, name);
+    helpers.resetButton(submitButton);
 
     if (result.success) {
-      closeLoginModal();
       helpers.showToast(`Bienvenue ${name} !`, "success");
 
       // Mettre à jour l'état global
       appState.set("user", result.data.user);
       appState.set("isAuthenticated", true);
+
+      continueAfterLogin();
     } else {
-      helpers.showToast("Erreur d'inscription", "error");
+      helpers.showToast(result.message || "Erreur d'inscription", "error");
     }
   });
 }
@@ -112,19 +212,13 @@ function attachForgotPasswordEvents() {
   forgotPasswordLink.addEventListener("click", (e) => {
     e.preventDefault();
 
-    // Fermer la modal de login
-    if (modalInstance) {
-      // Retirer le focus pour éviter les warnings aria-hidden
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
-      modalInstance.hide();
+    // Retirer le focus pour éviter les warnings aria-hidden
+    if (document.activeElement) {
+      document.activeElement.blur();
     }
 
-    // Ouvrir la modal de mot de passe oublié
-    setTimeout(() => {
-      openForgotPasswordModal();
-    }, 300);
+    // Fermer la modal de login puis ouvrir celle du mot de passe oublié
+    helpers.closeModalThen(modalInstance, openForgotPasswordModal);
   });
 }
 

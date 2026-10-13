@@ -5,6 +5,7 @@ import { auth } from "../utils/auth.js";
 import { helpers } from "../utils/helpers.js";
 import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { requireLogin } from "./loginModal.js";
 
 const templateObjects = {};
 
@@ -101,20 +102,14 @@ export async function renderEventCards(events, containerId, onEventClick) {
     if (btnFavorite) {
       btnFavorite.dataset.eventId = event.id;
 
-      // Vérifier si l'événement est déjà en favoris
-      const userFavorites = appState.get("favorites") || [];
-      const isFavorite = userFavorites.some((fav) => fav.event_id == event.id);
+      // Cœur plein si l'événement est déjà en favoris
+      setFavoriteButtonState(btnFavorite, isEventFavorite(event.id));
 
-      if (isFavorite) {
-        // Si déjà en favoris, cacher le bouton ou le désactiver
-        btnFavorite.style.display = "none";
-      } else {
-        // Gérer le clic pour ajouter aux favoris
-        btnFavorite.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          await addToFavorites(event.id, btnFavorite);
-        });
-      }
+      // Un clic bascule : ajout ou retrait selon l'état actuel
+      btnFavorite.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        await toggleFavorite(event.id, btnFavorite);
+      });
     }
 
     // Bouton Voir détails
@@ -148,60 +143,69 @@ export async function renderEventCards(events, containerId, onEventClick) {
   });
 }
 
-// Fonction pour ajouter un événement aux favoris
-async function addToFavorites(eventId, btnElement) {
+function isEventFavorite(eventId) {
+  const userFavorites = appState.get("favorites") || [];
+  return userFavorites.some((fav) => fav.event_id == eventId);
+}
+
+// Cœur plein quand l'événement est en favoris, cœur vide sinon
+function setFavoriteButtonState(btnElement, isFavorite) {
+  btnElement.classList.toggle("active", isFavorite);
+  btnElement.setAttribute("aria-pressed", String(isFavorite));
+  btnElement.setAttribute(
+    "aria-label",
+    isFavorite ? "Retirer des favoris" : "Ajouter aux favoris",
+  );
+
+  const icon = btnElement.querySelector("i");
+  if (icon) {
+    icon.classList.toggle("bi-heart-fill", isFavorite);
+    icon.classList.toggle("bi-heart", !isFavorite);
+  }
+}
+
+// Ajoute ou retire un événement des favoris selon son état actuel
+async function toggleFavorite(eventId, btnElement) {
   // Empêcher les clics multiples
   if (btnElement.disabled) {
     return;
   }
 
-  const isAuthenticated = appState.get("isAuthenticated");
-
-  // Si l'utilisateur n'est pas connecté, ouvrir la modale de connexion
-  if (!isAuthenticated) {
-    helpers.showToast(
-      "Vous devez être connecté pour ajouter des favoris",
-      "warning",
-    );
-    const loginModal = document.getElementById("loginModal");
-    if (loginModal) {
-      const modal = new bootstrap.Modal(loginModal);
-      modal.show();
-    }
+  // Si l'utilisateur n'est pas connecté : connexion puis ajout automatique
+  if (!appState.get("isAuthenticated")) {
+    helpers.showToast("Connectez-vous pour ajouter des favoris", "warning");
+    requireLogin(() => toggleFavorite(eventId, btnElement));
     return;
   }
 
   const token = auth.getToken();
+  const wasFavorite = isEventFavorite(eventId);
 
-  // Désactiver le bouton pendant le traitement
   btnElement.disabled = true;
-  btnElement.style.opacity = "0.6";
-  btnElement.style.cursor = "not-allowed";
 
   try {
-    const result = await FavoriteManager.add(eventId, token);
+    const result = wasFavorite
+      ? await FavoriteManager.remove(eventId, token)
+      : await FavoriteManager.add(eventId, token);
 
     if (result.success) {
-      // Masquer le bouton une fois ajouté
-      btnElement.style.display = "none";
-      helpers.showToast("Ajouté aux favoris", "success");
-
-      // Mettre à jour la liste des favoris dans le state
       const userFavorites = appState.get("favorites") || [];
-      userFavorites.push({ event_id: eventId });
-      appState.set("favorites", userFavorites);
+      const updatedFavorites = wasFavorite
+        ? userFavorites.filter((fav) => fav.event_id != eventId)
+        : [...userFavorites, { event_id: eventId }];
+      appState.set("favorites", updatedFavorites);
+
+      setFavoriteButtonState(btnElement, !wasFavorite);
+      helpers.showToast(
+        wasFavorite ? "Retiré des favoris" : "Ajouté aux favoris",
+        "success",
+      );
     } else {
-      helpers.showToast(result.message || "Erreur lors de l'ajout", "error");
-      // Réactiver le bouton en cas d'erreur
-      btnElement.disabled = false;
-      btnElement.style.opacity = "1";
-      btnElement.style.cursor = "pointer";
+      helpers.showToast(result.message || "Erreur", "error");
     }
   } catch (error) {
     helpers.showToast("Erreur réseau", "error");
-    // Réactiver le bouton en cas d'erreur
+  } finally {
     btnElement.disabled = false;
-    btnElement.style.opacity = "1";
-    btnElement.style.cursor = "pointer";
   }
 }

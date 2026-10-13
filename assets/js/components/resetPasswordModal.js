@@ -154,35 +154,37 @@ async function handleResetPassword() {
     const data = await response.json();
 
     if (data.success) {
-      showAlert(data.message, "success");
+      // Retirer le focus pour éviter les warnings aria-hidden
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
 
-      // Attendre 2 secondes puis fermer la modal et déconnecter
-      setTimeout(() => {
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("resetPasswordModal"),
-        );
-        if (modal) {
-          // Retirer le focus pour éviter les warnings aria-hidden
-          if (document.activeElement) {
-            document.activeElement.blur();
-          }
-          modal.hide();
-        }
-
+      const finishReset = async () => {
         // Déconnecter l'utilisateur
-        auth.logout();
+        await auth.logout();
         appState.set("user", null);
         appState.set("isAuthenticated", false);
 
         // Rediriger vers la page d'accueil
         window.router.navigate("/");
 
-        // Afficher un message de succès
+        // Message de succès puis ouverture directe de la connexion
         helpers.showToast(
           "Mot de passe réinitialisé ! Veuillez vous reconnecter.",
           "success",
         );
-      }, 2000);
+        window.dispatchEvent(new CustomEvent("openLoginModal"));
+      };
+
+      // Fermer la modal puis terminer
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("resetPasswordModal"),
+      );
+      if (modal) {
+        helpers.closeModalThen(modal, finishReset);
+      } else {
+        finishReset();
+      }
     } else {
       showAlert(data.message, "danger");
       btnReset.disabled = false;

@@ -14,6 +14,7 @@ import {
   clearFieldValidation,
 } from "../validators/formValidator.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { renderLoginRequiredPage } from "../components/loginModal.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -33,13 +34,11 @@ let selectedImageFile = null;
 export async function mount(container, params) {
   // Vérifier si l'utilisateur est connecté
   if (!appState.get("isAuthenticated")) {
-    helpers.showToast(
-      "Vous devez être connecté pour créer un événement",
-      "error",
+    // Connexion puis retour automatique sur cette page (voir loginModal.js)
+    renderLoginRequiredPage(
+      container,
+      "Connectez-vous pour créer un événement.",
     );
-    setTimeout(() => {
-      window.router.navigate("./");
-    }, 1500);
     return;
   }
 

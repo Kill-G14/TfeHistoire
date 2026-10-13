@@ -17,6 +17,7 @@ import {
   openResetPasswordModal,
 } from "../components/resetPasswordModal.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { renderLoginRequiredPage } from "../components/loginModal.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -36,13 +37,11 @@ let userReservations = [];
 export async function mount(container, params) {
   // Vérifier si l'utilisateur est connecté
   if (!appState.get("isAuthenticated")) {
-    helpers.showToast(
-      "Vous devez être connecté pour accéder à votre profil",
-      "error",
+    // Connexion puis retour automatique sur le profil (voir loginModal.js)
+    renderLoginRequiredPage(
+      container,
+      "Connectez-vous pour accéder à votre profil.",
     );
-    setTimeout(() => {
-      window.router.navigate("./");
-    }, 1500);
     return;
   }
 
@@ -389,11 +388,16 @@ async function handleConfirmPasswordReset() {
       );
       if (modal) modal.hide();
 
-      // Attendre un peu puis ouvrir la modal de réinitialisation
-      setTimeout(() => {
+      // Ouvrir la modal de réinitialisation une fois la confirmation fermée
+      const openReset = () => {
         openResetPasswordModal(user.email);
         helpers.showToast("Un code a été envoyé à votre email", "success");
-      }, 300);
+      };
+      if (modal) {
+        helpers.closeModalThen(modal, openReset);
+      } else {
+        openReset();
+      }
     } else {
       helpers.showToast(data.message, "error");
       btnConfirm.disabled = false;
