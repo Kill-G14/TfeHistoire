@@ -107,7 +107,7 @@
             />
             <small class="text-muted d-block mt-1">
               <i class="bi bi-info-circle"></i> Formats acceptés : JPG, PNG,
-              WEBP (max 25 MB). L'image est réduite automatiquement.
+              WEBP (max 25 MB)
             </small>
             <div class="invalid-feedback" id="imageEventError"></div>
             <div id="imagePreview" class="mt-2" style="display: none">
@@ -121,6 +121,23 @@
                 alt="Aperçu"
                 loading="lazy"
               />
+              <!-- Cadrage : proposé uniquement pour une image en format portrait -->
+              <div id="framingControl" class="mt-2" style="display: none">
+                <label for="framingRange" class="form-label small mb-1"
+                  >Cadrage de l'image</label
+                >
+                <input
+                  type="range"
+                  class="form-range"
+                  id="framingRange"
+                  min="0"
+                  max="100"
+                  value="50"
+                />
+                <div class="form-text">
+                  Faites glisser pour choisir la partie visible : haut ↔ bas.
+                </div>
+              </div>
               <button
                 type="button"
                 class="btn btn-sm btn-outline-danger mt-2"

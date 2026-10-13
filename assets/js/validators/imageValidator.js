@@ -136,9 +136,13 @@ const UPLOAD_TARGET_BYTES = 1.5 * 1024 * 1024 // reste sous upload_max_filesize 
  * La sortie est toujours un JPEG (les métadonnées d'origine sont retirées).
  *
  * @param {File} file - Image d'origine (déjà validée)
+ * @param {Object} options
+ * @param {number} options.portraitOffset - Position verticale du cadrage (0 = haut, 1 = bas),
+ *   utilisée pour recadrer une image portrait au format 16/9 de la carte d'événement
  * @returns {Promise<{file: File|null, error: string|null}>}
  */
-export async function resizeImageForUpload(file) {
+export async function resizeImageForUpload(file, options = {}) {
+  const { portraitOffset = 0.5 } = options
   let bitmap
   try {
     bitmap = await createImageBitmap(file)
@@ -146,7 +150,18 @@ export async function resizeImageForUpload(file) {
     return { file: null, error: 'Impossible de lire cette image.' }
   }
 
-  let scale = Math.min(1, UPLOAD_MAX_SIDE / Math.max(bitmap.width, bitmap.height))
+  // Zone de l'image d'origine conservée : tout, ou une bande 16/9 pour une image portrait
+  let sourceX = 0
+  let sourceY = 0
+  let sourceWidth = bitmap.width
+  let sourceHeight = bitmap.height
+
+  if (bitmap.height > bitmap.width) {
+    sourceHeight = Math.round((bitmap.width * 9) / 16)
+    sourceY = Math.round((bitmap.height - sourceHeight) * portraitOffset)
+  }
+
+  let scale = Math.min(1, UPLOAD_MAX_SIDE / Math.max(sourceWidth, sourceHeight))
   const canvas = document.createElement('canvas')
   const context = canvas.getContext('2d')
 
@@ -155,13 +170,17 @@ export async function resizeImageForUpload(file) {
 
   // On réduit d'abord la qualité, puis les dimensions, jusqu'à passer sous la taille cible
   for (let attempt = 0; attempt < 4; attempt++) {
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale))
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale))
+    canvas.width = Math.max(1, Math.round(sourceWidth * scale))
+    canvas.height = Math.max(1, Math.round(sourceHeight * scale))
 
     // Fond blanc : une image PNG transparente deviendrait noire en JPEG
     context.fillStyle = '#ffffff'
     context.fillRect(0, 0, canvas.width, canvas.height)
-    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    context.drawImage(
+      bitmap,
+      sourceX, sourceY, sourceWidth, sourceHeight,
+      0, 0, canvas.width, canvas.height
+    )
 
     for (const quality of [0.8, 0.7, 0.6, 0.5]) {
       const blob = await toBlob(quality)

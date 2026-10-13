@@ -17,6 +17,15 @@ class EventRepository {
     return $this->pdo;
   }
 
+  // Savoir si un fichier image est déjà rattaché à un événement
+  public function isImageUsed(string $imageName): bool {
+    $query = "SELECT COUNT(*) FROM events WHERE image_event = :image_event";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->bindParam(':image_event', $imageName);
+    $stmt->execute();
+    return (int) $stmt->fetchColumn() > 0;
+  }
+
   // Récupérer un événement par ID
   public function getEventById(int $id): ?Event {
     $query = "SELECT * FROM events WHERE id = :id AND is_deleted = FALSE";

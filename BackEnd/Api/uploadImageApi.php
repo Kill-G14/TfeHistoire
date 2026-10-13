@@ -17,6 +17,7 @@ require __DIR__ . '/../vendor/autoload.php';
 // Charger les variables d'environnement
 \App\Utils\EnvLoader::load();
 
+use App\Repositories\EventRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\SessionRepository;
 use App\Validators\UserValidator;
@@ -38,6 +39,45 @@ function iniSizeToBytes($value) {
       $number *= 1024;
   }
   return $number;
+}
+
+/**
+ * Supprime l'image "en attente" d'un utilisateur (envoyée mais jamais rattachée à un événement).
+ * Le fichier pending_<id>.txt mémorise le nom de la dernière image envoyée par cet utilisateur :
+ * il n'y en a donc jamais plus d'une en attente par utilisateur.
+ *
+ * @param string|null $onlyFilename Si fourni, ne supprime que si c'est bien cette image
+ * @return bool True si une image a été supprimée
+ */
+function removePendingImage($uploadDir, $markerPath, $eventRepository, $onlyFilename = null) {
+  if (!is_file($markerPath)) {
+    return false;
+  }
+
+  $pendingName = trim((string) file_get_contents($markerPath));
+
+  // Seuls les noms générés par le serveur sont acceptés (jamais de chemin)
+  if (!preg_match('/^[A-Za-z0-9_.\-]+\.(jpg|png|webp)$/', $pendingName)) {
+    @unlink($markerPath);
+    return false;
+  }
+
+  if ($onlyFilename !== null && $onlyFilename !== $pendingName) {
+    return false;
+  }
+
+  // Image déjà utilisée par un événement : elle n'est plus "en attente", on la garde
+  if ($eventRepository->isImageUsed($pendingName)) {
+    @unlink($markerPath);
+    return false;
+  }
+
+  $imagePath = $uploadDir . $pendingName;
+  if (is_file($imagePath)) {
+    unlink($imagePath);
+  }
+  @unlink($markerPath);
+  return true;
 }
 
 /**
@@ -149,9 +189,25 @@ $sessionService = new SessionService($sessionRepository);
 $authService = new AuthService($userRepository, new UserValidator(), $sessionService);
 
 $token = $_POST['token'] ?? null;
-if (!$token || !$authService->checkToken((string) $token)) {
+$userId = $token ? $authService->checkToken((string) $token) : null;
+if (!$userId) {
   http_response_code(401);
   echo json_encode(['success' => false, 'message' => 'Vous devez être connecté pour envoyer une image']);
+  exit;
+}
+
+$uploadDir = __DIR__ . '/../storage/images/';
+$pendingMarkerPath = $uploadDir . 'pending_' . $userId . '.txt';
+$eventRepository = new EventRepository();
+
+// Suppression d'une image envoyée mais jamais rattachée (ex. l'événement n'a pas pu être finalisé)
+if (($_POST['action'] ?? '') === 'delete') {
+  $filename = basename((string) ($_POST['filename'] ?? ''));
+  $deleted = removePendingImage($uploadDir, $pendingMarkerPath, $eventRepository, $filename);
+  echo json_encode([
+    'success' => $deleted,
+    'message' => $deleted ? 'Image supprimée' : 'Aucune image en attente à supprimer'
+  ]);
   exit;
 }
 
@@ -276,11 +332,17 @@ $safeExtension = $extensionsByMime[$mimeType];
 $newFileName = $uniqueId . '_' . $timestamp . '.' . $safeExtension;
 $destinationPath = $uploadDir . $newFileName;
 
+// Une seule image en attente par utilisateur : l'éventuelle image précédente non utilisée est supprimée
+removePendingImage($uploadDir, $pendingMarkerPath, $eventRepository);
+
 // Déplacer le fichier uploadé vers le dossier de destination
 if (!move_uploaded_file($file['tmp_name'], $destinationPath)) {
   echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'enregistrement du fichier']);
   exit;
 }
+
+// Mémoriser cette image comme "en attente" jusqu'à son rattachement à un événement
+file_put_contents($pendingMarkerPath, $newFileName);
 
 // Définir les permissions appropriées
 chmod($destinationPath, 0644);

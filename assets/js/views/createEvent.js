@@ -30,6 +30,8 @@ const templateObjects = {};
 // Variables locales
 let createEventForm = null;
 let selectedImageFile = null;
+// Image choisie par l'utilisateur (avant réduction) : sert à recadrer une image portrait
+let originalImageFile = null;
 
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
@@ -249,6 +251,26 @@ async function uploadImage(file, token) {
   }
 }
 
+// Supprime côté serveur une image envoyée mais jamais rattachée à un événement
+async function deleteUploadedImage(filename, token) {
+  try {
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("filename", filename);
+    formData.append("token", token);
+
+    const apiUrl =
+      window.__APP_CONFIG__?.API_URL ||
+      "https://memoriaeventia.com/BackEnd/Api";
+    await fetch(`${apiUrl}/uploadImageApi.php`, {
+      method: "POST",
+      body: formData,
+    });
+  } catch (error) {
+    // Pas bloquant : l'image sera de toute façon remplacée au prochain envoi de l'utilisateur
+  }
+}
+
 // Fonction pour géocoder une adresse (Nominatim OpenStreetMap)
 // Cascade du plus précis au plus large : rue+cp+ville+pays -> cp+ville+pays -> ville+pays
 async function geocodeAddress(address, city, postalCode, country) {
@@ -300,6 +322,12 @@ async function tryGeocode(params) {
 // Gérer la suppression d'image
 function handleRemoveImage() {
   selectedImageFile = null;
+  originalImageFile = null;
+
+  const framingControl = document.getElementById("framingControl");
+  if (framingControl) {
+    framingControl.style.display = "none";
+  }
 
   const imageInput = document.getElementById("imageEvent");
   const previewContainer = document.getElementById("imagePreview");
@@ -354,6 +382,7 @@ async function handleImageSelect(e) {
 
   // Stocker le fichier réduit
   selectedImageFile = resized.file;
+  originalImageFile = file;
 
   // Afficher l'aperçu avec la fonction utilitaire
   try {
@@ -364,7 +393,11 @@ async function handleImageSelect(e) {
 
     if (previewImg) {
       previewImg.src = previewUrl;
+      previewImg.style.objectPosition = "50% 50%";
     }
+
+    // Image portrait : l'utilisateur peut choisir la partie visible dans le cadre 16/9
+    await setupFramingControl(file, previewImg);
 
     if (previewContainer) {
       previewContainer.style.display = "block";
@@ -373,6 +406,49 @@ async function handleImageSelect(e) {
     helpers.showToast("Erreur lors de la création de l'aperçu", "error");
     e.target.value = "";
   }
+}
+
+// Affiche le curseur de cadrage pour une image portrait et l'applique à l'aperçu puis au fichier envoyé
+async function setupFramingControl(file, previewImg) {
+  const framingControl = document.getElementById("framingControl");
+  const framingRange = document.getElementById("framingRange");
+  if (!framingControl || !framingRange) return;
+
+  let isPortrait = false;
+  try {
+    const bitmap = await createImageBitmap(file);
+    isPortrait = bitmap.height > bitmap.width;
+    bitmap.close();
+  } catch (error) {
+    isPortrait = false;
+  }
+
+  framingControl.style.display = isPortrait ? "block" : "none";
+  framingRange.value = 50;
+  if (!isPortrait) return;
+
+  // L'aperçu utilise l'image d'origine pour que le cadrage soit visible en direct
+  if (previewImg) {
+    previewImg.src = await createImagePreview(file);
+  }
+
+  framingRange.oninput = () => {
+    if (previewImg) {
+      previewImg.style.objectPosition = `50% ${framingRange.value}%`;
+    }
+  };
+
+  // Au relâchement du curseur : on régénère le fichier envoyé avec le nouveau cadrage
+  framingRange.onchange = async () => {
+    const resized = await resizeImageForUpload(originalImageFile, {
+      portraitOffset: framingRange.value / 100,
+    });
+    if (resized.file) {
+      selectedImageFile = resized.file;
+    } else {
+      helpers.showToast(resized.error, "error");
+    }
+  };
 }
 
 // Gérer la soumission du formulaire
@@ -508,6 +584,10 @@ async function handleSubmit(e) {
   }
 
   const eventId = createResult.data?.id;
+  if (!eventId) {
+    // Pas d'identifiant d'événement : l'image ne pourra pas être rattachée
+    await deleteUploadedImage(uploadResult.data.filename, token);
+  }
   if (eventId) {
     // Envoyer tous les champs + l'image pour passer la validation backend
     const updateData = {
@@ -518,6 +598,9 @@ async function handleSubmit(e) {
     const updateResult = await EventManager.update(eventId, updateData, token);
 
     if (!updateResult.success) {
+      // L'image envoyée n'est rattachée à aucun événement : on la supprime du serveur
+      await deleteUploadedImage(uploadResult.data.filename, token);
+
       // L'événement est créé mais l'image n'a pas pu être associée
       helpers.showToast(
         "Événement créé mais l'image n'a pas pu être associée. Vous pouvez la modifier plus tard.",
