@@ -28,6 +28,9 @@ const routes = {
   "/privacy": () => import("./views/privacy.js"),
   "/faq": () => import("./views/faq.js"),
   "/contact": () => import("./views/contact.js"),
+  // Retour de la page de paiement Stripe (la vue choisit le message selon l'URL)
+  "/payment/success": () => import("./views/payment.js"),
+  "/payment/cancel": () => import("./views/payment.js"),
 };
 
 // Instance du routeur

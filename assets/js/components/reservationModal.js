@@ -6,6 +6,7 @@ import { auth } from "../utils/auth.js";
 import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 import { requireLogin } from "./loginModal.js";
+import PaymentManager from "../managers/PaymentManager.js";
 
 // Objet pour stocker les templates
 const templateObjects = {};
@@ -68,6 +69,18 @@ export async function showReservationModal(event, quantity = 1) {
       day: "numeric",
     });
 
+    const unitPrice = Number(event.price) || 0;
+    const isPaid = unitPrice > 0;
+    const priceHtml = isPaid
+      ? `<span class="fw-bold text-primary">${helpers.escapeHtml(helpers.formatEventPrice(unitPrice))} / place &middot; Total : ${helpers.escapeHtml(helpers.formatEventPrice(unitPrice * quantity))}</span>`
+      : '<span class="badge bg-success">Événement gratuit</span>';
+    const organizerHtml = event.organizer_name
+      ? `<div class="d-flex align-items-center">
+            <i class="bi bi-person-badge text-muted me-2" style="width: 20px;"></i>
+            <span class="text-muted">Organisé par ${helpers.escapeHtml(event.organizer_name)}</span>
+          </div>`
+      : "";
+
     eventInfo.innerHTML = `
       <div class="card-body">
         <h5 class="card-title text-primary mb-3">
@@ -86,9 +99,10 @@ export async function showReservationModal(event, quantity = 1) {
             <i class="bi bi-geo-alt-fill text-muted me-2" style="width: 20px;"></i>
             <span class="text-muted">${helpers.escapeHtml(event.city)}, ${helpers.escapeHtml(event.country)}</span>
           </div>
+          ${organizerHtml}
           <div class="d-flex align-items-center mt-2">
             <i class="bi bi-tag-fill text-success me-2" style="width: 20px;"></i>
-            <span class="badge bg-success">Événement gratuit</span>
+            ${priceHtml}
           </div>
           <div class="d-flex align-items-center">
             <i class="bi bi-ticket-perforated-fill text-muted me-2" style="width: 20px;"></i>
@@ -97,6 +111,21 @@ export async function showReservationModal(event, quantity = 1) {
         </div>
       </div>
     `;
+  }
+
+  // Événement payant : libellé du bouton et rappel de la destination du paiement
+  const isPaidEvent = (Number(event.price) || 0) > 0;
+  const confirmLabel = document.getElementById("confirmReservationLabel");
+  if (confirmLabel) {
+    confirmLabel.textContent = isPaidEvent
+      ? `Payer ${helpers.formatEventPrice((Number(event.price) || 0) * quantity)}`
+      : "Réserver";
+  }
+  const noticeText = document.getElementById("reservationNoticeText");
+  if (noticeText) {
+    noticeText.textContent = isPaidEvent
+      ? "Le paiement est encaissé directement par l'organisateur : MemoriaEventia ne perçoit aucun montant. Pour toute demande de remboursement ou en cas de litige, contactez l'organisateur."
+      : "Cette réservation sera ajoutée à votre profil.";
   }
 
   // Attacher l'événement de confirmation
@@ -139,6 +168,29 @@ async function handleConfirmReservation() {
     currentQuantity,
     token,
   );
+
+  // Événement payant : on passe par la page de paiement Stripe (hébergée par Stripe)
+  if (result.success && result.data?.requires_payment) {
+    const reservationId = result.data.reservation_id;
+    const sessionResult = await PaymentManager.createCheckoutSession(
+      reservationId,
+      token,
+    );
+
+    if (sessionResult.success && sessionResult.data?.url) {
+      window.location.href = sessionResult.data.url;
+      return;
+    }
+
+    // Paiement impossible à démarrer : on libère les places retenues
+    await PaymentManager.abandonPayment(reservationId, token);
+    helpers.showToast(
+      sessionResult.message || "Impossible de démarrer le paiement",
+      "error",
+    );
+    helpers.resetButton(confirmBtn);
+    return;
+  }
 
   if (result.success) {
     helpers.showToast(result.message, "success");

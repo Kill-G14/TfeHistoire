@@ -41,6 +41,7 @@
       <div class="eventDetail-body">
         <div class="mb-4">
           <h2 class="text-primary mb-2" id="detailTitle"></h2>
+          <p class="eventDetail-organizer mb-2" id="detailOrganizer"></p>
           <p class="mb-0" id="detailDescription"></p>
         </div>
 
@@ -133,8 +134,12 @@
             id="reserveBtn"
           >
             <i class="bi bi-ticket-perforated"></i>
-            Réserver maintenant
+            <span id="reserveBtnLabel">Réserver maintenant</span>
           </button>
+          <p class="form-text mt-2 mb-0 d-none" id="paymentNotice">
+            Le paiement est encaissé directement par l'organisateur :
+            MemoriaEventia ne perçoit aucun montant.
+          </p>
         </div>
       </div>
     </div>

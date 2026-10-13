@@ -28,6 +28,16 @@ export const helpers = {
     return parseFloat(price).toFixed(2);
   },
 
+  // Prix affiché : "Gratuit" ou montant en euros (ex. 12,50 €)
+  formatEventPrice(price) {
+    const amount = Number(price) || 0;
+    if (amount <= 0) return "Gratuit";
+    return amount.toLocaleString("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    });
+  },
+
   // Afficher le toast ( Visuel qui permet de notifier l'utilisateur d'une action ou d'un événement de manière non intrusive. )
   showToast(message, type = "success") {
     const toastContainer = document.getElementById("toastContainer");
@@ -164,7 +174,7 @@ export const helpers = {
     return {
       ...event,
       image: this.getImageUrl(event.image_event),
-      price: "Gratuit",
+      price: Number(event.price) || 0,
       quantity: event.ticket_quantity || 0,
       availableTickets: event.ticket_quantity || 0,
     };

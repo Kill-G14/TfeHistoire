@@ -127,16 +127,38 @@ function fillEventDetails(event) {
     }
   }
 
-  // Tous les événements sont gratuits
+  // Prix par place et total (prix unitaire x quantité)
   if (detailPrice) {
-    detailPrice.textContent = "Gratuit";
+    detailPrice.textContent = helpers.formatEventPrice(event.price);
   }
 
   if (quantityEl) quantityEl.textContent = quantity;
 
-  // Le total est toujours gratuit
   if (totalPrice) {
-    totalPrice.textContent = "Gratuit";
+    totalPrice.textContent = helpers.formatEventPrice(
+      (Number(event.price) || 0) * quantity,
+    );
+  }
+
+  // L'acheteur doit toujours savoir à qui il achète
+  const detailOrganizer = document.getElementById("detailOrganizer");
+  if (detailOrganizer) {
+    detailOrganizer.textContent = event.organizer_name
+      ? `Organisé par ${event.organizer_name}`
+      : "";
+  }
+
+  // Événement payant : libellé du bouton et rappel sur la destination du paiement
+  const isPaid = (Number(event.price) || 0) > 0;
+  const reserveBtnLabel = document.getElementById("reserveBtnLabel");
+  if (reserveBtnLabel) {
+    reserveBtnLabel.textContent = isPaid
+      ? "Réserver et payer"
+      : "Réserver maintenant";
+  }
+  const paymentNotice = document.getElementById("paymentNotice");
+  if (paymentNotice) {
+    paymentNotice.classList.toggle("d-none", !isPaid);
   }
 }
 
@@ -205,9 +227,10 @@ function updateQuantityDisplay() {
   const totalPrice = document.getElementById("totalPrice");
 
   if (quantityEl) quantityEl.textContent = quantity;
-  // Tous les événements sont gratuits, total toujours à 0
-  if (totalPrice) {
-    totalPrice.textContent = "Gratuit";
+  if (totalPrice && currentEvent) {
+    totalPrice.textContent = helpers.formatEventPrice(
+      (Number(currentEvent.price) || 0) * quantity,
+    );
   }
 }
 

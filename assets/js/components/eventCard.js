@@ -108,9 +108,9 @@ export async function renderEventCards(
     if (date) date.textContent = helpers.formatDate(event.date);
     if (time) time.textContent = helpers.formatTime(event.time);
 
-    // Tous les événements sont gratuits
+    // Prix par place : "Gratuit" ou montant en euros
     if (price) {
-      price.textContent = "Gratuit";
+      price.textContent = helpers.formatEventPrice(event.price);
     }
 
     // Configurer le bouton favoris
