@@ -6,6 +6,11 @@ import { appState } from "../store/appState.js";
 import { showReservationModal } from "./reservationModal.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 import { requireLogin } from "./loginModal.js";
+import {
+  isEventFavorite,
+  setFavoriteButtonState,
+  toggleFavorite,
+} from "./eventCard.js";
 
 const templateObjects = {};
 let currentEvent = null;
@@ -16,6 +21,9 @@ let previouslyFocusedElement = null;
 
 // Échap ferme le détail ; Tab reste à l'intérieur du panneau
 function handleDetailKeydown(keyboardEvent) {
+  // Un modal (connexion...) ouvert par-dessus le détail gère lui-même le clavier
+  if (document.querySelector(".modal.show")) return;
+
   if (keyboardEvent.key === "Escape") {
     closeEventDetail();
     return;
@@ -138,6 +146,16 @@ function attachDetailEvents() {
   const decreaseBtn = document.getElementById("decreaseQty");
   const increaseBtn = document.getElementById("increaseQty");
   const reserveBtn = document.getElementById("reserveBtn");
+  const favoriteBtn = document.getElementById("detailFavoriteBtn");
+
+  // Favori : même comportement que le cœur des cartes (connexion demandée si besoin)
+  if (favoriteBtn && currentEvent) {
+    favoriteBtn.dataset.eventId = currentEvent.id;
+    setFavoriteButtonState(favoriteBtn, isEventFavorite(currentEvent.id));
+    favoriteBtn.addEventListener("click", () => {
+      toggleFavorite(currentEvent.id, favoriteBtn);
+    });
+  }
 
   if (closeBtn) {
     closeBtn.addEventListener("click", closeEventDetail);

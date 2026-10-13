@@ -158,13 +158,13 @@ export async function renderEventCards(
   });
 }
 
-function isEventFavorite(eventId) {
+export function isEventFavorite(eventId) {
   const userFavorites = appState.get("favorites") || [];
   return userFavorites.some((fav) => fav.event_id == eventId);
 }
 
 // Cœur plein quand l'événement est en favoris, cœur vide sinon
-function setFavoriteButtonState(btnElement, isFavorite) {
+export function setFavoriteButtonState(btnElement, isFavorite) {
   btnElement.classList.toggle("active", isFavorite);
   btnElement.setAttribute("aria-pressed", String(isFavorite));
   btnElement.setAttribute(
@@ -180,7 +180,7 @@ function setFavoriteButtonState(btnElement, isFavorite) {
 }
 
 // Ajoute ou retire un événement des favoris selon son état actuel
-async function toggleFavorite(eventId, btnElement) {
+export async function toggleFavorite(eventId, btnElement) {
   // Empêcher les clics multiples
   if (btnElement.disabled) {
     return;
@@ -210,6 +210,12 @@ async function toggleFavorite(eventId, btnElement) {
         : [...userFavorites, { event_id: eventId }];
       appState.set("favorites", updatedFavorites);
 
+      // Tous les cœurs de cet événement (carte de la liste, détail ouvert) restent synchronisés
+      document
+        .querySelectorAll(`.btn-favorite[data-event-id="${eventId}"]`)
+        .forEach((heartButton) =>
+          setFavoriteButtonState(heartButton, !wasFavorite),
+        );
       setFavoriteButtonState(btnElement, !wasFavorite);
       helpers.showToast(
         wasFavorite ? "Retiré des favoris" : "Ajouté aux favoris",
