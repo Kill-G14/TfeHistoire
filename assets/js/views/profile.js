@@ -566,45 +566,6 @@ function displayCreatedEvents(events) {
         .join("")}
     </div>
   `;
-
-  // Le conteneur est réutilisé à chaque rechargement : on n'attache les écouteurs qu'une fois
-  if (!reservationsContainer.dataset.cardEventsAttached) {
-    attachReservationCardEvents(reservationsContainer);
-    reservationsContainer.dataset.cardEventsAttached = "true";
-  }
-}
-
-// Ouvre le détail de l'événement lié à une réservation (clic ou clavier sur la carte)
-function attachReservationCardEvents(container) {
-  const openEventFromCard = async (card) => {
-    // Le détail attend un événement complet : la réservation ne contient qu'un résumé
-    const result = await EventManager.getById(Number(card.dataset.eventId));
-
-    if (result.success && result.data) {
-      showEventDetail(result.data);
-    } else {
-      helpers.showToast("Cet événement n'est plus disponible", "error");
-    }
-  };
-
-  container.addEventListener("click", (e) => {
-    // Le bouton d'annulation garde son propre comportement
-    if (e.target.closest("button")) return;
-
-    const card = e.target.closest(".reservation-card");
-    if (card) openEventFromCard(card);
-  });
-
-  container.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    if (e.target.closest("button")) return;
-
-    const card = e.target.closest(".reservation-card");
-    if (card) {
-      e.preventDefault();
-      openEventFromCard(card);
-    }
-  });
 }
 
 // Voir les détails d'un événement créé (fonction globale pour onclick)
@@ -837,13 +798,13 @@ async function loadReservations() {
   }
 }
 
-// Afficher les réservations
+// Afficher les réservations (même carte que les favoris : cliquable pour voir l'événement)
 function displayReservations(reservations) {
   const reservationsContainer = document.getElementById("userReservations");
   if (!reservationsContainer) return;
 
   reservationsContainer.innerHTML = `
-    <div class="d-flex flex-column gap-3">
+    <div class="d-flex flex-wrap gap-3">
       ${reservations
         .map((reservation) => {
           // Déterminer le statut de la réservation
@@ -852,7 +813,6 @@ function displayReservations(reservations) {
 
           if (reservation.status === "confirmed") {
             statusBadge = '<span class="badge bg-success">Confirmée</span>';
-            statusClass = "border-success";
           } else if (reservation.status === "cancelled") {
             statusBadge = '<span class="badge bg-danger">Annulée</span>';
             statusClass = "border-danger";
@@ -861,60 +821,63 @@ function displayReservations(reservations) {
           // Tous les événements sont gratuits
           const priceDisplay = "Gratuit";
 
-          // Formater la date de réservation
           const reservationDate = helpers.formatDate(reservation.created_at);
-
-          // Formater la date de l'événement
           const eventDate = helpers.formatDate(reservation.event_date);
 
           return `
-        <div class="card reservation-card ${statusClass}" style="border-width: 2px; cursor: pointer;"
-             role="button" tabindex="0"
-             data-event-id="${reservation.event_id}">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <h6 class="card-title mb-1">${helpers.escapeHtml(reservation.event_title)}</h6>
-                <small class="text-muted">
-                  <i class="bi bi-calendar3"></i> Réservé le ${reservationDate}
-                </small>
+        <div class="favorite-card-wrapper" id="reservation-card-${reservation.id}">
+          <div class="card h-100 shadow-sm hover-card ${statusClass}"
+               onclick="viewReservationEventDetails(${reservation.event_id})"
+               style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="card-title text-primary mb-0">${helpers.escapeHtml(reservation.event_title)}</h5>
+                ${statusBadge}
               </div>
-              ${statusBadge}
-            </div>
-            
-            <div class="mb-3">
-              <div class="d-flex align-items-center mb-2">
-                <i class="bi bi-calendar-event me-2 text-primary"></i>
-                <span>${eventDate} à ${helpers.formatTime(reservation.event_time)}</span>
+
+              <div class="mb-3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-geo-alt text-muted"></i>
+                  <span>${helpers.escapeHtml(reservation.event_city)}, ${helpers.escapeHtml(reservation.event_address)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-calendar3 text-muted"></i>
+                  <span>${eventDate} à ${helpers.formatTime(reservation.event_time)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-ticket-perforated text-muted"></i>
+                  <span>${reservation.quantity} place${reservation.quantity > 1 ? "s" : ""}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <i class="bi bi-tag text-muted"></i>
+                  <span class="fw-bold text-primary">${priceDisplay}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-clock-history text-muted"></i>
+                  <span class="small text-muted">Réservé le ${reservationDate}</span>
+                </div>
               </div>
-              <div class="d-flex align-items-center mb-2">
-                <i class="bi bi-geo-alt me-2 text-primary"></i>
-                <span>${helpers.escapeHtml(reservation.event_city)} - ${helpers.escapeHtml(reservation.event_address)}</span>
-              </div>
-              <div class="d-flex align-items-center">
-                <i class="bi bi-ticket-perforated me-2 text-primary"></i>
-                <span>${reservation.quantity} place${reservation.quantity > 1 ? "s" : ""}</span>
-              </div>
-            </div>
-            
-            <div class="d-flex justify-content-between align-items-center border-top pt-3">
-              <span class="fw-bold">Prix</span>
-              <span class="fs-5 fw-bold text-primary">${priceDisplay}</span>
-            </div>
-            
-            ${
-              reservation.status === "confirmed"
-                ? `
-              <div class="d-grid gap-2 mt-3">
-                <button class="btn btn-outline-danger btn-sm" 
-                        onclick="cancelReservation(${reservation.id})"
-                        id="cancel-reservation-${reservation.id}">
-                  <i class="bi bi-x-circle"></i> Annuler la réservation
+
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm flex-grow-1"
+                        onclick="event.stopPropagation(); viewReservationEventDetails(${reservation.event_id})">
+                  <i class="bi bi-eye"></i> Voir détails
                 </button>
+                ${
+                  reservation.status === "confirmed"
+                    ? `
+                <button class="btn btn-outline-danger btn-sm"
+                        onclick="event.stopPropagation(); cancelReservation(${reservation.id})"
+                        id="cancel-reservation-${reservation.id}"
+                        title="Annuler la réservation"
+                        aria-label="Annuler la réservation">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+                `
+                    : ""
+                }
               </div>
-            `
-                : ""
-            }
+            </div>
           </div>
         </div>
         `;
@@ -923,6 +886,18 @@ function displayReservations(reservations) {
     </div>
   `;
 }
+
+// Voir les détails de l'événement d'une réservation (fonction globale pour onclick)
+window.viewReservationEventDetails = async function (eventId) {
+  // Le détail attend un événement complet : la réservation ne contient qu'un résumé
+  const result = await EventManager.getById(eventId);
+
+  if (result.success && result.data) {
+    showEventDetail(result.data);
+  } else {
+    helpers.showToast("Cet événement n'est plus disponible", "error");
+  }
+};
 
 // Fonction globale pour annuler une réservation
 window.cancelReservation = function (reservationId) {
@@ -955,7 +930,7 @@ window.cancelReservation = function (reservationId) {
     // Désactiver le bouton pendant le traitement
     btnElement.disabled = true;
     btnElement.innerHTML =
-      '<span class="spinner-border spinner-border-sm"></span> Annulation...';
+      '<span class="spinner-border spinner-border-sm"></span>';
 
     const result = await ReservationManager.cancel(resId, token);
 
@@ -967,7 +942,7 @@ window.cancelReservation = function (reservationId) {
       helpers.showToast(result.message, "error");
       btnElement.disabled = false;
       btnElement.innerHTML =
-        '<i class="bi bi-x-circle"></i> Annuler la réservation';
+        '<i class="bi bi-x-circle"></i>';
       // La modal de confirmation reste ouverte
       return false;
     }
