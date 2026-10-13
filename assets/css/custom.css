@@ -1962,13 +1962,6 @@ html {
   box-shadow: 0 4px 12px rgba(15, 94, 89, 0.4);
 }
 
-/* Le bouton "Créer un événement" disparaît sur petits écrans (accès via la navigation mobile et le profil) */
-@media (max-width: 991px) {
-  .header-create-btn {
-    display: none;
-  }
-}
-
 /* Footer : liens légaux alignés, séparés visuellement */
 .footer-legal {
   display: flex;
