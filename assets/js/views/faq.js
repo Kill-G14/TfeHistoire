@@ -40,8 +40,25 @@ function attachEventListeners() {
     searchInput.addEventListener("input", handleSearch);
   }
 
-  // Filtres par catégorie
-  const categoryButtons = document.querySelectorAll("[data-category]");
+  // Filtres par catégorie (uniquement les boutons : les questions portent aussi data-category,
+  // un clic sur une question ne doit pas filtrer la liste)
+  const categoryButtons = document.querySelectorAll("button[data-category]");
+
+  // Nombre de questions affiché dans chaque bouton de catégorie
+  categoryButtons.forEach((button) => {
+    const category = button.dataset.category;
+    const count =
+      category === "all"
+        ? document.querySelectorAll(".faq-item").length
+        : document.querySelectorAll(`.faq-item[data-category="${category}"]`)
+            .length;
+
+    const badge = document.createElement("span");
+    badge.className = "badge text-bg-light ms-2";
+    badge.textContent = count;
+    button.appendChild(badge);
+  });
+
   categoryButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const category = button.dataset.category;
@@ -77,14 +94,40 @@ function handleSearch(e) {
   // Si recherche active, afficher toutes les catégories
   if (searchTerm) {
     currentCategory = "all";
-    document.querySelectorAll('[data-category="all"]').forEach((btn) => {
-      btn.classList.add("active");
-    });
     document
-      .querySelectorAll('[data-category]:not([data-category="all"])')
+      .querySelectorAll('button[data-category="all"]')
+      .forEach((btn) => {
+        btn.classList.add("active");
+      });
+    document
+      .querySelectorAll('button[data-category]:not([data-category="all"])')
       .forEach((btn) => {
         btn.classList.remove("active");
       });
+  }
+
+  updateEmptyMessage();
+}
+
+// Affiche un message quand aucune question ne correspond
+function updateEmptyMessage() {
+  const accordion = document.getElementById("faqAccordion");
+  if (!accordion) return;
+
+  const hasVisibleItem = Array.from(
+    accordion.querySelectorAll(".faq-item"),
+  ).some((item) => item.style.display !== "none");
+
+  let message = document.getElementById("faqEmptyMessage");
+  if (!hasVisibleItem && !message) {
+    message = document.createElement("div");
+    message.id = "faqEmptyMessage";
+    message.className = "empty-state";
+    message.textContent =
+      "Aucune question ne correspond à votre recherche. Vous pouvez nous écrire depuis la page Contact.";
+    accordion.appendChild(message);
+  } else if (hasVisibleItem && message) {
+    message.remove();
   }
 }
 
@@ -106,6 +149,8 @@ function filterByCategory(category) {
       item.style.display = "none";
     }
   });
+
+  updateEmptyMessage();
 }
 
 // Export par défaut

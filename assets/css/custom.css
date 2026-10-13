@@ -1920,3 +1920,24 @@ html {
   border: 2px solid var(--color-accent);
   box-shadow: var(--shadow-sm);
 }
+
+/* Pages statiques : sommaire et ancres sous le header collant */
+.toc-list {
+  padding-left: 1.25rem;
+}
+
+.toc-list li {
+  margin-bottom: 0.4rem;
+}
+
+.toc-list .btn-link {
+  text-decoration: none;
+}
+
+.toc-list .btn-link:hover {
+  text-decoration: underline;
+}
+
+[id^="toc-section-"] {
+  scroll-margin-top: 160px;
+}

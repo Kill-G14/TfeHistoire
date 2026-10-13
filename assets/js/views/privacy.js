@@ -1,6 +1,7 @@
 // Vue Politique de confidentialité
 
 import { loadHTMLTemplate } from "../utils/templateLoader.js";
+import { buildTableOfContents } from "../utils/tableOfContents.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -19,6 +20,9 @@ export async function mount(container, params) {
 
   // Injecter le template
   container.innerHTML = template;
+
+  // Sommaire cliquable pour naviguer dans les sections
+  buildTableOfContents(container);
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
