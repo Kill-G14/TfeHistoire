@@ -3,6 +3,7 @@
 import { auth } from "../utils/auth.js";
 import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
+import { config } from "../config.js";
 
 const templateObjects = {};
 
@@ -26,15 +27,26 @@ export async function renderHeader() {
   renderHeaderActions();
 }
 
-function updateActiveNav() {
-  const currentPath = window.location.pathname;
+export function updateActiveNav() {
+  // On retire BASE_PATH pour comparer le même chemin en local (/tfeHistoire/) et en production (/)
+  const basePath = config.BASE_PATH.replace(/\/$/, "");
+  let currentPath = window.location.pathname;
+  if (basePath && currentPath.startsWith(basePath)) {
+    currentPath = currentPath.slice(basePath.length);
+  }
+  if (currentPath.length > 1 && currentPath.endsWith("/")) {
+    currentPath = currentPath.slice(0, -1);
+  }
   const navHome = document.getElementById("navHome");
   const navMap = document.getElementById("navMap");
 
   if (navHome) navHome.classList.remove("active");
   if (navMap) navMap.classList.remove("active");
 
-  if ((currentPath === "/" || currentPath === "") && navHome) {
+  if (
+    (currentPath === "/" || currentPath === "" || currentPath === "/index.html") &&
+    navHome
+  ) {
     navHome.classList.add("active");
   } else if (currentPath === "/map" && navMap) {
     navMap.classList.add("active");

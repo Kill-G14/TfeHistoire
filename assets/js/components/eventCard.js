@@ -8,6 +8,39 @@ import { loadTemplate } from "../utils/templateLoader.js";
 
 const templateObjects = {};
 
+// Affiche des cartes grises animées pendant le chargement des événements
+export function renderEventCardsSkeleton(containerId, count = 6) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = "";
+  container.setAttribute("aria-busy", "true");
+
+  for (let index = 0; index < count; index++) {
+    const column = document.createElement("div");
+    column.className = "col";
+    column.setAttribute("aria-hidden", "true");
+
+    const card = document.createElement("div");
+    card.className = "card eventCard-skeleton h-100";
+
+    const image = document.createElement("div");
+    image.className = "skeleton skeleton-image";
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+    for (const widthClass of ["w-75", "w-100", "w-50"]) {
+      const line = document.createElement("div");
+      line.className = `skeleton skeleton-line ${widthClass}`;
+      body.appendChild(line);
+    }
+
+    card.append(image, body);
+    column.appendChild(card);
+    container.appendChild(column);
+  }
+}
+
 export async function renderEventCards(events, containerId, onEventClick) {
   Object.assign(
     templateObjects,
@@ -18,6 +51,7 @@ export async function renderEventCards(events, containerId, onEventClick) {
   if (!container) return;
 
   container.innerHTML = "";
+  container.removeAttribute("aria-busy");
 
   if (events.length === 0) {
     container.innerHTML = `

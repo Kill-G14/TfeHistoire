@@ -19,9 +19,6 @@ export async function mount(container, params) {
 
   // Injecter le template
   container.innerHTML = template;
-
-  // Scroll en haut de la page
-  window.scrollTo(0, 0);
 }
 
 // Fonction unmount (appelée avant de quitter la vue)

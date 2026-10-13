@@ -1,6 +1,9 @@
 // Vue Home - Page d'accueil avec liste d'événements
 
-import { renderEventCards } from "../components/eventCard.js";
+import {
+  renderEventCards,
+  renderEventCardsSkeleton,
+} from "../components/eventCard.js";
 import { showEventDetail } from "../components/eventDetail.js";
 import { helpers } from "../utils/helpers.js";
 import { filters } from "../utils/filters.js";
@@ -39,6 +42,9 @@ export async function mount(container, params) {
   // S'abonner aux changements d'état AVANT de charger
   unsubscribe = appState.subscribe("events", handleEventsChange);
 
+  // Skeleton affiché tant que les événements ne sont pas arrivés (remplacé par displayEvents)
+  renderEventCardsSkeleton("eventsList");
+
   // Charger les données (déclenche automatiquement l'affichage via l'abonnement)
   await loadEvents();
 
@@ -73,6 +79,8 @@ async function loadEvents() {
     helpers.showToast("Erreur lors du chargement des événements", "error");
     allEvents = [];
     filteredEvents = [];
+    // Pas de changement d'état en cas d'erreur : on remplace le skeleton nous-mêmes
+    await displayEvents();
   }
 }
 

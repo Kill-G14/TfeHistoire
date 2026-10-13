@@ -25,9 +25,6 @@ export async function mount(container, params) {
 
   // Attacher les événements
   attachEventListeners();
-
-  // Scroll en haut de la page
-  window.scrollTo(0, 0);
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
