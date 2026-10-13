@@ -111,8 +111,13 @@ async function handleConfirmCancel() {
     '<span class="spinner-border spinner-border-sm"></span> Annulation...';
 
   try {
-    // Appeler le callback de confirmation
-    await onConfirmCallback(currentReservationId);
+    // Appeler le callback de confirmation (il renvoie false si l'annulation a échoué)
+    const cancelSucceeded = await onConfirmCallback(currentReservationId);
+
+    // Échec : on garde la modal ouverte, le message est déjà affiché par le callback
+    if (cancelSucceeded === false) {
+      return;
+    }
 
     // Fermer la modal
     // Retirer le focus pour éviter les warnings aria-hidden

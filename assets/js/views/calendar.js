@@ -134,13 +134,16 @@ function openDayEventsModal(date, events) {
         // Bouton voir détails
         const detailBtn = eventCard.querySelector("button");
         detailBtn.addEventListener("click", () => {
-          // Fermer la modal
+          // Afficher le détail de l'événement une fois la modal fermée (évite deux couches superposées)
           const bsModal = bootstrap.Modal.getInstance(modal);
+          const openDetail = () =>
+            showEventDetail(helpers.transformEvents([event])[0]);
+
           if (bsModal) {
-            bsModal.hide();
+            helpers.closeModalThen(bsModal, openDetail);
+          } else {
+            openDetail();
           }
-          // Afficher le détail de l'événement
-          showEventDetail(helpers.transformEvents([event])[0]);
         });
 
         eventsList.appendChild(eventCard);

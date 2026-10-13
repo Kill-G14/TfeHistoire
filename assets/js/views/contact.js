@@ -134,6 +134,8 @@ async function handleSubmit(e) {
   const successMessage = document.getElementById("contactSuccessMessage");
   if (successMessage) {
     successMessage.classList.remove("d-none");
+    // Le formulaire est long : on amène le message de succès à l'écran
+    successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   if (submitBtn) {

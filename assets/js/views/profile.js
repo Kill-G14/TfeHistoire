@@ -903,12 +903,12 @@ window.cancelReservation = function (reservationId) {
   // Ouvrir la modal de confirmation avec un callback
   openCancelReservationModal(reservationId, eventInfo, async (resId) => {
     const btnElement = document.getElementById(`cancel-reservation-${resId}`);
-    if (!btnElement || btnElement.disabled) return;
+    if (!btnElement || btnElement.disabled) return false;
 
     const token = auth.getToken();
     if (!token) {
       helpers.showToast("Vous devez être connecté", "error");
-      return;
+      return false;
     }
 
     // Désactiver le bouton pendant le traitement
@@ -927,6 +927,8 @@ window.cancelReservation = function (reservationId) {
       btnElement.disabled = false;
       btnElement.innerHTML =
         '<i class="bi bi-x-circle"></i> Annuler la réservation';
+      // La modal de confirmation reste ouverte
+      return false;
     }
   });
 };

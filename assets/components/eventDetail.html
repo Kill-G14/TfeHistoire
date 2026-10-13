@@ -1,5 +1,11 @@
 <template id="eventDetailTemplate">
-  <div class="eventDetail" id="eventDetailOverlay">
+  <div
+    class="eventDetail"
+    id="eventDetailOverlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="detailTitle"
+  >
     <div class="eventDetail-content">
       <div class="position-relative">
         <img
@@ -13,6 +19,7 @@
           type="button"
           class="btn btn-light position-absolute top-0 end-0 m-3"
           id="closeDetailBtn"
+          aria-label="Fermer le détail de l'événement"
         >
           <i class="bi bi-x-lg"></i>
         </button>

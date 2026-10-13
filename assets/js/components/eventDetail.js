@@ -11,6 +11,38 @@ const templateObjects = {};
 let currentEvent = null;
 let quantity = 1;
 
+// Élément qui avait le focus avant l'ouverture : on le lui rend à la fermeture
+let previouslyFocusedElement = null;
+
+// Échap ferme le détail ; Tab reste à l'intérieur du panneau
+function handleDetailKeydown(keyboardEvent) {
+  if (keyboardEvent.key === "Escape") {
+    closeEventDetail();
+    return;
+  }
+
+  if (keyboardEvent.key !== "Tab") return;
+
+  const overlay = document.getElementById("eventDetailOverlay");
+  if (!overlay) return;
+
+  const focusableElements = overlay.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  );
+  if (focusableElements.length === 0) return;
+
+  const first = focusableElements[0];
+  const last = focusableElements[focusableElements.length - 1];
+
+  if (keyboardEvent.shiftKey && document.activeElement === first) {
+    keyboardEvent.preventDefault();
+    last.focus();
+  } else if (!keyboardEvent.shiftKey && document.activeElement === last) {
+    keyboardEvent.preventDefault();
+    first.focus();
+  }
+}
+
 export async function showEventDetail(event) {
   Object.assign(
     templateObjects,
@@ -43,6 +75,14 @@ export async function showEventDetail(event) {
 
   // Empêcher le scroll du body
   document.body.style.overflow = "hidden";
+
+  // Accessibilité : focus dans le panneau, Échap pour fermer
+  previouslyFocusedElement = document.activeElement;
+  document.addEventListener("keydown", handleDetailKeydown);
+  // Navigation du navigateur (retour) : le détail ne doit pas rester par-dessus la nouvelle page
+  window.addEventListener("popstate", closeEventDetail);
+  const closeButton = document.getElementById("closeDetailBtn");
+  if (closeButton) closeButton.focus();
 }
 
 function fillEventDetails(event) {
@@ -194,4 +234,13 @@ export function closeEventDetail() {
 
   // Réactiver le scroll du body
   document.body.style.overflow = "";
+
+  document.removeEventListener("keydown", handleDetailKeydown);
+  window.removeEventListener("popstate", closeEventDetail);
+
+  // Rendre le focus à l'élément qui avait ouvert le détail
+  if (previouslyFocusedElement && previouslyFocusedElement.isConnected) {
+    previouslyFocusedElement.focus();
+  }
+  previouslyFocusedElement = null;
 }
