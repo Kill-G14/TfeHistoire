@@ -2017,8 +2017,10 @@ html {
   color: white;
 }
 
+/* Déconnexion : rouge en permanence, c'est une action qui met fin à la session */
 .header-icon-btn-logout {
-  color: #6c757d;
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 .header-icon-btn-logout:hover {
