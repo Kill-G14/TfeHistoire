@@ -1991,3 +1991,38 @@ html {
     align-items: center;
   }
 }
+
+/* Header : boutons profil / déconnexion de même taille, alignés avec le bouton de connexion */
+.header-icon-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: var(--radius);
+  font-size: 1.25rem;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.header-icon-btn-profile {
+  color: var(--color-primary);
+}
+
+.header-icon-btn-profile:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.header-icon-btn-logout {
+  color: #6c757d;
+}
+
+.header-icon-btn-logout:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
