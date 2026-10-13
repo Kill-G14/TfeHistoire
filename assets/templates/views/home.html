@@ -1,13 +1,21 @@
 <template id="homeView">
   <div class="container py-5">
     <!-- Hero Section -->
-    <div class="text-center mb-5">
+    <section class="hero text-center mb-5">
       <h1 class="page-title">Festivités Historiques d'Europe</h1>
       <p class="page-subtitle">
         Découvrez et participez aux plus grandes célébrations historiques à
         travers l'Europe
       </p>
-    </div>
+      <div class="hero-actions d-flex flex-wrap justify-content-center gap-3">
+        <a href="#eventsSection" class="btn btn-primary btn-lg" id="heroDiscover">
+          <i class="bi bi-compass me-2"></i>Découvrir les événements
+        </a>
+        <a href="/create-event" data-link class="btn btn-outline-primary btn-lg">
+          <i class="bi bi-plus-circle me-2"></i>Proposer un événement
+        </a>
+      </div>
+    </section>
 
     <!-- Filters -->
     <div class="filterContainer mb-4">
@@ -40,6 +48,22 @@
             <option value="all">Toutes les catégories</option>
           </select>
         </div>
+      </div>
+    </div>
+
+    <!-- Compteur de résultats et tri -->
+    <div
+      class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4"
+      id="eventsSection"
+    >
+      <p class="mb-0 fw-semibold" id="resultsCount" aria-live="polite"></p>
+      <div class="d-flex align-items-center gap-2">
+        <label for="sortSelect" class="form-label mb-0 text-nowrap">Trier par</label>
+        <select class="form-select" id="sortSelect">
+          <option value="date-asc">Date (la plus proche)</option>
+          <option value="date-desc">Date (la plus lointaine)</option>
+          <option value="city-asc">Ville (A à Z)</option>
+        </select>
       </div>
     </div>
 

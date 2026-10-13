@@ -25,6 +25,36 @@ const templateObjects = {};
 let allEvents = [];
 let filteredEvents = [];
 let unsubscribe = null;
+let sortMode = "date-asc";
+
+// Trie une copie de la liste (la liste d'origine du state n'est jamais modifiée)
+function sortEvents(events) {
+  const sorted = [...events];
+
+  if (sortMode === "city-asc") {
+    sorted.sort((a, b) => (a.city || "").localeCompare(b.city || "", "fr"));
+  } else {
+    // Les dates sont au format AAAA-MM-JJ : la comparaison de texte suffit
+    sorted.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    if (sortMode === "date-desc") sorted.reverse();
+  }
+
+  return sorted;
+}
+
+// Remet tous les filtres à zéro (état, champs affichés, liste)
+function resetFilters() {
+  filters.reset();
+
+  const searchInput = document.getElementById("searchInput");
+  const countrySelect = document.getElementById("countrySelect");
+  const categorySelect = document.getElementById("categorySelect");
+  if (searchInput) searchInput.value = "";
+  if (countrySelect) countrySelect.value = "all";
+  if (categorySelect) categorySelect.value = "all";
+
+  applyFilters();
+}
 
 // Fonction mount (appelée lors du chargement de la vue)
 export async function mount(container, params) {
@@ -38,6 +68,10 @@ export async function mount(container, params) {
   const clone = templateObjects["homeView"].cloneNode(true);
   container.innerHTML = "";
   container.appendChild(clone);
+
+  // Les filtres mémorisés d'une visite précédente ne correspondent plus aux champs vides
+  filters.reset();
+  sortMode = "date-asc";
 
   // S'abonner aux changements d'état AVANT de charger
   unsubscribe = appState.subscribe("events", handleEventsChange);
@@ -53,6 +87,27 @@ export async function mount(container, params) {
 
   // Attacher les événements de filtrage
   filters.attachFilterListeners({}, applyFilters);
+
+  // Tri
+  const sortSelect = document.getElementById("sortSelect");
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      sortMode = e.target.value;
+      displayEvents();
+    });
+  }
+
+  // Bouton hero : défilement vers la liste (le router intercepte les liens, on évite de le laisser faire)
+  const heroDiscover = document.getElementById("heroDiscover");
+  if (heroDiscover) {
+    heroDiscover.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document
+        .getElementById("eventsSection")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 }
 
 // Fonction unmount (appelée avant de quitter la vue)
@@ -86,7 +141,22 @@ async function loadEvents() {
 
 // Afficher les événements
 async function displayEvents() {
-  await renderEventCards(filteredEvents, "eventsList", handleEventClick);
+  const sortedEvents = sortEvents(filteredEvents);
+
+  const resultsCount = document.getElementById("resultsCount");
+  if (resultsCount) {
+    const total = sortedEvents.length;
+    resultsCount.textContent = `${total} événement${total > 1 ? "s" : ""}`;
+  }
+
+  // Le bouton de réinitialisation n'a de sens que si des filtres sont actifs
+  const onReset = filters.hasActiveFilters() ? resetFilters : null;
+  await renderEventCards(
+    sortedEvents,
+    "eventsList",
+    handleEventClick,
+    onReset,
+  );
 }
 
 // Gérer le clic sur un événement
@@ -102,8 +172,9 @@ function applyFilters() {
 
 // Gérer les changements d'événements
 function handleEventsChange(events) {
+  // Les filtres actifs restent appliqués quand la liste est rafraîchie
   allEvents = events;
-  filteredEvents = events;
+  filteredEvents = filters.filterEvents(allEvents);
   displayEvents();
 }
 

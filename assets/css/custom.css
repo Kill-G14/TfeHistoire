@@ -1171,7 +1171,7 @@ html {
   }
 
   .eventCard img {
-    height: 180px;
+    height: auto;
   }
 }
 
@@ -1770,5 +1770,36 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Accueil : hero aéré avec accroche et appels à l'action */
+.hero {
+  padding: 3.5rem 1rem;
+  border-radius: var(--radius);
+  background: linear-gradient(
+    180deg,
+    rgba(15, 94, 89, 0.08) 0%,
+    rgba(196, 154, 82, 0.08) 100%
+  );
+  border: 1px solid rgba(15, 94, 89, 0.12);
+}
+
+.hero .page-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero .page-subtitle {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero .page-title {
+    font-size: 1.75rem;
   }
 }

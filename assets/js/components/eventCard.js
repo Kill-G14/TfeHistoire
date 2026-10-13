@@ -42,7 +42,12 @@ export function renderEventCardsSkeleton(containerId, count = 6) {
   }
 }
 
-export async function renderEventCards(events, containerId, onEventClick) {
+export async function renderEventCards(
+  events,
+  containerId,
+  onEventClick,
+  onResetFilters = null,
+) {
   Object.assign(
     templateObjects,
     await loadTemplate("assets/components/eventCard.html"),
@@ -63,6 +68,16 @@ export async function renderEventCards(events, containerId, onEventClick) {
         </div>
       </div>
     `;
+
+    // Proposer de réinitialiser les filtres quand c'est eux qui vident la liste
+    if (onResetFilters) {
+      const resetButton = document.createElement("button");
+      resetButton.type = "button";
+      resetButton.className = "btn btn-outline-primary";
+      resetButton.textContent = "Réinitialiser les filtres";
+      resetButton.addEventListener("click", onResetFilters);
+      container.querySelector(".empty-state").appendChild(resetButton);
+    }
     return;
   }
 
