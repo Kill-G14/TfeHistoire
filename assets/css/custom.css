@@ -436,21 +436,23 @@ h3, h4, h5, h6,
   object-fit: cover;
 }
 
-/* Bouton de fermeture : forme Bootstrap d'origine, seul le survol est plus visible.
-   On passe par les variables du bouton Bootstrap pour que le survol l'emporte sur .btn-light */
+/* Bouton de fermeture : forme Bootstrap d'origine, seul le survol à la souris est plus visible.
+   Bootstrap applique les variables "hover" aussi sur :focus-visible : on cible donc :hover
+   directement (sans toucher aux variables) pour que le focus donné à l'ouverture reste neutre. */
 #closeDetailBtn {
-  --bs-btn-hover-bg: #dc3545;
-  --bs-btn-hover-border-color: #dc3545;
-  --bs-btn-hover-color: #ffffff;
-  --bs-btn-active-bg: #b02a37;
-  --bs-btn-active-border-color: #b02a37;
-  --bs-btn-active-color: #ffffff;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
-#closeDetailBtn:hover,
-#closeDetailBtn:focus-visible {
+#closeDetailBtn:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.35);
+}
+
+#closeDetailBtn:active:hover {
+  background-color: #b02a37;
+  border-color: #b02a37;
 }
 
 .eventDetail-body {
