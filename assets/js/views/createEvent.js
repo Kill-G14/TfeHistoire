@@ -300,7 +300,6 @@ async function tryGeocode(params) {
 // Gérer la suppression d'image
 function handleRemoveImage() {
   selectedImageFile = null;
-  uploadedImageFilename = null;
 
   const imageInput = document.getElementById("imageEvent");
   const previewContainer = document.getElementById("imagePreview");
