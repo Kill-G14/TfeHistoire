@@ -12,8 +12,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   exit;
 }
 
+require __DIR__ . '/../vendor/autoload.php';
+
+// Charger les variables d'environnement
+\App\Utils\EnvLoader::load();
+
+use App\Repositories\UserRepository;
+use App\Repositories\SessionRepository;
+use App\Validators\UserValidator;
+use App\Services\AuthService;
+use App\Services\SessionService;
+
+/**
+ * Convertit une valeur php.ini ("2M", "8M", "512K") en octets
+ */
+function iniSizeToBytes($value) {
+  $value = trim((string) $value);
+  $number = (int) $value;
+  switch (strtolower(substr($value, -1))) {
+    case 'g':
+      $number *= 1024;
+    case 'm':
+      $number *= 1024;
+    case 'k':
+      $number *= 1024;
+  }
+  return $number;
+}
+
 /**
  * Redimensionne une image à 650px de largeur en préservant le ratio
+ * (l'image est toujours ré-encodée, même si elle est déjà petite : cela retire
+ * tout contenu caché dans les métadonnées du fichier d'origine)
  * 
  * @param string $sourcePath Chemin vers l'image source
  * @param string $mimeType Type MIME de l'image
@@ -47,14 +77,8 @@ function resizeImage($sourcePath, $mimeType) {
   $originalWidth = imagesx($sourceImage);
   $originalHeight = imagesy($sourceImage);
 
-  // Largeur cible : 650px
-  $targetWidth = 650;
-
-  // Si l'image est déjà plus petite ou égale à 650px, pas de redimensionnement
-  if ($originalWidth <= $targetWidth) {
-    imagedestroy($sourceImage);
-    return true;
-  }
+  // Largeur cible : 650px maximum (une image plus petite garde sa taille mais est ré-encodée)
+  $targetWidth = min(650, $originalWidth);
 
   // Calculer la hauteur proportionnelle
   $ratio = $originalHeight / $originalWidth;
@@ -111,6 +135,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   exit;
 }
 
+// Requête plus grosse que post_max_size : PHP vide $_POST et $_FILES, il faut le détecter avant tout
+$postMaxBytes = iniSizeToBytes(ini_get('post_max_size'));
+if ($postMaxBytes > 0 && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > $postMaxBytes) {
+  echo json_encode(['success' => false, 'message' => 'Le fichier est trop volumineux pour le serveur (max ' . ini_get('post_max_size') . ')']);
+  exit;
+}
+
+// Seul un utilisateur connecté peut envoyer une image (le token arrive dans le formulaire multipart)
+$userRepository = new UserRepository();
+$sessionRepository = new SessionRepository();
+$sessionService = new SessionService($sessionRepository);
+$authService = new AuthService($userRepository, new UserValidator(), $sessionService);
+
+$token = $_POST['token'] ?? null;
+if (!$token || !$authService->checkToken((string) $token)) {
+  http_response_code(401);
+  echo json_encode(['success' => false, 'message' => 'Vous devez être connecté pour envoyer une image']);
+  exit;
+}
+
 // Vérifier qu'un fichier a été uploadé
 if (!isset($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE) {
   echo json_encode(['success' => false, 'message' => 'Aucun fichier reçu']);
@@ -122,7 +166,7 @@ $file = $_FILES['image'];
 // Vérifier les erreurs d'upload
 if ($file['error'] !== UPLOAD_ERR_OK) {
   $errorMessages = [
-    UPLOAD_ERR_INI_SIZE => 'Le fichier dépasse la taille maximale autorisée par le serveur',
+    UPLOAD_ERR_INI_SIZE => 'Le fichier dépasse la taille maximale autorisée par le serveur (max ' . ini_get('upload_max_filesize') . ')',
     UPLOAD_ERR_FORM_SIZE => 'Le fichier dépasse la taille maximale autorisée',
     UPLOAD_ERR_PARTIAL => 'Le fichier n\'a été que partiellement uploadé',
     UPLOAD_ERR_NO_TMP_DIR => 'Dossier temporaire manquant',
@@ -135,10 +179,11 @@ if ($file['error'] !== UPLOAD_ERR_OK) {
   exit;
 }
 
-// Taille maximale : 5 MB
-$maxSize = 5 * 1024 * 1024;
+// Taille maximale : 2 MB, alignée sur la valeur par défaut de php.ini (upload_max_filesize = 2M).
+// Le navigateur réduit l'image avant l'envoi, un fichier normal pèse bien moins.
+$maxSize = 2 * 1024 * 1024;
 if ($file['size'] > $maxSize) {
-  echo json_encode(['success' => false, 'message' => 'Le fichier est trop volumineux (max 5 MB)']);
+  echo json_encode(['success' => false, 'message' => 'Le fichier est trop volumineux (max 2 MB)']);
   exit;
 }
 
@@ -171,6 +216,14 @@ if (!in_array($mimeType, $allowedMimeTypes)) {
 $imageInfo = @getimagesize($file['tmp_name']);
 if ($imageInfo === false) {
   echo json_encode(['success' => false, 'message' => 'Le fichier n\'est pas une image valide']);
+  exit;
+}
+
+// Dimensions maximales : une image légère mais gigantesque saturerait la mémoire de GD au décodage
+$maxSide = 4000;
+$maxPixels = 12000000;
+if ($imageInfo[0] > $maxSide || $imageInfo[1] > $maxSide || ($imageInfo[0] * $imageInfo[1]) > $maxPixels) {
+  echo json_encode(['success' => false, 'message' => 'Les dimensions de l\'image sont trop grandes (max ' . $maxSide . ' px de côté)']);
   exit;
 }
 
@@ -217,7 +270,10 @@ if (!is_dir($uploadDir)) {
 // Générer un nom de fichier unique et sécurisé
 $uniqueId = uniqid('event_', true);
 $timestamp = time();
-$newFileName = $uniqueId . '_' . $timestamp . '.' . $fileExtension;
+// L'extension vient du contenu réel de l'image, jamais du nom envoyé par le client
+$extensionsByMime = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+$safeExtension = $extensionsByMime[$mimeType];
+$newFileName = $uniqueId . '_' . $timestamp . '.' . $safeExtension;
 $destinationPath = $uploadDir . $newFileName;
 
 // Déplacer le fichier uploadé vers le dossier de destination

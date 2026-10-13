@@ -126,6 +126,62 @@ export async function validateImageFile(file, options = {}) {
   }
 }
 
+// Réglages de l'image envoyée au serveur
+const UPLOAD_MAX_SIDE = 1200 // px, côté le plus long
+const UPLOAD_TARGET_BYTES = 1.5 * 1024 * 1024 // reste sous upload_max_filesize (2 MB par défaut)
+
+/**
+ * Réduit une image dans le navigateur avant l'envoi : l'utilisateur peut choisir
+ * une photo de 12 MB, le fichier envoyé pèsera quelques centaines de Ko.
+ * La sortie est toujours un JPEG (les métadonnées d'origine sont retirées).
+ *
+ * @param {File} file - Image d'origine (déjà validée)
+ * @returns {Promise<{file: File|null, error: string|null}>}
+ */
+export async function resizeImageForUpload(file) {
+  let bitmap
+  try {
+    bitmap = await createImageBitmap(file)
+  } catch (error) {
+    return { file: null, error: 'Impossible de lire cette image.' }
+  }
+
+  let scale = Math.min(1, UPLOAD_MAX_SIDE / Math.max(bitmap.width, bitmap.height))
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
+
+  const toBlob = (quality) =>
+    new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality))
+
+  // On réduit d'abord la qualité, puis les dimensions, jusqu'à passer sous la taille cible
+  for (let attempt = 0; attempt < 4; attempt++) {
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale))
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale))
+
+    // Fond blanc : une image PNG transparente deviendrait noire en JPEG
+    context.fillStyle = '#ffffff'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+
+    for (const quality of [0.8, 0.7, 0.6, 0.5]) {
+      const blob = await toBlob(quality)
+      if (blob && blob.size <= UPLOAD_TARGET_BYTES) {
+        bitmap.close()
+        const baseName = file.name.replace(/\.[^.]+$/, '')
+        return {
+          file: new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' }),
+          error: null
+        }
+      }
+    }
+
+    scale *= 0.75
+  }
+
+  bitmap.close()
+  return { file: null, error: "Impossible de réduire cette image à une taille acceptable." }
+}
+
 /**
  * Crée un aperçu (preview) d'une image
  * 

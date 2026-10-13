@@ -7,6 +7,7 @@ import EventManager from "../managers/EventManager.js";
 import { populateCountrySelect, countryCodes } from "../utils/countries.js";
 import {
   validateImageFile,
+  resizeImageForUpload,
   createImagePreview,
 } from "../validators/imageValidator.js";
 import {
@@ -224,10 +225,12 @@ function clearAllValidation() {
 }
 
 // Fonction pour uploader l'image
-async function uploadImage(file) {
+async function uploadImage(file, token) {
   try {
     const formData = new FormData();
     formData.append("image", file);
+    // Le serveur n'accepte l'envoi que pour un utilisateur connecté
+    formData.append("token", token);
 
     const apiUrl =
       window.__APP_CONFIG__?.API_URL ||
@@ -330,8 +333,10 @@ async function handleImageSelect(e) {
 
   if (!file) return;
 
-  // Valider le fichier image avec le validator dédié
-  const validation = await validateImageFile(file);
+  // Valider le fichier d'origine (type, signature) : il peut être lourd, il ne sera pas envoyé tel quel
+  const validation = await validateImageFile(file, {
+    maxSize: 25 * 1024 * 1024,
+  });
 
   if (!validation.valid) {
     helpers.showToast(validation.error, "error");
@@ -339,12 +344,21 @@ async function handleImageSelect(e) {
     return;
   }
 
-  // Stocker le fichier
-  selectedImageFile = file;
+  // Réduire l'image dans le navigateur : c'est ce fichier léger qui sera envoyé
+  const resized = await resizeImageForUpload(file);
+
+  if (!resized.file) {
+    helpers.showToast(resized.error, "error");
+    e.target.value = "";
+    return;
+  }
+
+  // Stocker le fichier réduit
+  selectedImageFile = resized.file;
 
   // Afficher l'aperçu avec la fonction utilitaire
   try {
-    const previewUrl = await createImagePreview(file);
+    const previewUrl = await createImagePreview(resized.file);
 
     const previewContainer = document.getElementById("imagePreview");
     const previewImg = document.getElementById("previewImg");
@@ -474,7 +488,7 @@ async function handleSubmit(e) {
       '<i class="bi bi-hourglass-split"></i> Upload de l\'image...';
   }
 
-  const uploadResult = await uploadImage(selectedImageFile);
+  const uploadResult = await uploadImage(selectedImageFile, token);
 
   if (!uploadResult.success) {
     // L'événement est créé mais sans image
