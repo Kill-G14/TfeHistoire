@@ -6,7 +6,8 @@
     "php": ">=8.0",
     "tecnickcom/tcpdf": "^6.11",
     "sendgrid/sendgrid": "^8.0",
-    "stripe/stripe-php": "^17.0"
+    "stripe/stripe-php": "^17.0",
+    "phpmailer/phpmailer": "^6.9"
   },
   "autoload": {
     "psr-4": {
