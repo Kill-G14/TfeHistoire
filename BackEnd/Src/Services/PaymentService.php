@@ -379,6 +379,8 @@ class PaymentService
         $event = $this->eventRepository->getEventById($reservation->event_id);
 
         if ($user && $event) {
+            $organizer = $this->userRepository->getUserById($event->user_id);
+
             $this->emailService->sendReservationConfirmation(
                 $user->email,
                 $user->name,
@@ -390,7 +392,13 @@ class PaymentService
                     'city' => $event->city,
                     'country' => $event->country,
                 ],
-                $reservation->quantity
+                $reservation->quantity,
+                [
+                    'reservation_id' => $reservation->id,
+                    'amount_total' => $reservation->amount_total,
+                    'organizer_name' => $organizer->name ?? null,
+                    'organizer_email' => $organizer->email ?? null,
+                ]
             );
         }
     }

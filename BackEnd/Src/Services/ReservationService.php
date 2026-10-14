@@ -155,11 +155,19 @@ class ReservationService
                 'event' => $event->title
             ]);
 
+            $organizer = $this->userRepository->getUserById($event->user_id);
+
             $this->emailService->sendReservationConfirmation(
                 $user->email,
                 $user->name,
                 $eventData,
-                $quantity
+                $quantity,
+                [
+                    'reservation_id' => $createdReservation->id,
+                    'amount_total' => $createdReservation->amount_total,
+                    'organizer_name' => $organizer->name ?? null,
+                    'organizer_email' => $organizer->email ?? null,
+                ]
             );
         }
 

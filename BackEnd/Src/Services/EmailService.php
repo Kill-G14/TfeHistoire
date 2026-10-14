@@ -13,6 +13,7 @@ class EmailService {
   private string $fromName;
   private ?SendGrid $sendgrid;
   private bool $enabled;
+  private string $driver;
 
   public function __construct(UserRepository $userRepository) {
     $this->userRepository = $userRepository;
@@ -20,8 +21,11 @@ class EmailService {
     // Configuration depuis .env
     $this->fromEmail = $_ENV['SENDGRID_FROM_EMAIL'] ?? 'noreply@memoriaeventia.com';
     $this->fromName = $_ENV['SENDGRID_FROM_NAME'] ?? 'MemoriaEventia';
-    $this->enabled = filter_var($_ENV['SENDGRID_ENABLED'] ?? 'false', FILTER_VALIDATE_BOOLEAN);
-    
+    // MAIL_DRIVER : smtp | sendgrid | simulation. Sans valeur, on garde l'ancien comportement (SENDGRID_ENABLED).
+    $legacyEnabled = filter_var($_ENV['SENDGRID_ENABLED'] ?? 'false', FILTER_VALIDATE_BOOLEAN);
+    $this->driver = strtolower($_ENV['MAIL_DRIVER'] ?? ($legacyEnabled ? 'sendgrid' : 'simulation'));
+    $this->enabled = $this->driver === 'sendgrid';
+
     // Initialiser SendGrid si activé et clé API disponible
     if ($this->enabled && !empty($_ENV['SENDGRID_API_KEY'])) {
       // Options pour résoudre les problèmes SSL en développement
@@ -45,6 +49,11 @@ class EmailService {
    * Envoyer un email via SendGrid
    */
   private function sendEmail(string $to, string $toName, string $subject, string $htmlContent, string $textContent = ''): bool {
+    // Envoi par le serveur SMTP de l'hébergeur (boîte mail Infomaniak)
+    if ($this->driver === 'smtp') {
+      return $this->sendViaSmtp($to, $toName, $subject, $htmlContent, $textContent);
+    }
+
     // Si SendGrid est désactivé, logger et retourner true (mode simulation)
     if (!$this->enabled) {
       Logger::info('Email simulation (SendGrid désactivé)', [
@@ -99,46 +108,144 @@ class EmailService {
   }
 
   /**
+   * Envoyer un email via SMTP (PHPMailer). Paramètres lus dans le .env :
+   * MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION (tls|ssl)
+   */
+  private function sendViaSmtp(string $to, string $toName, string $subject, string $htmlContent, string $textContent): bool {
+    if (!class_exists(\PHPMailer\PHPMailer\PHPMailer::class)) {
+      Logger::error('MAIL_DRIVER=smtp mais PHPMailer n\'est pas installé (composer require phpmailer/phpmailer)');
+      return false;
+    }
+
+    try {
+      $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+      $mail->isSMTP();
+      $mail->Host = $_ENV['MAIL_HOST'] ?? '';
+      $mail->Port = (int) ($_ENV['MAIL_PORT'] ?? 587);
+      $mail->SMTPAuth = true;
+      $mail->Username = $_ENV['MAIL_USERNAME'] ?? '';
+      $mail->Password = $_ENV['MAIL_PASSWORD'] ?? '';
+      $mail->SMTPSecure = strtolower($_ENV['MAIL_ENCRYPTION'] ?? 'tls') === 'ssl'
+        ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
+        : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+      $mail->CharSet = 'UTF-8';
+      $mail->Timeout = 10;
+
+      // Infomaniak impose que l'expéditeur soit l'adresse de la boîte authentifiée
+      $mail->setFrom($this->fromEmail, $this->fromName);
+      $mail->addAddress($to, $toName);
+      $mail->Subject = $subject;
+      $mail->isHTML(true);
+      $mail->Body = $htmlContent;
+      if (!empty($textContent)) {
+        $mail->AltBody = $textContent;
+      }
+
+      $mail->send();
+      Logger::info('Email envoyé avec succès (SMTP)', ['to' => $to, 'subject' => $subject]);
+      return true;
+    } catch (\Exception $e) {
+      // Le message d'erreur ne contient jamais le mot de passe
+      Logger::error('Erreur lors de l\'envoi SMTP', ['to' => $to, 'error' => $e->getMessage()]);
+      return false;
+    }
+  }
+
+  /**
    * Envoyer un email de confirmation de réservation
+   */
+  /**
+   * $reservationDetails (optionnel) : reservation_id, amount_total, organizer_name, organizer_email
    */
   public function sendReservationConfirmation(
     string $to,
     string $toName,
     array $eventData,
-    int $quantity
+    int $quantity,
+    array $reservationDetails = []
   ): bool {
     $subject = '✅ Réservation confirmée : ' . $eventData['title'];
-    
+
+    // Les valeurs viennent d'utilisateurs : échappées avant d'entrer dans le HTML
+    $safe = fn($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+    $profileUrl = $this->getProfileReservationsUrl();
+    $reference = isset($reservationDetails['reservation_id'])
+      ? 'MEM-' . str_pad((string) $reservationDetails['reservation_id'], 6, '0', STR_PAD_LEFT)
+      : null;
+    $amountText = (isset($reservationDetails['amount_total']) && (float) $reservationDetails['amount_total'] > 0)
+      ? number_format((float) $reservationDetails['amount_total'], 2, ',', ' ') . ' €'
+      : 'Gratuit';
+    $organizerName = $reservationDetails['organizer_name'] ?? null;
+    $organizerEmail = $reservationDetails['organizer_email'] ?? null;
+
+    $referenceHtml = $reference ? "<p><strong>🔖 Référence :</strong> {$safe($reference)}</p>" : '';
+    $organizerHtml = $organizerName
+      ? "<p><strong>🎫 Organisé par :</strong> {$safe($organizerName)}" . ($organizerEmail ? " (<a href='mailto:{$safe($organizerEmail)}'>{$safe($organizerEmail)}</a>)" : '') . "</p>"
+      : '';
+    $profileButtonHtml = $profileUrl
+      ? "<p style='text-align: center; margin: 25px 0;'>
+          <a href='{$safe($profileUrl)}' style='background-color: #1a3a52; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;'>Voir mes réservations</a>
+        </p>"
+      : '';
+
     $htmlContent = "
       <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
         <h2 style='color: #1a3a52;'>Réservation confirmée !</h2>
-        <p>Bonjour <strong>{$toName}</strong>,</p>
+        <p>Bonjour <strong>{$safe($toName)}</strong>,</p>
         <p>Votre réservation a été confirmée avec succès pour l'événement suivant :</p>
-        
+
         <div style='background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;'>
-          <h3 style='color: #1a3a52; margin-top: 0;'>{$eventData['title']}</h3>
-          <p><strong>📅 Date :</strong> {$eventData['date']} à {$eventData['time']}</p>
-          <p><strong>📍 Lieu :</strong> {$eventData['address']}, {$eventData['city']}, {$eventData['country']}</p>
+          <h3 style='color: #1a3a52; margin-top: 0;'>{$safe($eventData['title'])}</h3>
+          <p><strong>📅 Date :</strong> {$safe($eventData['date'])} à {$safe($eventData['time'])}</p>
+          <p><strong>📍 Lieu :</strong> {$safe($eventData['address'])}, {$safe($eventData['city'])}, {$safe($eventData['country'])}</p>
           <p><strong>👥 Nombre de places :</strong> {$quantity}</p>
+          <p><strong>💶 Montant :</strong> {$amountText}</p>
+          {$referenceHtml}
+          {$organizerHtml}
         </div>
-        
-        <p>Vous pouvez retrouver les détails de votre réservation à tout moment dans votre profil.</p>
-        <p>En cas de question, n'hésitez pas à nous contacter.</p>
-        
+
+        {$profileButtonHtml}
+
+        <p>Vous pouvez retrouver les détails de votre réservation à tout moment dans votre profil (connexion requise).</p>
+        <p>Pour toute question ou demande de remboursement, contactez directement l'organisateur : MemoriaEventia met en relation les visiteurs et les organisateurs et n'encaisse aucun paiement.</p>
+
         <p style='margin-top: 30px;'>Cordialement,<br><strong>L'équipe MemoriaEventia</strong></p>
       </div>
     ";
-    
+
     $textContent = "Réservation confirmée !\n\n";
     $textContent .= "Bonjour {$toName},\n\n";
     $textContent .= "Votre réservation a été confirmée pour :\n\n";
     $textContent .= "Événement : {$eventData['title']}\n";
     $textContent .= "Date : {$eventData['date']} à {$eventData['time']}\n";
     $textContent .= "Lieu : {$eventData['address']}, {$eventData['city']}, {$eventData['country']}\n";
-    $textContent .= "Nombre de places : {$quantity}\n\n";
+    $textContent .= "Nombre de places : {$quantity}\n";
+    $textContent .= "Montant : {$amountText}\n";
+    if ($reference) {
+      $textContent .= "Référence : {$reference}\n";
+    }
+    if ($organizerName) {
+      $textContent .= "Organisé par : {$organizerName}" . ($organizerEmail ? " ({$organizerEmail})" : '') . "\n";
+    }
+    $textContent .= "\n";
+    if ($profileUrl) {
+      $textContent .= "Voir mes réservations (connexion requise) : {$profileUrl}\n\n";
+    }
+    $textContent .= "Pour toute question ou demande de remboursement, contactez directement l'organisateur.\n\n";
     $textContent .= "Cordialement,\nL'équipe MemoriaEventia";
 
     return $this->sendEmail($to, $toName, $subject, $htmlContent, $textContent);
+  }
+
+  /**
+   * Lien vers la section « réservations » du profil.
+   * Ne contient aucun jeton : l'accès exige toujours la connexion.
+   * Retourne null si FRONTEND_URL n'est pas configurée (le mail part alors sans lien).
+   */
+  private function getProfileReservationsUrl(): ?string {
+    $frontendUrl = rtrim($_ENV['FRONTEND_URL'] ?? '', '/');
+    return $frontendUrl !== '' ? $frontendUrl . '/profile?section=reservations' : null;
   }
 
   /**
@@ -150,7 +257,8 @@ class EmailService {
     array $eventData
   ): bool {
     $subject = '❌ Réservation annulée : ' . $eventData['title'];
-    
+    $profileUrl = $this->getProfileReservationsUrl();
+
     $htmlContent = "
       <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
         <h2 style='color: #dc3545;'>Réservation annulée</h2>
@@ -164,17 +272,21 @@ class EmailService {
         </div>
         
         <p>Si vous n'avez pas demandé cette annulation, veuillez nous contacter immédiatement.</p>
-        
+        " . ($profileUrl ? "<p><a href='" . htmlspecialchars($profileUrl, ENT_QUOTES, 'UTF-8') . "'>Voir mes réservations</a> (connexion requise)</p>" : '') . "
+
         <p style='margin-top: 30px;'>Cordialement,<br><strong>L'équipe MemoriaEventia</strong></p>
       </div>
     ";
-    
+
     $textContent = "Réservation annulée\n\n";
     $textContent .= "Bonjour {$toName},\n\n";
     $textContent .= "Votre réservation a été annulée pour :\n\n";
     $textContent .= "Événement : {$eventData['title']}\n";
     $textContent .= "Date : {$eventData['date']} à {$eventData['time']}\n";
     $textContent .= "Lieu : {$eventData['address']}, {$eventData['city']}, {$eventData['country']}\n\n";
+    if ($profileUrl) {
+      $textContent .= "Voir mes réservations (connexion requise) : {$profileUrl}\n\n";
+    }
     $textContent .= "Cordialement,\nL'équipe MemoriaEventia";
 
     return $this->sendEmail($to, $toName, $subject, $htmlContent, $textContent);
