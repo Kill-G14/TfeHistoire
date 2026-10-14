@@ -48,6 +48,21 @@ class EventRepository {
     return $stmt->fetchAll();
   }
 
+  // Empreinte légère de la liste publique : change dès qu'un événement est ajouté,
+  // modifié, approuvé, rejeté ou supprimé (évite de renvoyer toute la liste pour comparer)
+  public function getPublicEventsFingerprint(): string {
+    $query = "SELECT COUNT(*) AS total,
+                     COALESCE(MAX(updated_at), '') AS last_update,
+                     COALESCE(SUM(UNIX_TIMESTAMP(updated_at)), 0) AS timestamps_sum
+              FROM events
+              WHERE is_deleted = FALSE AND is_approved = TRUE";
+    $stmt = $this->getPdo()->prepare($query);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $row['total'] . '|' . $row['last_update'] . '|' . $row['timestamps_sum'];
+  }
+
   // Récupérer tous les événements pour l'admin (tous les statuts)
   public function getAllEventsForAdmin(): array {
     $query = "SELECT *, (SELECT name FROM users WHERE users.id = events.user_id) AS organizer_name FROM events 

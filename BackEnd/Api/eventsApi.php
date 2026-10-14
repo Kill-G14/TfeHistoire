@@ -64,6 +64,10 @@ switch ($request['action']) {
     $response = $eventService->getAllEvents();
     break;
 
+  case 'getFingerprint':
+    $response = $eventService->getEventsFingerprint();
+    break;
+
   case 'getById':
     if (!isset($request['id'])) {
       $response = ['success' => false, 'message' => 'ID non fourni'];

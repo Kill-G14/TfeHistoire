@@ -35,6 +35,14 @@ class EventService {
     ];
   }
 
+  // Empreinte de la liste publique : le front la compare avant de recharger les événements
+  public function getEventsFingerprint(): array {
+    return [
+      'success' => true,
+      'data' => ['fingerprint' => $this->eventRepository->getPublicEventsFingerprint()]
+    ];
+  }
+
   // Récupérer tous les événements pour l'admin (tous les statuts)
   public function getAllEventsForAdmin(): array {
     $events = $this->eventRepository->getAllEventsForAdmin();

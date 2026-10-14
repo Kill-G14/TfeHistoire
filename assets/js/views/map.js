@@ -6,6 +6,7 @@ import { helpers } from "../utils/helpers.js";
 import { loadTemplate } from "../utils/templateLoader.js";
 import { showEventDetail } from "../components/eventDetail.js";
 import { appState } from "../store/appState.js";
+import { loadLeaflet } from "../utils/leafletLoader.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -84,6 +85,14 @@ async function initMap() {
   const defaultLat = 50.8503;
   const defaultLng = 4.3517;
   const defaultZoom = 5;
+
+  // Leaflet n'est chargé que pour cette page
+  try {
+    await loadLeaflet();
+  } catch (error) {
+    helpers.showToast("La carte n'a pas pu être chargée, réessayez plus tard", "error");
+    return false;
+  }
 
   // Créer la carte
   map = L.map("map").setView([defaultLat, defaultLng], defaultZoom);

@@ -7,6 +7,28 @@ class EventManager {
     this.apiUrl = config.API_URL;
   }
 
+  // Empreinte de la liste publique (très légère) : sert à savoir si un rechargement est utile
+  async getFingerprint() {
+    try {
+      const response = await fetch(`${this.apiUrl}/eventsApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "getFingerprint",
+        }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return {
+        success: false,
+        message: "Erreur de connexion au serveur",
+      };
+    }
+  }
+
   // Récupérer tous les événements
   async getAll() {
     try {
