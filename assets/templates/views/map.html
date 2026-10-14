@@ -51,6 +51,33 @@
                 </button>
                 <div id="locationStatus" class="small text-muted"></div>
               </div>
+              <p class="small text-muted mt-2 mb-0">
+                Sur un ordinateur fixe, la localisation peut être imprécise.
+                Indiquez votre adresse ou votre ville pour calculer un
+                itinéraire exact.
+              </p>
+              <form id="manualLocationForm" class="mt-3" novalidate>
+                <label for="manualLocationInput" class="form-label small mb-1">
+                  Mon adresse ou ma ville
+                </label>
+                <div class="input-group input-group-sm">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="manualLocationInput"
+                    placeholder="Ex. Rue de la Loi 16, Namur"
+                    maxlength="150"
+                    autocomplete="street-address"
+                  />
+                  <button
+                    class="btn btn-outline-primary"
+                    type="submit"
+                    id="manualLocationButton"
+                  >
+                    <i class="bi bi-search me-1"></i>Valider
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 

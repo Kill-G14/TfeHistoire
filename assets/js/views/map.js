@@ -154,6 +154,66 @@ function getUserLocation() {
   );
 }
 
+// Appliquer une position (GPS ou saisie manuelle) : marqueur, distances et liste
+function applyUserPosition(latitude, longitude, zoom) {
+  userPosition = { lat: latitude, lng: longitude };
+
+  map.setView([latitude, longitude], zoom);
+  addUserMarker();
+
+  if (events.length > 0) {
+    updateEventDistances();
+    addEventMarkers();
+    renderEventsList();
+  }
+}
+
+// Localiser l'utilisateur à partir d'une adresse ou d'une ville saisie
+// (le navigateur donne parfois une position approximative sur ordinateur fixe)
+async function locateFromAddress(searchText) {
+  const statusElement = document.getElementById("locationStatus");
+  const button = document.getElementById("manualLocationButton");
+
+  const setStatus = (message, cssClass) => {
+    if (statusElement) {
+      statusElement.textContent = message;
+      statusElement.className = `small ${cssClass}`;
+    }
+  };
+
+  if (searchText.trim().length < 2) {
+    setStatus("Saisissez une adresse ou une ville", "text-warning");
+    return;
+  }
+
+  if (button) button.disabled = true;
+  setStatus("Recherche de l'adresse...", "text-primary");
+
+  try {
+    const query = new URLSearchParams({
+      format: "json",
+      limit: "1",
+      q: searchText.trim(),
+    });
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?${query.toString()}`,
+    );
+    const results = await response.json();
+
+    if (!results || results.length === 0) {
+      setStatus("Adresse introuvable, essayez avec la ville", "text-warning");
+      return;
+    }
+
+    applyUserPosition(parseFloat(results[0].lat), parseFloat(results[0].lon), 10);
+    setStatus("Position définie d'après votre adresse", "text-success");
+  } catch (error) {
+    setStatus("Recherche impossible, réessayez plus tard", "text-danger");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 // Ajouter le marqueur de l'utilisateur
 function addUserMarker() {
   if (!userPosition || !map) return;
@@ -639,6 +699,17 @@ function attachEventListeners() {
       } else {
         getUserLocation();
       }
+    });
+  }
+
+  // Saisie manuelle de l'adresse ou de la ville
+  const manualLocationForm = document.getElementById("manualLocationForm");
+  if (manualLocationForm) {
+    manualLocationForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      locateFromAddress(
+        document.getElementById("manualLocationInput").value,
+      );
     });
   }
 
