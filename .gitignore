@@ -16,6 +16,8 @@ bump-version.sh
 bump-version.bat
 
 # Base de données (ne pas commit les structures SQL locales)
+# Aucun script SQL dans le dépôt (structures, migrations, dumps) : à garder hors Git
+/BackEnd/*.sql
 /BackEnd/database.sql
 /BackEnd/database_production.sql
 /BackEnd/migration_rate_limiter_contact.sql
