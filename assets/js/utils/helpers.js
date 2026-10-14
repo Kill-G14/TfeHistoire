@@ -161,7 +161,8 @@ export const helpers = {
 
   // Construire l'URL de l'image à partir du nom de fichier
   getImageUrl(imageName) {
-    if (!imageName) return "/assets/images/default-event.jpg"; // Image par défaut
+    // Image par défaut : le logo, seul visuel présent dans le dépôt (même chemin relatif que le header)
+    if (!imageName) return "./assets/images/MemoriaEventiaLogo.png";
     // Importer config dynamiquement ou utiliser une variable globale
     const apiUrl =
       window.__APP_CONFIG__?.API_URL ||
