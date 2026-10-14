@@ -48,10 +48,10 @@ class EmailService {
   /**
    * Envoyer un email via SendGrid
    */
-  private function sendEmail(string $to, string $toName, string $subject, string $htmlContent, string $textContent = ''): bool {
+  private function sendEmail(string $to, string $toName, string $subject, string $htmlContent, string $textContent = '', array $attachments = []): bool {
     // Envoi par le serveur SMTP de l'hébergeur (boîte mail Infomaniak)
     if ($this->driver === 'smtp') {
-      return $this->sendViaSmtp($to, $toName, $subject, $htmlContent, $textContent);
+      return $this->sendViaSmtp($to, $toName, $subject, $htmlContent, $textContent, $attachments);
     }
 
     // Si SendGrid est désactivé, logger et retourner true (mode simulation)
@@ -79,6 +79,16 @@ class EmailService {
       // Ajouter contenu texte si fourni
       if (!empty($textContent)) {
         $email->addContent("text/plain", $textContent);
+      }
+
+      // Pièces jointes (ex. billets PDF) : SendGrid attend le contenu en base64
+      foreach ($attachments as $attachment) {
+        $email->addAttachment(
+          base64_encode($attachment['content']),
+          $attachment['mime_type'],
+          $attachment['filename'],
+          'attachment'
+        );
       }
 
       $response = $this->sendgrid->send($email);
@@ -111,7 +121,7 @@ class EmailService {
    * Envoyer un email via SMTP (PHPMailer). Paramètres lus dans le .env :
    * MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION (tls|ssl)
    */
-  private function sendViaSmtp(string $to, string $toName, string $subject, string $htmlContent, string $textContent): bool {
+  private function sendViaSmtp(string $to, string $toName, string $subject, string $htmlContent, string $textContent, array $attachments = []): bool {
     if (!class_exists(\PHPMailer\PHPMailer\PHPMailer::class)) {
       Logger::error('MAIL_DRIVER=smtp mais PHPMailer n\'est pas installé (composer require phpmailer/phpmailer)');
       return false;
@@ -139,6 +149,15 @@ class EmailService {
       $mail->Body = $htmlContent;
       if (!empty($textContent)) {
         $mail->AltBody = $textContent;
+      }
+
+      foreach ($attachments as $attachment) {
+        $mail->addStringAttachment(
+          $attachment['content'],
+          $attachment['filename'],
+          \PHPMailer\PHPMailer\PHPMailer::ENCODING_BASE64,
+          $attachment['mime_type']
+        );
       }
 
       $mail->send();
@@ -207,7 +226,7 @@ class EmailService {
 
         {$profileButtonHtml}
 
-        <p>Vous pouvez retrouver les détails de votre réservation à tout moment dans votre profil (connexion requise).</p>
+        <p>Vos billets (un par place, avec QR code) sont joints à ce message en PDF. Vous pouvez aussi les retrouver à tout moment dans votre profil (connexion requise).</p>
         <p>Pour toute question ou demande de remboursement, contactez directement l'organisateur : MemoriaEventia met en relation les visiteurs et les organisateurs et n'encaisse aucun paiement.</p>
 
         <p style='margin-top: 30px;'>Cordialement,<br><strong>L'équipe MemoriaEventia</strong></p>
@@ -235,7 +254,17 @@ class EmailService {
     $textContent .= "Pour toute question ou demande de remboursement, contactez directement l'organisateur.\n\n";
     $textContent .= "Cordialement,\nL'équipe MemoriaEventia";
 
-    return $this->sendEmail($to, $toName, $subject, $htmlContent, $textContent);
+    // Billets PDF en pièce jointe (généré par l'appelant, absent si la génération a échoué)
+    $attachments = [];
+    if (!empty($reservationDetails['pdf_content'])) {
+      $attachments[] = [
+        'content' => $reservationDetails['pdf_content'],
+        'filename' => $reservationDetails['pdf_filename'] ?? 'billets.pdf',
+        'mime_type' => 'application/pdf',
+      ];
+    }
+
+    return $this->sendEmail($to, $toName, $subject, $htmlContent, $textContent, $attachments);
   }
 
   /**

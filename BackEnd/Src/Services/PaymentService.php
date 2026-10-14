@@ -381,6 +381,14 @@ class PaymentService
         if ($user && $event) {
             $organizer = $this->userRepository->getUserById($event->user_id);
 
+            // Billets PDF joints au mail (vide si la génération échoue : le mail part quand même)
+            $ticketService = new TicketService(
+                $this->reservationRepository,
+                $this->eventRepository,
+                $this->userRepository
+            );
+            $ticketAttachment = $ticketService->buildEmailAttachment($reservation->user_id, $reservation->id);
+
             $this->emailService->sendReservationConfirmation(
                 $user->email,
                 $user->name,
@@ -398,7 +406,7 @@ class PaymentService
                     'amount_total' => $reservation->amount_total,
                     'organizer_name' => $organizer->name ?? null,
                     'organizer_email' => $organizer->email ?? null,
-                ]
+                ] + $ticketAttachment
             );
         }
     }

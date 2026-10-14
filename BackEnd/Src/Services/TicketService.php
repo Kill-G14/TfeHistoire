@@ -60,6 +60,86 @@ class TicketService
     }
 
     /**
+     * PDF prêt à être joint à l'e-mail de confirmation.
+     * Retourne un tableau vide en cas d'échec : le mail part alors sans pièce jointe.
+     */
+    public function buildEmailAttachment(int $userId, int $reservationId): array
+    {
+        try {
+            $result = $this->generatePdf($userId, $reservationId);
+        } catch (\Throwable $exception) {
+            Logger::error('Billet PDF non joint à l\'e-mail', ['error' => $exception->getMessage()]);
+            return [];
+        }
+
+        if (!$result['success']) {
+            Logger::warning('Billet PDF non joint à l\'e-mail', ['reason' => $result['message']]);
+            return [];
+        }
+
+        return ['pdf_content' => $result['pdf'], 'pdf_filename' => $result['filename']];
+    }
+
+    /**
+     * Vérifier un billet à partir du contenu du QR code (lien complet ou code seul).
+     * Public volontairement (n'importe qui peut scanner) : ne renvoie que le strict nécessaire.
+     */
+    public function verifyTicket(string $scannedValue): array
+    {
+        // Le QR contient un lien : on en extrait seulement le code, au format strict
+        if (!preg_match('/MEM-(\d{6})-(\d{1,3})-([0-9A-Fa-f]{12})/', $scannedValue, $matches)) {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Code de billet non reconnu']];
+        }
+
+        $reservationId = (int) $matches[1];
+        $seatNumber = (int) $matches[2];
+
+        // Comparaison à temps constant : la signature ne peut pas être devinée petit à petit
+        $expectedCode = $this->buildTicketCode($reservationId, $seatNumber);
+        if (!hash_equals($expectedCode, strtoupper($matches[0]))) {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Billet falsifié ou invalide']];
+        }
+
+        $reservation = $this->reservationRepository->getById($reservationId);
+        if (!$reservation || $seatNumber < 1 || $seatNumber > $reservation->quantity) {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Billet introuvable']];
+        }
+
+        if ($reservation->status === 'cancelled') {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Réservation annulée']];
+        }
+
+        $isSettled = in_array($reservation->payment_status, ['not_required', 'paid'], true);
+        if ($reservation->status !== 'confirmed' || !$isSettled) {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Réservation non confirmée ou non payée']];
+        }
+
+        $event = $this->eventRepository->getEventById($reservation->event_id);
+        $holder = $this->userRepository->getUserById($reservation->user_id);
+        if (!$event || !$holder) {
+            return ['success' => true, 'data' => ['valid' => false, 'reason' => 'Événement introuvable']];
+        }
+
+        return [
+            'success' => true,
+            'data' => [
+                'valid' => true,
+                'reason' => 'Billet valide',
+                'event_title' => $event->title,
+                'event_date' => $event->date,
+                'event_time' => substr((string) $event->time, 0, 5),
+                'event_city' => $event->city,
+                'organizer_name' => $event->organizer_name,
+                'seat_number' => $seatNumber,
+                'seat_total' => $reservation->quantity,
+                'reference' => $this->buildReference($reservation->id),
+                // Initiales seulement : le contrôleur reconnaît la personne sans exposer son identité
+                'holder_initials' => $this->buildInitials($holder->name),
+            ],
+        ];
+    }
+
+    /**
      * PDF d'une réservation : une page par place.
      * Retourne ['success' => true, 'pdf' => contenu, 'filename' => nom] ou une erreur.
      */
@@ -128,7 +208,7 @@ class TicketService
 
             // QR code signé de la place
             $qrY = max($pdf->GetY() + 6, 92);
-            $pdf->write2DBarcode($code, 'QRCODE,M', 49, $qrY, 50, 50, [
+            $pdf->write2DBarcode($this->buildQrPayload($code), 'QRCODE,M', 49, $qrY, 50, 50, [
                 'border' => false,
                 'padding' => 0,
                 'fgcolor' => [10, 63, 59],
@@ -220,10 +300,32 @@ class TicketService
         return $this->buildReference($reservationId) . '-' . $seatNumber . '-' . strtoupper($signature);
     }
 
+    // Initiales d'un nom complet (ex. « Killian Godmont » devient « K. G. »)
+    private function buildInitials(string $fullName): string
+    {
+        $parts = preg_split('/\s+/', trim($fullName), -1, PREG_SPLIT_NO_EMPTY);
+        $initials = array_map(fn($part) => mb_strtoupper(mb_substr($part, 0, 1)) . '.', $parts);
+
+        return implode(' ', $initials);
+    }
+
+    /**
+     * Contenu du QR : le lien de la page de vérification (le téléphone l'ouvre directement).
+     * Sans FRONTEND_URL, le QR contient le code seul.
+     */
+    private function buildQrPayload(string $code): string
+    {
+        $frontendUrl = rtrim($_ENV['FRONTEND_URL'] ?? '', '/');
+
+        return $frontendUrl !== ''
+            ? $frontendUrl . '/ticket/verify?code=' . urlencode($code)
+            : $code;
+    }
+
     // QR code en SVG intégré (data URI) : aucune image stockée sur le serveur
     private function buildQrDataUri(string $code): string
     {
-        $barcode = new \TCPDF2DBarcode($code, 'QRCODE,M');
+        $barcode = new \TCPDF2DBarcode($this->buildQrPayload($code), 'QRCODE,M');
         $svg = $barcode->getBarcodeSVGcode(4, 4, 'black');
 
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
