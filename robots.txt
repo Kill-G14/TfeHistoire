@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /AdminOffice/
+Disallow: /BackEnd/
+Allow: /BackEnd/Api/imageApi.php
+Disallow: /profile
+Disallow: /create-event
+Disallow: /payment/
+Disallow: /ticket/
+
+Sitemap: https://memoriaeventia.com/sitemap.xml

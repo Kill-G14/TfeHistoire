@@ -2,6 +2,7 @@
 import { config } from "./config.js";
 import { updateActiveNav } from "./components/mobileNav.js";
 import { updateActiveNav as updateHeaderActiveNav } from "./components/header.js";
+import { setPageMetadata, clearStructuredData } from "./utils/seo.js";
 
 export class Router {
   constructor(routes, appSelector) {
@@ -159,13 +160,9 @@ export class Router {
   }
 
   updateMetadata(meta = {}) {
-    document.title = meta.title || "MemoriaEventia";
-
-    const description = document.getElementById("pageDescription");
-    if (description) {
-      description.content =
-        meta.description || "Découvrez les événements historiques d'Europe";
-    }
+    // Les données structurées de la page précédente ne doivent pas rester
+    clearStructuredData();
+    setPageMetadata(meta);
   }
 
   show404() {

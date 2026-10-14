@@ -1,0 +1,48 @@
+# Modèle de .htaccess pour la PRODUCTION (Infomaniak) : à copier à la racine du site en .htaccess.
+# Le .htaccess local est ignoré par Git (RewriteBase différent) : celui-ci sert de référence.
+
+# --- Compression des fichiers texte ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/xml
+  AddOutputFilterByType DEFLATE application/javascript text/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# --- Mise en cache navigateur ---
+# Images et polices : longue durée. HTML, CSS et JS : revalidés à chaque visite (réponse 304
+# très légère si rien n'a changé), donc une mise en ligne est visible tout de suite.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|css|js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# --- Redirections ---
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Plan du site pour les moteurs de recherche
+  RewriteRule ^sitemap\.xml$ BackEnd/Api/sitemapApi.php [L]
+
+  # Page d'un événement : index.html avec balises de référencement déjà remplies
+  RewriteRule ^event/([0-9]+)/?$ BackEnd/Api/eventPage.php?id=$1 [L,QSA]
+
+  # Toute autre URL qui n'est pas un fichier ou un dossier réel : la SPA prend le relais
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# --- Fichiers sensibles : jamais servis ---
+<FilesMatch "^(\.env|credentials.*|.*\.sql)$">
+  Require all denied
+</FilesMatch>

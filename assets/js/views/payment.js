@@ -9,6 +9,7 @@ import { renderLoginRequiredPage } from "../components/loginModal.js";
 export const meta = {
   title: "Paiement - MemoriaEventia",
   description: "Résultat de votre paiement",
+  noindex: true,
 };
 
 // Nombre de vérifications auprès du serveur avant d'abandonner l'attente

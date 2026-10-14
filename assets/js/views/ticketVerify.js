@@ -8,6 +8,7 @@ import { helpers } from "../utils/helpers.js";
 export const meta = {
   title: "Vérification d'un billet - MemoriaEventia",
   description: "Vérifiez la validité d'un billet MemoriaEventia",
+  noindex: true,
 };
 
 // Crée un élément avec un texte (textContent : aucune donnée n'est injectée en HTML)

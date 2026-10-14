@@ -32,6 +32,7 @@ const routes = {
   "/payment/success": () => import("./views/payment.js"),
   "/payment/cancel": () => import("./views/payment.js"),
   "/ticket/verify": () => import("./views/ticketVerify.js"),
+  "/event/:id": () => import("./views/eventPage.js"),
 };
 
 // Instance du routeur
@@ -49,24 +50,24 @@ async function init() {
     if (session.valid) {
       appState.set("user", session.user);
       appState.set("isAuthenticated", true);
-
-      // Charger les favoris de l'utilisateur
-      const token = auth.getToken();
-      const favoritesResult = await FavoriteManager.getByUser(token);
-      if (favoritesResult.success) {
-        appState.set("favorites", favoritesResult.data || []);
-      }
     }
   }
 
-  // Rendre les composants persistants
-  await renderHeader();
-  await renderFooter();
-  await loadMobileNav();
-  await renderLoginModal();
+  // Les composants persistants (header, footer, modals) et les favoris ne dépendent pas
+  // les uns des autres : ils se chargent en parallèle plutôt qu'à la file.
+  // Les favoris restent attendus avant le routeur : les cartes les lisent à l'affichage.
+  const favoritesLoading = appState.get("isAuthenticated")
+    ? loadUserFavorites()
+    : Promise.resolve();
 
-  // Précharger la modal de réservation
-  await initReservationModal();
+  await Promise.all([
+    renderHeader(),
+    renderFooter(),
+    loadMobileNav(),
+    renderLoginModal(),
+    initReservationModal(),
+    favoritesLoading,
+  ]);
 
   // Initialiser le routeur
   router.init();
@@ -78,10 +79,29 @@ async function init() {
   startEventsPolling();
 }
 
+// Charger les favoris de l'utilisateur connecté (sans bloquer le démarrage)
+async function loadUserFavorites() {
+  const favoritesResult = await FavoriteManager.getByUser(auth.getToken());
+  if (favoritesResult.success) {
+    appState.set("favorites", favoritesResult.data || []);
+  }
+}
+
 // Sonder périodiquement les événements pour refléter les actions de modération sans reload
 function startEventsPolling() {
+  // Dernière empreinte connue : la liste complète n'est rechargée que si elle a changé
+  let lastFingerprint = null;
+
   setInterval(async () => {
     if (document.hidden) return; // ne pas solliciter le serveur si l'onglet n'est pas actif
+
+    const fingerprintResult = await EventManager.getFingerprint();
+    if (!fingerprintResult.success) return;
+
+    // Rien n'a changé depuis la dernière sonde : on évite de recharger toute la liste
+    const fingerprint = fingerprintResult.data.fingerprint;
+    if (fingerprint === lastFingerprint) return;
+    lastFingerprint = fingerprint;
 
     const result = await EventManager.getAll();
     if (result.success) {

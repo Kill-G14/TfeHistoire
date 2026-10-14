@@ -3,22 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0F5E59" />
 
-    <!-- Base URL pour l'application SPA - Détection automatique -->
+    <!-- Base URL de la SPA selon l'environnement (insérée par le DOM : plus de document.write bloquant) -->
     <script>
-      // Détection de l'environnement pour définir le base href correct
-      const hostname = window.location.hostname;
-      const isProduction =
-        hostname === "memoriaeventia.com" ||
-        hostname === "www.memoriaeventia.com";
-      const basePath = isProduction ? "/" : "/tfeHistoire/";
-      document.write('<base href="' + basePath + '" />');
+      (function () {
+        const hostname = window.location.hostname;
+        const isProduction =
+          hostname === "memoriaeventia.com" ||
+          hostname === "www.memoriaeventia.com";
+        const base = document.createElement("base");
+        base.href = isProduction ? "/" : "/tfeHistoire/";
+        document.head.appendChild(base);
+      })();
     </script>
 
     <link
       rel="icon"
       type="image/png"
-      href="assets/images/MemoriaEventiaLogo.png"
+      href="assets/images/MemoriaEventiaIcon-192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="assets/images/MemoriaEventiaIcon-192.png"
     />
     <title id="pageTitle">
       MemoriaEventia - Événements historiques d'Europe
@@ -28,6 +35,29 @@
       id="pageDescription"
       content="Découvrez et participez aux plus grandes célébrations historiques à travers l'Europe"
     />
+
+    <!-- Référencement et partage : valeurs par défaut, le routeur les met à jour à chaque page -->
+    <link rel="canonical" id="pageCanonical" href="https://memoriaeventia.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MemoriaEventia" />
+    <meta property="og:locale" content="fr_BE" />
+    <meta
+      property="og:title"
+      id="ogTitle"
+      content="MemoriaEventia - Événements historiques d'Europe"
+    />
+    <meta
+      property="og:description"
+      id="ogDescription"
+      content="Découvrez et participez aux plus grandes célébrations historiques à travers l'Europe"
+    />
+    <meta property="og:url" id="ogUrl" content="https://memoriaeventia.com/" />
+    <meta
+      property="og:image"
+      id="ogImage"
+      content="https://memoriaeventia.com/assets/images/MemoriaEventiaShare-1200x630.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -53,24 +83,21 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
 
-    <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/custom.css?v=1.5.3" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=1.5.4" />
   </head>
 
   <body>
+    <!-- Lien d'accès rapide au contenu (clavier et lecteurs d'écran) -->
+    <a class="skip-link visually-hidden-focusable" href="#app">
+      Aller au contenu
+    </a>
+
     <!-- Navbar persistante -->
     <div id="header"></div>
 
     <!-- Conteneur principal pour les vues -->
-    <main id="app"></main>
+    <main id="app" tabindex="-1"></main>
 
     <!-- Footer persistant -->
     <div id="footer"></div>
@@ -91,14 +118,9 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- Leaflet JS -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
+    <!-- Leaflet n'est plus chargé ici : la page carte le charge à la demande (utils/leafletLoader.js) -->
 
     <!-- Application principale -->
-    <script type="module" src="assets/js/app.js?v=1.0.0"></script>
+    <script type="module" src="assets/js/app.js?v=1.0.1"></script>
   </body>
 </html>

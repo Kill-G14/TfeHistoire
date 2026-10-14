@@ -22,6 +22,7 @@ export const meta = {
   title: "Créer un événement - MemoriaEventia",
   description:
     "Créez votre événement historique et partagez-le avec toute l'Europe",
+  noindex: true,
 };
 
 // Template HTML

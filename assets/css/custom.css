@@ -2028,3 +2028,15 @@ html {
   border-color: #dc3545;
   color: white;
 }
+
+/* Lien d'accès rapide : invisible jusqu'à la navigation au clavier */
+.skip-link:focus {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2000;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-dark);
+  color: #fff;
+  border-radius: 0.375rem;
+}

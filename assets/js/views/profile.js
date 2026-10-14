@@ -25,6 +25,7 @@ import TicketManager from "../managers/TicketManager.js";
 export const meta = {
   title: "Mon Profil - MemoriaEventia",
   description: "Gérez votre profil et consultez vos réservations",
+  noindex: true,
 };
 
 // Template HTML
