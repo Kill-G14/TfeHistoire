@@ -31,6 +31,7 @@ const routes = {
   // Retour de la page de paiement Stripe (la vue choisit le message selon l'URL)
   "/payment/success": () => import("./views/payment.js"),
   "/payment/cancel": () => import("./views/payment.js"),
+  "/ticket/verify": () => import("./views/ticketVerify.js"),
 };
 
 // Instance du routeur

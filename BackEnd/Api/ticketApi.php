@@ -48,7 +48,20 @@ if (!$request || !isset($request['action'])) {
   sendJsonError('Requête invalide', 400);
 }
 
-// Les billets ne sont jamais publics : utilisateur connecté obligatoire
+// Vérification d'un billet : publique (page ouverte en scannant le QR code)
+if ($request['action'] === 'verifyTicket') {
+  try {
+    $result = $ticketService->verifyTicket((string) ($request['code'] ?? ''));
+  } catch (\Throwable $exception) {
+    \App\Utils\Logger::error('Erreur vérification billet', ['error' => $exception->getMessage()]);
+    sendJsonError('Vérification impossible', 500);
+  }
+  header("Content-Type: application/json; charset=UTF-8");
+  echo json_encode($result);
+  exit;
+}
+
+// Les autres actions ne sont jamais publiques : utilisateur connecté obligatoire
 $token = $request['token'] ?? '';
 $userId = $token ? $sessionService->getUserIdByToken($token) : null;
 

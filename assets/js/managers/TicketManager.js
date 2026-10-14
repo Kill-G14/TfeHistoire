@@ -46,6 +46,23 @@ class TicketManager {
     return await response.json();
   }
 
+  // Vérification publique d'un billet (page ouverte en scannant le QR code)
+  async verifyTicket(code) {
+    try {
+      const response = await fetch(`${this.apiUrl}/ticketApi.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "verifyTicket", code }),
+      });
+
+      return await response.json();
+    } catch (error) {
+      return { success: false, message: "Erreur de connexion au serveur" };
+    }
+  }
+
   // PDF de la réservation : retourne le fichier prêt à être téléchargé
   async downloadPdf(reservationId, token) {
     const { response, message } = await this.call(
