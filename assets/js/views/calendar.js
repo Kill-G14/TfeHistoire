@@ -1,13 +1,12 @@
 // Vue Calendar - Calendrier des événements
 // Calendrier écrit à la main (aucune bibliothèque) : grille mensuelle, vue agenda,
-// filtre par catégorie, fenêtre du jour et export .ics.
+// filtre par catégorie et fenêtre du jour.
 
 import EventManager from "../managers/EventManager.js";
 import { helpers } from "../utils/helpers.js";
 import { showEventDetail } from "../components/eventDetail.js";
 import { appState } from "../store/appState.js";
 import { loadTemplate } from "../utils/templateLoader.js";
-import { downloadEventIcs } from "../utils/icsExport.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -550,19 +549,7 @@ function createEventCard(event, onOpenDetail) {
   detailButton.type = "button";
   detailButton.addEventListener("click", onOpenDetail);
 
-  const icsButton = createElement("button", "btn btn-sm btn-outline-secondary");
-  icsButton.type = "button";
-  icsButton.title = "Ajouter à mon agenda";
-  icsButton.setAttribute("aria-label", `Ajouter ${event.title} à mon agenda`);
-  const icsIcon = createElement("i", "bi bi-calendar-plus");
-  icsIcon.setAttribute("aria-hidden", "true");
-  icsButton.appendChild(icsIcon);
-  icsButton.addEventListener("click", () => {
-    const base = window.location.origin + new URL("./", document.baseURI).pathname;
-    downloadEventIcs(event, `${base}event/${event.id}`);
-  });
-
-  actions.append(detailButton, icsButton);
+  actions.append(detailButton);
   card.append(image, body, actions);
 
   return card;
