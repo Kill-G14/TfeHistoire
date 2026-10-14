@@ -21,6 +21,10 @@ class ComposerStaticInit759a1d9f42300b059b0e00aa19de5de7
             'SendGrid\\Contacts\\' => 18,
             'SendGrid\\' => 9,
         ),
+        'P' => 
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
         'E' => 
         array (
             'EllipticCurve\\' => 14,
@@ -59,6 +63,10 @@ class ComposerStaticInit759a1d9f42300b059b0e00aa19de5de7
         'SendGrid\\' => 
         array (
             0 => __DIR__ . '/..' . '/sendgrid/php-http-client/lib',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'EllipticCurve\\' => 
         array (
