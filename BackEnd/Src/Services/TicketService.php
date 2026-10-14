@@ -171,7 +171,7 @@ class TicketService
         $organizerName = $event->organizer_name ?? ($organizer->name ?? 'l\'organisateur');
         $organizerEmail = $organizer->email ?? '';
         $reference = $this->buildReference($reservation->id);
-        $logoPath = dirname(__DIR__, 3) . '/assets/images/MemoriaEventiaLogo.png';
+        $logoPath = dirname(__DIR__, 3) . '/assets/images/MemoriaEventiaLogo-480.png';
 
         for ($seatNumber = 1; $seatNumber <= $reservation->quantity; $seatNumber++) {
             $code = $this->buildTicketCode($reservation->id, $seatNumber);
