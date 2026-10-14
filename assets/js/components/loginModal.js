@@ -188,7 +188,7 @@ function attachRegisterEvents() {
     if (submitButton.dataset.originalHtml !== undefined) return;
 
     helpers.setButtonLoading(submitButton, "Inscription...");
-    const result = await auth.register(email, password, name);
+    const result = await auth.register(email, password, name, true);
     helpers.resetButton(submitButton);
 
     if (result.success) {
@@ -251,6 +251,12 @@ function attachValidationEvents() {
   // Champs de connexion
   const loginEmail = document.getElementById("loginEmail");
   const loginPassword = document.getElementById("loginPassword");
+
+  // Acceptation des conditions d'utilisation : débloque le bouton d'inscription
+  const registerAcceptTerms = document.getElementById("registerAcceptTerms");
+  if (registerAcceptTerms) {
+    registerAcceptTerms.addEventListener("change", checkRegisterFormValidity);
+  }
 
   // Validation inscription
   if (registerName) {
@@ -339,10 +345,17 @@ function checkRegisterFormValidity() {
   const isNameValid = validateRegisterName();
   const isEmailValid = validateRegisterEmail();
   const isPasswordValid = validateRegisterPassword();
+  const hasAcceptedTerms =
+    document.getElementById("registerAcceptTerms")?.checked === true;
 
   const submitBtn = document.getElementById("registerSubmitBtn");
   if (submitBtn) {
-    submitBtn.disabled = !(isNameValid && isEmailValid && isPasswordValid);
+    submitBtn.disabled = !(
+      isNameValid &&
+      isEmailValid &&
+      isPasswordValid &&
+      hasAcceptedTerms
+    );
   }
 }
 

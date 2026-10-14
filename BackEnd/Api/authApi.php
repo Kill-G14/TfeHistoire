@@ -67,6 +67,15 @@ switch ($request['action']) {
       break;
     }
     
+    // Les conditions d'utilisation doivent être acceptées (contrôle aussi côté serveur)
+    if (($request['accept_terms'] ?? false) !== true) {
+      $response = [
+        'success' => false,
+        'message' => 'Vous devez accepter les conditions d\'utilisation pour créer un compte'
+      ];
+      break;
+    }
+
     // Traiter l'inscription
     $response = $authService->register($request);
     

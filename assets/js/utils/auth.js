@@ -31,8 +31,13 @@ export const auth = {
   },
 
   // Inscription avec appel API
-  async register(email, password, name) {
-    const result = await AuthManager.register(email, password, name);
+  async register(email, password, name, acceptTerms) {
+    const result = await AuthManager.register(
+      email,
+      password,
+      name,
+      acceptTerms,
+    );
 
     if (result.success) {
       // Stocker l'utilisateur et le token

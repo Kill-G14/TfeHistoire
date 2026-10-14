@@ -31,7 +31,7 @@ class AuthManager {
   }
 
   // Inscription
-  async register(email, password, name) {
+  async register(email, password, name, acceptTerms = false) {
     try {
       const response = await fetch(`${this.apiUrl}/authApi.php`, {
         method: "POST",
@@ -43,6 +43,7 @@ class AuthManager {
           email: email,
           password: password,
           name: name,
+          accept_terms: acceptTerms,
         }),
       });
 
