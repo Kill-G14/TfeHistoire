@@ -19,6 +19,7 @@ import {
 import { loadTemplate } from "../utils/templateLoader.js";
 import { renderLoginRequiredPage } from "../components/loginModal.js";
 import PaymentManager from "../managers/PaymentManager.js";
+import TicketManager from "../managers/TicketManager.js";
 
 // Métadonnées de la vue
 export const meta = {
@@ -168,6 +169,90 @@ async function renderStripeConnectBox() {
     );
   }
 }
+
+// Afficher ou masquer les billets (un par place) d'une réservation (fonction globale pour onclick)
+window.toggleTickets = async function (reservationId) {
+  const list = document.getElementById(`ticket-list-${reservationId}`);
+  const button = document.getElementById(`toggle-tickets-${reservationId}`);
+  if (!list || !button) return;
+
+  // Déjà chargés : on bascule simplement l'affichage
+  if (list.dataset.loaded === "true") {
+    const isHidden = list.classList.toggle("d-none");
+    button.setAttribute("aria-expanded", String(!isHidden));
+    return;
+  }
+
+  button.disabled = true;
+  const result = await TicketManager.getTickets(
+    reservationId,
+    auth.getToken(),
+  );
+  button.disabled = false;
+
+  if (!result.success) {
+    helpers.showToast(result.message || "Impossible de charger les billets", "error");
+    return;
+  }
+
+  // Construction par le DOM : aucune donnée du serveur n'est injectée en HTML
+  list.replaceChildren();
+  result.data.tickets.forEach((ticket) => {
+    const card = document.createElement("div");
+    card.className =
+      "ticket-card d-flex align-items-center gap-3 border rounded p-2 mb-2";
+
+    const image = document.createElement("img");
+    image.src = ticket.qr_image;
+    image.alt = `QR code de la place ${ticket.seat_number} sur ${ticket.seat_total}`;
+    image.width = 96;
+    image.height = 96;
+
+    const text = document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "fw-bold";
+    title.textContent = `Place ${ticket.seat_number} / ${ticket.seat_total}`;
+    const code = document.createElement("div");
+    code.className = "small text-muted";
+    code.textContent = ticket.code;
+
+    text.append(title, code);
+    card.append(image, text);
+    list.appendChild(card);
+  });
+
+  list.dataset.loaded = "true";
+  list.classList.remove("d-none");
+  button.setAttribute("aria-expanded", "true");
+};
+
+// Télécharger les billets d'une réservation en PDF (fonction globale pour onclick)
+window.downloadTicketsPdf = async function (reservationId) {
+  const button = document.getElementById(`download-tickets-${reservationId}`);
+  if (button) button.disabled = true;
+
+  const result = await TicketManager.downloadPdf(
+    reservationId,
+    auth.getToken(),
+  );
+
+  if (button) button.disabled = false;
+
+  if (!result.success) {
+    helpers.showToast(result.message, "error");
+    return;
+  }
+
+  // Téléchargement via un lien temporaire : le PDF n'est jamais à une URL publique
+  const url = URL.createObjectURL(result.blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = result.filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
 
 // Reprendre le paiement d'une réservation en attente (fonction globale pour onclick)
 window.resumePayment = async function (reservationId) {
@@ -997,7 +1082,31 @@ function displayReservations(reservations) {
                 }
               </div>
 
-              <!-- Étape 7 : l'emplacement des billets (QR + PDF) viendra ici, au-dessus des boutons -->
+              ${
+                reservation.status === "confirmed" &&
+                ["not_required", "paid"].includes(reservation.payment_status)
+                  ? `
+              <div class="mb-3" onclick="event.stopPropagation()">
+                <div class="d-flex gap-2">
+                  <button class="btn btn-outline-primary btn-sm flex-grow-1"
+                          onclick="toggleTickets(${reservation.id})"
+                          id="toggle-tickets-${reservation.id}"
+                          aria-expanded="false"
+                          aria-controls="ticket-list-${reservation.id}">
+                    <i class="bi bi-qr-code"></i> Voir mes billets
+                  </button>
+                  <button class="btn btn-outline-secondary btn-sm"
+                          onclick="downloadTicketsPdf(${reservation.id})"
+                          id="download-tickets-${reservation.id}"
+                          title="Télécharger les billets en PDF">
+                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                  </button>
+                </div>
+                <div class="ticket-list d-none mt-3" id="ticket-list-${reservation.id}"></div>
+              </div>
+              `
+                  : ""
+              }
               <div class="d-flex gap-2">
                 <button class="btn btn-primary btn-sm flex-grow-1"
                         onclick="event.stopPropagation(); viewReservationEventDetails(${reservation.event_id})">
