@@ -3,7 +3,7 @@
 // ============================================
 
 // Version actuelle des templates (à incrémenter à chaque modification)
-const TEMPLATE_VERSION = "1.0.1";
+const TEMPLATE_VERSION = "1.0.2";
 
 /**
  * Charge un template HTML avec versioning pour éviter les problèmes de cache

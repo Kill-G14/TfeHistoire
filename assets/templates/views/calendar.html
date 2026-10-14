@@ -1,87 +1,108 @@
 <template id="calendarView">
-  <div class="container py-5" style="max-width: 1200px">
-    <!-- En-tête calendrier -->
+  <div class="container py-4 py-md-5 calendar-page" style="max-width: 1200px">
+    <!-- En-tête de la page -->
     <div class="text-center mb-4">
       <h1 class="page-title mb-2">Calendrier des Événements</h1>
-      <p class="text-muted">Découvrez tous les événements à venir</p>
+      <p class="text-muted mb-0">Découvrez tous les événements à venir</p>
     </div>
 
-    <!-- Navigation du calendrier -->
-    <div class="calendar-navigation mb-4">
-      <div class="d-flex align-items-center justify-content-between">
-        <button class="btn btn-outline-primary" id="prevMonth">
-          <i class="bi bi-chevron-left"></i> Mois précédent
+    <!-- Barre d'outils : navigation, mois courant, affichage -->
+    <div class="calendar-toolbar mb-3">
+      <div class="calendar-toolbar-nav">
+        <button
+          type="button"
+          class="btn btn-outline-primary calendar-icon-btn"
+          id="prevMonth"
+          aria-label="Mois précédent"
+        >
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
         </button>
-        <h2 class="mb-0" id="currentMonthYear">Mars 2026</h2>
-        <button class="btn btn-outline-primary" id="nextMonth">
-          Mois suivant <i class="bi bi-chevron-right"></i>
+        <button
+          type="button"
+          class="btn btn-outline-primary calendar-icon-btn"
+          id="nextMonth"
+          aria-label="Mois suivant"
+        >
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn btn-outline-primary" id="todayBtn">
+          Aujourd'hui
         </button>
       </div>
-    </div>
 
-    <!-- Calendrier -->
-    <div class="calendar-container">
-      <div class="calendar-grid">
-        <!-- En-têtes des jours -->
-        <div class="calendar-header">
-          <div class="calendar-day-name">Lun</div>
-          <div class="calendar-day-name">Mar</div>
-          <div class="calendar-day-name">Mer</div>
-          <div class="calendar-day-name">Jeu</div>
-          <div class="calendar-day-name">Ven</div>
-          <div class="calendar-day-name">Sam</div>
-          <div class="calendar-day-name">Dim</div>
-        </div>
+      <h2 class="calendar-title mb-0" id="currentMonthYear" aria-live="polite">
+        Mois
+      </h2>
 
-        <!-- Jours du calendrier -->
-        <div class="calendar-body" id="calendarDays">
-          <!-- Les jours seront injectés dynamiquement -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Légende -->
-    <div class="mt-4 text-center">
       <div
-        class="d-inline-flex align-items-center gap-3 flex-wrap justify-content-center"
+        class="btn-group calendar-view-switch"
+        role="group"
+        aria-label="Mode d'affichage"
       >
-        <div class="d-flex align-items-center gap-2">
-          <div
-            class="legend-box"
-            style="
-              background-color: var(--color-primary);
-              width: 20px;
-              height: 20px;
-              border-radius: 4px;
-            "
-          ></div>
-          <span>Jour avec événement(s)</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div
-            class="legend-box"
-            style="
-              background-color: #e9ecef;
-              width: 20px;
-              height: 20px;
-              border-radius: 4px;
-            "
-          ></div>
-          <span>Jour sans événement</span>
-        </div>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          id="viewGridBtn"
+          aria-pressed="true"
+        >
+          <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Mois
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          id="viewAgendaBtn"
+          aria-pressed="false"
+        >
+          <i class="bi bi-list-ul me-1" aria-hidden="true"></i>Agenda
+        </button>
       </div>
     </div>
+
+    <!-- Résumé du mois et prochain événement -->
+    <div class="calendar-summary mb-3">
+      <span id="calendarSummary" class="text-muted"></span>
+      <button
+        type="button"
+        class="btn btn-link btn-sm p-0 d-none"
+        id="nextEventBtn"
+      ></button>
+    </div>
+
+    <!-- Catégories : légende et filtre à la fois -->
+    <div
+      class="calendar-legend mb-3"
+      id="calendarLegend"
+      role="group"
+      aria-label="Filtrer par catégorie"
+    ></div>
+
+    <!-- Vue mensuelle -->
+    <div class="calendar-container calendar-fade" id="calendarGridView">
+      <div class="calendar-header" aria-hidden="true">
+        <div class="calendar-day-name">Lun</div>
+        <div class="calendar-day-name">Mar</div>
+        <div class="calendar-day-name">Mer</div>
+        <div class="calendar-day-name">Jeu</div>
+        <div class="calendar-day-name">Ven</div>
+        <div class="calendar-day-name">Sam</div>
+        <div class="calendar-day-name">Dim</div>
+      </div>
+      <div class="calendar-body" id="calendarDays"></div>
+    </div>
+
+    <!-- Vue agenda (liste par jour) -->
+    <div class="calendar-agenda calendar-fade d-none" id="calendarAgendaView"></div>
 
     <!-- Bouton retour -->
     <div class="text-center mt-5">
       <a href="./" data-link class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Retour aux événements
+        <i class="bi bi-arrow-left me-2" aria-hidden="true"></i>Retour aux événements
       </a>
     </div>
   </div>
 </template>
 
-<!-- Modal pour afficher les événements d'un jour -->
+<!-- Fenêtre des événements d'un jour -->
 <template id="dayEventsModal">
   <div
     class="modal fade"
@@ -100,13 +121,11 @@
             type="button"
             class="btn-close"
             data-bs-dismiss="modal"
-            aria-label="Close"
+            aria-label="Fermer"
           ></button>
         </div>
         <div class="modal-body">
-          <div id="modalEventsList">
-            <!-- Les événements seront injectés ici -->
-          </div>
+          <div id="modalEventsList"></div>
         </div>
         <div class="modal-footer">
           <button
