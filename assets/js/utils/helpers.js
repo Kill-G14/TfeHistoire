@@ -160,14 +160,16 @@ export const helpers = {
   },
 
   // Construire l'URL de l'image à partir du nom de fichier
-  getImageUrl(imageName) {
+  getImageUrl(imageName, width = null) {
     // Image par défaut : le logo, seul visuel présent dans le dépôt (même chemin relatif que le header)
-    if (!imageName) return "./assets/images/MemoriaEventiaLogo.png";
+    if (!imageName) return "./assets/images/MemoriaEventiaLogo-480.png";
     // Importer config dynamiquement ou utiliser une variable globale
     const apiUrl =
       window.__APP_CONFIG__?.API_URL ||
       "https://memoriaeventia.com/BackEnd/Api";
-    return `${apiUrl}/imageApi.php?name=${encodeURIComponent(imageName)}`;
+    // width : miniature générée par le serveur (480 ou 960), absente = image d'origine
+    const widthParameter = width ? `&w=${width}` : "";
+    return `${apiUrl}/imageApi.php?name=${encodeURIComponent(imageName)}${widthParameter}`;
   },
 
   // Transformer un événement pour ajouter l'URL de l'image et les infos de capacité
@@ -175,6 +177,8 @@ export const helpers = {
     return {
       ...event,
       image: this.getImageUrl(event.image_event),
+      // Version réduite pour les cartes (liste d'accueil, carte, calendrier)
+      thumbnail: this.getImageUrl(event.image_event, 480),
       price: Number(event.price) || 0,
       quantity: event.ticket_quantity || 0,
       availableTickets: event.ticket_quantity || 0,

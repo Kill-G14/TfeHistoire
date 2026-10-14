@@ -98,7 +98,7 @@ export async function renderEventCards(
     const btnFavorite = clone.querySelector(".btn-favorite");
 
     if (img) {
-      img.src = event.image;
+      img.src = event.thumbnail || event.image;
       img.alt = event.title;
     }
     if (category) category.textContent = event.category;

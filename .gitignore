@@ -46,6 +46,7 @@ desktop.ini
 *~
 
 # Images uploadées (garder le dossier mais pas les fichiers)
+/BackEnd/storage/thumbnails/
 /BackEnd/storage/images/*
 !/BackEnd/storage/images/.gitkeep
 /BackEnd/Src/img/*
